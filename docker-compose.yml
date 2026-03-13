@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: card_game_db
+    environment:
+      POSTGRES_DB: wob_basic_db
+      POSTGRES_USER: umangmathur
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: card_game_server
+    environment:
+      DB_HOST: db
+    ports:
+      - "1729:1729"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

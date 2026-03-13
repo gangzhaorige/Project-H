@@ -1,0 +1,12 @@
+[
+  { "id": 0, "name": "Imbibitor Lunae", "pathId": 0, "element": "Imaginary" },
+  { "id": 1, "name": "Himeko", "pathId": 2, "element": "Fire" },
+  { "id": 2, "name": "Kafka", "pathId": 4, "element": "Lightning" },
+  { "id": 3, "name": "Bronya", "pathId": 3, "element": "Wind" },
+  { "id": 4, "name": "Clara", "pathId": 0, "element": "Physical" },
+  { "id": 5, "name": "Jing Yuan", "pathId": 2, "element": "Lightning" },
+  { "id": 6, "name": "Sparkle", "pathId": 3, "element": "Quantum" },
+  { "id": 7, "name": "Welt", "pathId": 4, "element": "Imaginary" },
+  { "id": 8, "name": "Jade", "pathId": 2, "element": "Quantum" },
+  { "id": 9, "name": "Jing Liu", "pathId": 0, "element": "Ice" }
+]

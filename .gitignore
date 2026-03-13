@@ -1,0 +1,61 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build results
+*.app/
+client_BurstDebugInformation_DoNotShip/
+
+# Unity
+/[Cc]lient/Library/
+/[Cc]lient/Temp/
+/[Cc]lient/Obj/
+/[Cc]lient/Logs/
+/[Cc]lient/UserSettings/
+/[Cc]lient/MemoryCaptures/
+/[Cc]lient/Build/
+/[Cc]lient/Builds/
+/[Cc]lient/Packages/manifest-lock.json
+/[Cc]lient/Assets/AssetStoreTools*
+
+# Visual Studio / VS Code
+.vscode/
+/[Cc]lient/Assembly-CSharp.csproj
+/[Cc]lient/Assembly-CSharp-Editor.csproj
+/[Cc]lient/client.slnx
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.IDB
+*.BSL
+*.lnk
+*.apk
+*.unitypackage
+
+# Java / Maven
+/[Ss]erver/target/
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+.mvn/

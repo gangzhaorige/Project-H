@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Start.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Login.unity
+    guid: 341337580650b45808547e6b9856636b
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: 79b294cb64f8c446dbffeae0b11a2d52
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
+    guid: 3c0d6b27ae78e4c948a8f8c901bacb37
+  - enabled: 1
+    path: Assets/Scenes/Reconnect.unity
+    guid: 4427a7162b32d46c6bec35b21a34106d
+  - enabled: 1
+    path: Assets/Scenes/ChampSelect.unity
+    guid: fee677044956645de8c91b9540966b3d
+  m_configObjects:
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_UseUCBPForAssetBundles: 0
