@@ -16,6 +16,7 @@ public class PlayerSetupInfo {
     public int PlayerId;
     public string Username;
     public int Team;
+    public int PlayerIndex;
     public ChampionSetupInfo Champion;
 }
 
@@ -43,6 +44,7 @@ public class ResponseGameSetup : BaseNetworkResponse {
             player.PlayerId = DataReader.ReadInt(DataStream);
             player.Username = DataReader.ReadString(DataStream);
             player.Team = DataReader.ReadInt(DataStream);
+            player.PlayerIndex = DataReader.ReadInt(DataStream);
 
             int champId = DataReader.ReadInt(DataStream);
             if (champId != -1) {

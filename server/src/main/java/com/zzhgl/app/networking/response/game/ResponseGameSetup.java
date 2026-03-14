@@ -27,11 +27,12 @@ public class ResponseGameSetup extends GameResponse {
         packet.addString(""); // Add empty message
         
         packet.addShort16((short) players.size());
-        System.out.println("---------------- ---------------" + players.size());
+        int index = 0;
         for (Player player : players) {
             packet.addInt32(player.getID());
             packet.addString(player.getUsername());
             packet.addInt32(player.getTeam());
+            packet.addInt32(index++);
             
             Champion champ = player.getSelectedChampion();
             if (champ != null) {

@@ -66,7 +66,10 @@ public class PreGameState implements GameState {
         }
     }
 
-    private void sendSetupToAll(GameManager game) {
+    private synchronized void sendSetupToAll(GameManager game) {
+        if (currentPhase != Phase.WAITING_FOR_SETUP) return;
+        cancelTimer();
+
         currentPhase = Phase.WAITING_FOR_READY;
         Log.printf("Broadcasting ResponseGameSetup to all players.");
         
@@ -81,7 +84,10 @@ public class PreGameState implements GameState {
         }, HANDSHAKE_TIMEOUT);
     }
 
-    private void startGameplay(GameManager game) {
+    private synchronized void startGameplay(GameManager game) {
+        if (currentPhase != Phase.WAITING_FOR_READY) return;
+        cancelTimer();
+
         Log.printf("All players ready or timeout reached. Starting game!");
         game.setState(new GameplayState());
     }

@@ -12,7 +12,7 @@ public class ChampionSetup : MonoBehaviour
         new Vector3(-17.42f, 0.1f, -8.96f),
         new Vector3(17.35f, 0.1f, 0.13f),
         new Vector3(11.36f, 0.1f, 8.98f),
-        new Vector3(0.16f, 0.1f, 0.96f),
+        new Vector3(0.5f, 0.1f, 8.83f),
         new Vector3(-10.41f, 0.1f, 8.96f),
         new Vector3(-17.49f, 0.1f, 0.21f)
     };
@@ -25,10 +25,36 @@ public class ChampionSetup : MonoBehaviour
             return;
         }
 
+        // 1. Find the local player's index in the server-provided list
+        int localPlayerServerIndex = -1;
+        foreach (var p in players)
+        {
+            if (p.PlayerId == Constants.USER_ID)
+            {
+                localPlayerServerIndex = p.PlayerIndex;
+                break;
+            }
+        }
+
+        if (localPlayerServerIndex == -1)
+        {
+            Debug.LogWarning("Local player not found in setup list. Defaulting to index 0.");
+            localPlayerServerIndex = 0;
+        }
+
+        int totalPlayers = players.Count;
+
         for (int i = 0; i < players.Count; i++)
         {
             var info = players[i];
-            Debug.Log($"Processing player {info.Username} (ID: {info.PlayerId})");
+            
+            // 2. Calculate the "visual index" relative to the local player
+            // Formula: (targetIndex - localIndex + totalPlayers) % totalPlayers
+            // This ensures local player is always index 0, and others follow clockwise
+            int visualIndex = (info.PlayerIndex - localPlayerServerIndex + totalPlayers) % totalPlayers;
+
+            Debug.Log($"Processing player {info.Username} (ServerIdx: {info.PlayerIndex}, VisualIdx: {visualIndex})");
+            
             // Store data in Session
             PlayerData data = new PlayerData
             {
@@ -39,7 +65,7 @@ public class ChampionSetup : MonoBehaviour
 
             if (info.Champion != null)
             {
-                Debug.Log($"Spawning champion {info.Champion.ChampionName} for {info.Username}");
+                Debug.Log($"Spawning champion {info.Champion.ChampionName} for {info.Username} at VisualIdx {visualIndex}");
                 data.Champion = new ChampionData
                 {
                     Id = info.Champion.ChampionId,
@@ -52,8 +78,8 @@ public class ChampionSetup : MonoBehaviour
                     AttackRange = info.Champion.AttackRange
                 };
 
-                // Spawn the object at the fixed position based on index
-                Vector3 position = (i < spawnPositions.Length) ? spawnPositions[i] : Vector3.zero;
+                // Spawn at the position corresponding to the visual index
+                Vector3 position = (visualIndex < spawnPositions.Length) ? spawnPositions[visualIndex] : Vector3.zero;
                 Debug.Log($"Instantiating at {position}");
 
                 GameObject go = Instantiate(championPrefab, position, championPrefab.transform.rotation);

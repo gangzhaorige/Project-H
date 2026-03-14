@@ -62,7 +62,6 @@ public class ChampionSelectState implements GameState {
                            readyCmd.getPlayerId(), readyPlayers.size(), game.getPlayers().size());
                 
                 if (readyPlayers.size() >= game.getPlayers().size()) {
-                    cancelTimer();
                     startSelectionPhase(game);
                 }
             }
@@ -88,7 +87,10 @@ public class ChampionSelectState implements GameState {
         }
     }
 
-    private void startSelectionPhase(GameManager game) {
+    private synchronized void startSelectionPhase(GameManager game) {
+        if (currentPhase != Phase.WAITING_FOR_READY) return;
+        cancelTimer();
+
         currentPhase = Phase.SELECTING;
         game.setActivePlayerIndex(0);
         Log.printf("Assigning teams and starting champion selection.");
@@ -120,7 +122,13 @@ public class ChampionSelectState implements GameState {
         }, SELECTION_TIMEOUT_SECONDS);
     }
 
-    private void processPick(GameManager game, Player player, int championId) {
+    private synchronized void processPick(GameManager game, Player player, int championId) {
+        if (currentPhase != Phase.SELECTING) return;
+        
+        // Ensure this is actually the turn of the player picking
+        Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
+        if (player.getID() != activePlayer.getID()) return;
+
         cancelTimer();
         Champion champion = ChampionFactory.getInstance().createChampion(championId);
         player.setSelectedChampion(champion);
@@ -148,7 +156,7 @@ public class ChampionSelectState implements GameState {
     }
 
     private void assignTeams(GameManager game) {
-        List<Player> players = new ArrayList<>(game.getPlayers());
+        List<Player> players = game.getPlayers();
         Collections.shuffle(players);
 
         // Circular alternating teams: Blue, Red, Blue, Red...
@@ -160,14 +168,14 @@ public class ChampionSelectState implements GameState {
         }
     }
 
-    private void assignRandomChampion(GameManager game) {
-        synchronized (this) {
-            Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
-            if (activePlayer.getSelectedChampion() == null && !availableChampions.isEmpty()) {
-                int randomIndex = new Random().nextInt(availableChampions.size());
-                int randomChampion = availableChampions.get(randomIndex);
-                processPick(game, activePlayer, randomChampion);
-            }
+    private synchronized void assignRandomChampion(GameManager game) {
+        if (currentPhase != Phase.SELECTING) return;
+
+        Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
+        if (activePlayer.getSelectedChampion() == null && !availableChampions.isEmpty()) {
+            int randomIndex = new Random().nextInt(availableChampions.size());
+            int randomChampion = availableChampions.get(randomIndex);
+            processPick(game, activePlayer, randomChampion);
         }
     }
 
