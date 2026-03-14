@@ -13,15 +13,14 @@ public abstract class BaseNetworkResponse : NetworkResponse {
     
     public short GetStatus() { return status; }
     public string GetMessage() { return message; }
-    
     public override sealed void Parse() {
         // Always read status and message first (from GameResponse base class)
         status = DataReader.ReadShort(DataStream);
         message = DataReader.ReadString(DataStream);
-        
+
         if(Response_id != Constants.SMSG_HEARTBEAT)
         Debug.Log($"{GetType().Name} - Status: {status}, Message: {message}");
-        
+
         // Only continue parsing if status is 0 (success) or if derived class handles errors
         if (status == 0 || ShouldParseOnError()) {
             ParseResponseData();

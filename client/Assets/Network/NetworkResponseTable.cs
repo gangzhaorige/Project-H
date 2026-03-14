@@ -20,6 +20,7 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_CHAMPION_SELECT_COMPLETED, "ResponseChampionSelectCompleted");
 		Add(Constants.SMSG_CHAMPION_SELECT_READY, "ResponseChampionSelectReady");
 		Add(Constants.SMSG_START_CHAMPION_SELECTION, "ResponseStartChampionSelection");
+		Add(Constants.SMSG_GAME_SETUP, "ResponseGameSetup");
 		Add(Constants.SMSG_CARD_DRAW, "ResponseDrawCard");
 		Add(Constants.SMSG_PLAY_CARD, "ResponsePlayCard");
 		Add(Constants.SMSG_END_TURN, "ResponseEndTurn");
@@ -35,7 +36,6 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_STATE_CHANGE, "ResponseStateChange");
 		Add(Constants.SMSG_UPDATE_ATTACK, "ResponseUpdateAttack");
 		Add(Constants.SMSG_ADD_CARD, "ResponseAddCard");
-		Add(Constants.SMSG_UPDATE_PLAYERS_POSITION, "ResponseUpdatePlayerPosition");
 		Add(Constants.SMSG_DISCARD_CARDS, "ResponseDiscardCards");
 		Add(Constants.SMSG_CHANGE_JUDGEMENT, "ResponseChangeJudgement");
 		Add(Constants.SMSG_SWAP_JUDGEMENT, "ResponseSwapJudgement");

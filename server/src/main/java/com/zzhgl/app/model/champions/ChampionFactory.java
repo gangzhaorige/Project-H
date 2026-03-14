@@ -33,7 +33,7 @@ public class ChampionFactory {
 
     private void loadChampions() {
         try {
-            InputStream is = getClass().getResourceAsStream("/com/zzhgl/app/resources/champions.json");
+            InputStream is = getClass().getResourceAsStream("/champions.json");
             if (is == null) {
                 Log.printf("Error: champions.json not found!");
                 return;
@@ -66,6 +66,7 @@ public class ChampionFactory {
         newChamp.setElement(prototype.getElement());
         newChamp.setMaxHP(prototype.getMaxHP());
         newChamp.setCurHP(prototype.getMaxHP());
+        newChamp.setAttack(prototype.getAttack());
         newChamp.setAttackRange(prototype.getAttackRange());
         newChamp.setSpecialRange(prototype.getSpecialRange());
         newChamp.setMaxNumOfAttack(prototype.getMaxNumOfAttack());

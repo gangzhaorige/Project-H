@@ -61,6 +61,7 @@ public class Constants {
     public final static short SMSG_CHAMPION_SELECT_COMPLETED = 404;
     public final static short SMSG_START_CHAMPION_SELECTION = 405;
     public final static short SMSG_CHAMPION_SELECT_READY = 407;
+    public final static short SMSG_GAME_SETUP = 408;
 
     // Card System
     public final static short SMSG_CARD_DRAW = 410;
@@ -92,6 +93,8 @@ public class Constants {
     public final static short SMSG_UPDATE_ATTACK = 445;
 
     public final static short CMSG_CONFIRMATION = 350;
+    public final static short CMSG_READY_FOR_GAME_SETUP = 351;
+    public final static short CMSG_READY_TO_PLAY = 352;
 
     // --- Other ---
     public static final float BIOMASS_SCALE = 1000;

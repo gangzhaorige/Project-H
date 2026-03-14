@@ -10,6 +10,7 @@ public class Champion {
     private String element;
     private int curHP;
     private int maxHP;
+    private int attack = 1;
     private int attackRange = 1;
     private int specialRange = 1;
     private int curNumOfAttack;
@@ -45,6 +46,9 @@ public class Champion {
 
     public int getMaxHP() { return maxHP; }
     public void setMaxHP(int maxHP) { this.maxHP = maxHP; }
+
+    public int getAttack() { return attack; }
+    public void setAttack(int attack) { this.attack = attack; }
 
     public int getAttackRange() { return attackRange; }
     public void setAttackRange(int attackRange) { this.attackRange = attackRange; }

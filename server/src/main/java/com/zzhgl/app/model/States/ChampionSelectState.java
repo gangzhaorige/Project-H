@@ -142,8 +142,8 @@ public class ChampionSelectState implements GameState {
         } else {
             Log.printf("All players have selected champions.");
             broadcast(game, new ResponseChampionSelectCompleted());
-            // Transition to next state when ready
-            // game.setState(new PlayState());
+            // Transition to handshake state
+            game.setState(new PreGameState());
         }
     }
 

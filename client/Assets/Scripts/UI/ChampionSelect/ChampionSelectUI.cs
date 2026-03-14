@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class ChampionSelectUI : MonoBehaviour
 {
@@ -113,8 +114,8 @@ public class ChampionSelectUI : MonoBehaviour
 
     private Sprite GetChampionPortrait(int championId)
     {
-        Sprite s = Resources.Load<Sprite>($"Images/Characters/Portraits/{championId}");
-        if (s == null) s = Resources.Load<Sprite>("Images/Characters/Portraits/default");
+        Sprite s = Resources.Load<Sprite>($"Images/Characters/Portraits/ChampSelect/{championId}");
+        if (s == null) s = Resources.Load<Sprite>("Images/Characters/Portraits/ChampSelect/default");
         return s;
     }
 
@@ -314,8 +315,16 @@ private void OnPlayerPick(ExtendedEventArgs args)
         {
             timerText.text = "0";
         }
-        statusText.text = "Champion Selection Completed!";
+        statusText.text = "Champion Selection Completed! Loading game...";
         confirmButton.gameObject.SetActive(false);
+
+        // Load Game scene after a short delay
+        Invoke("LoadGameScene", 2.0f);
+    }
+
+    private void LoadGameScene()
+    {
+        SceneManager.LoadScene("Game");
     }
 
     private void UpdateInteractivity()

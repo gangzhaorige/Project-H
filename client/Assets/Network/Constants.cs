@@ -61,6 +61,7 @@ public class Constants {
     public static readonly short SMSG_CHAMPION_SELECT_COMPLETED = 404;
     public static readonly short SMSG_START_CHAMPION_SELECTION = 405;
     public static readonly short SMSG_CHAMPION_SELECT_READY = 407;
+    public static readonly short SMSG_GAME_SETUP = 408;
 
     // Card System
     public static readonly short SMSG_CARD_DRAW = 410;
@@ -92,6 +93,8 @@ public class Constants {
     public static readonly short SMSG_UPDATE_ATTACK = 445;
 
     public static readonly short CMSG_CONFIRMATION = 350;
+    public static readonly short CMSG_READY_FOR_GAME_SETUP = 351;
+    public static readonly short CMSG_READY_TO_PLAY = 352;
 
 	// Other
 	public static readonly short SUCCESS = 0;

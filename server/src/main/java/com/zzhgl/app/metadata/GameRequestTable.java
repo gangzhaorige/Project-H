@@ -30,11 +30,13 @@ public class GameRequestTable<T> {
         add(Constants.CMSG_LEAVE_ROOM, "RequestLeaveRoom", "room");
         add(Constants.CMSG_ALL_ROOMS, "RequestAllRooms", "room");
         add(Constants.CMSG_RECONNECT, "RequestReconnect", "authentication");
-        add(Constants.CMSG_GAME_START, "RequestStartGame", "game");
-        add(Constants.CMSG_END_GAME, "RequestEndGame", "game");
-        add(Constants.CMSG_READY_FOR_CHAMPION_SELECT, "RequestReadyForChampionSelect", "game");
-        add(Constants.CMSG_PICK_CHAMPION, "RequestPickChampion", "game");
-        add(Constants.CMSG_SELECT_CHAMPION, "RequestSelectChampion", "game");
+        add(Constants.CMSG_GAME_START, "RequestStartGame", "champSelect");
+        add(Constants.CMSG_END_GAME, "RequestEndGame", "champSelect");
+        add(Constants.CMSG_READY_FOR_CHAMPION_SELECT, "RequestReadyForChampionSelect", "champSelect");
+        add(Constants.CMSG_PICK_CHAMPION, "RequestPickChampion", "champSelect");
+        add(Constants.CMSG_SELECT_CHAMPION, "RequestSelectChampion", "champSelect");
+        add(Constants.CMSG_READY_FOR_GAME_SETUP, "RequestReadyForGameSetup", "game");
+        add(Constants.CMSG_READY_TO_PLAY, "RequestReadyToPlay", "game");
         // Matchmaking
     }
 
