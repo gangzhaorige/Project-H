@@ -5,10 +5,15 @@ import com.zzhgl.app.model.Command.ReadyForSetupCommand;
 import com.zzhgl.app.model.Command.ReadyToPlayCommand;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
+import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.networking.response.game.ResponseGameSetup;
+import com.zzhgl.app.networking.response.game.ResponseDrawCard;
+import com.zzhgl.app.networking.response.game.ResponseDrawCardOther;
 import com.zzhgl.app.utility.Log;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -88,7 +93,32 @@ public class PreGameState implements GameState {
         if (currentPhase != Phase.WAITING_FOR_READY) return;
         cancelTimer();
 
-        Log.printf("All players ready or timeout reached. Starting game!");
+        Log.printf("All players ready or timeout reached. Distributing starting hands.");
+        
+        // Give everyone 4 cards
+        for (Player p : game.getPlayers()) {
+            List<AbstractCard> drawn = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                AbstractCard card = game.getDrawPile().draw();
+                if (card != null) {
+                    p.getHand().addCard(card);
+                    drawn.add(card);
+                }
+            }
+            
+            // Send the actual cards to the player
+            p.addResponseForUpdate(new ResponseDrawCard(drawn));
+            
+            // Notify others that this player drew cards
+            ResponseDrawCardOther otherRes = new ResponseDrawCardOther(p.getID(), drawn.size());
+            for (Player recipient : game.getPlayers()) {
+                if (recipient.getID() != p.getID()) {
+                    recipient.addResponseForUpdate(otherRes);
+                }
+            }
+        }
+
+        Log.printf("Starting GameplayState.");
         game.setState(new GameplayState());
     }
 

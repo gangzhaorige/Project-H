@@ -23,6 +23,8 @@ public class GameplayManager : MonoBehaviour
 
         Debug.Log("[GameplayManager] Registering SMSG_GAME_SETUP callback.");
         NetworkManager.Instance.AddCallback(Constants.SMSG_GAME_SETUP, OnGameSetup);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_CARD_DRAW, OnCardDraw);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_CARD_DRAW_OTHER, OnCardDrawOther);
         
         // Handshake Step 1: Tell server we loaded the scene and are ready for data
         Debug.Log("[GameplayManager] Sending RequestReadyForGameSetup...");
@@ -36,6 +38,26 @@ public class GameplayManager : MonoBehaviour
         if (NetworkManager.Instance != null)
         {
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_GAME_SETUP);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_CARD_DRAW);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_CARD_DRAW_OTHER);
+        }
+    }
+
+    private void OnCardDraw(ExtendedEventArgs args)
+    {
+        ResponseDrawCardEventArgs res = args as ResponseDrawCardEventArgs;
+        if (res != null)
+        {
+            CardManager.Instance.HandleLocalDraw(res.Cards);
+        }
+    }
+
+    private void OnCardDrawOther(ExtendedEventArgs args)
+    {
+        ResponseDrawCardOtherEventArgs res = args as ResponseDrawCardOtherEventArgs;
+        if (res != null)
+        {
+            CardManager.Instance.HandleOtherDraw(res.PlayerId, res.CardCount);
         }
     }
 

@@ -65,6 +65,7 @@ public class Constants {
 
     // Card System
     public final static short SMSG_CARD_DRAW = 410;
+    public final static short SMSG_CARD_DRAW_OTHER = 415;
     public final static short CMSG_PLAY_CARD = 311;
     public final static short SMSG_PLAY_CARD = 411;
     public final static short SMSG_ADD_CARD = 412;

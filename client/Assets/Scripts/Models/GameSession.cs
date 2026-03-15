@@ -25,6 +25,7 @@ namespace ProjectH.Models
         public int Team;
         public ChampionData Champion;
         public GameObject ChampionObject; // Reference to the spawned prefab
+        public List<CardData> Hand = new List<CardData>();
     }
 
     public class GameSession

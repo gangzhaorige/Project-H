@@ -22,6 +22,7 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_START_CHAMPION_SELECTION, "ResponseStartChampionSelection");
 		Add(Constants.SMSG_GAME_SETUP, "ResponseGameSetup");
 		Add(Constants.SMSG_CARD_DRAW, "ResponseDrawCard");
+		Add(Constants.SMSG_CARD_DRAW_OTHER, "ResponseDrawCardOther");
 		Add(Constants.SMSG_PLAY_CARD, "ResponsePlayCard");
 		Add(Constants.SMSG_END_TURN, "ResponseEndTurn");
 		Add(Constants.SMSG_TURN_START, "ResponseTurnStart");
