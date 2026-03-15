@@ -3,7 +3,10 @@ package com.zzhgl.app.model.core;
 import com.zzhgl.app.model.Command.Command;
 import com.zzhgl.app.model.States.GameState;
 import com.zzhgl.app.model.cards.AbstractCard;
+import com.zzhgl.app.networking.response.game.ResponseDrawCard;
+import com.zzhgl.app.networking.response.game.ResponseDrawCardOther;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +51,33 @@ public class GameManager {
 
     public Pile getDiscardPile() {
         return discardPile;
+    }
+
+    /**
+     * Draws a specified number of cards for a player and notifies everyone.
+     */
+    public void drawCards(Player player, int count) {
+        List<AbstractCard> drawn = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            AbstractCard card = drawPile.draw();
+            if (card != null) {
+                player.getHand().addCard(card);
+                drawn.add(card);
+            }
+        }
+
+        if (drawn.isEmpty()) return;
+
+        // 1. Send the actual card data to the player
+        player.addResponseForUpdate(new ResponseDrawCard(drawn));
+
+        // 2. Notify all other players about the draw count
+        ResponseDrawCardOther otherRes = new ResponseDrawCardOther(player.getID(), drawn.size());
+        for (Player p : players) {
+            if (p.getID() != player.getID()) {
+                p.addResponseForUpdate(otherRes);
+            }
+        }
     }
 
     public void pushState(GameState newState) {

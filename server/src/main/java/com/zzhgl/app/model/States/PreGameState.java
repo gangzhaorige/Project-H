@@ -94,32 +94,13 @@ public class PreGameState implements GameState {
         cancelTimer();
 
         Log.printf("All players ready or timeout reached. Distributing starting hands.");
-        
+
         // Give everyone 4 cards
         for (Player p : game.getPlayers()) {
-            List<AbstractCard> drawn = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                AbstractCard card = game.getDrawPile().draw();
-                if (card != null) {
-                    p.getHand().addCard(card);
-                    drawn.add(card);
-                }
-            }
-            
-            // Send the actual cards to the player
-            p.addResponseForUpdate(new ResponseDrawCard(drawn));
-            
-            // Notify others that this player drew cards
-            ResponseDrawCardOther otherRes = new ResponseDrawCardOther(p.getID(), drawn.size());
-            for (Player recipient : game.getPlayers()) {
-                if (recipient.getID() != p.getID()) {
-                    recipient.addResponseForUpdate(otherRes);
-                }
-            }
+            game.drawCards(p, 4);
         }
 
-        Log.printf("Starting GameplayState.");
-        game.setState(new GameplayState());
+        Log.printf("Starting TurnState.");        game.setState(new TurnState());
     }
 
     private void startTimer(Runnable task, int seconds) {
