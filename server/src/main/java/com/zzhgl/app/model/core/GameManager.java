@@ -2,7 +2,11 @@ package com.zzhgl.app.model.core;
 
 import com.zzhgl.app.model.Command.Command;
 import com.zzhgl.app.model.States.GameState;
+import com.zzhgl.app.model.States.InteractionResolutionState;
+import com.zzhgl.app.model.States.SkillResolutionState;
 import com.zzhgl.app.model.cards.AbstractCard;
+import com.zzhgl.app.model.interactions.AbstractInteraction;
+import com.zzhgl.app.model.skills.AbstractSkill;
 import com.zzhgl.app.networking.response.game.ResponseDrawCard;
 import com.zzhgl.app.networking.response.game.ResponseDrawCardOther;
 import java.util.ArrayDeque;
@@ -32,7 +36,7 @@ public class GameManager {
         for (Player player : players) {
             this.playerMap.put(player.getID(), player);
         }
-        this.activePlayerIndex = 0;
+        this.activePlayerIndex = -1;
         this.turnCounter = 1;
         this.inGame = true;
         this.stateStack = new ArrayDeque<>();
@@ -78,6 +82,43 @@ public class GameManager {
                 p.addResponseForUpdate(otherRes);
             }
         }
+    }
+
+    /**
+     * Emits a game event and allows all champions to react sequentially.
+     */
+    public void emitEvent(GameEvent event) {
+        SkillResolutionState resolutionState = new SkillResolutionState();
+        int totalPlayers = players.size();
+        boolean hasSkills = false;
+        
+        // Loop through players starting from the active player
+        for (int i = 0; i < totalPlayers; i++) {
+            int index = (activePlayerIndex + i) % totalPlayers;
+            Player p = players.get(index);
+            
+            if (p.getSelectedChampion() != null) {
+                for (AbstractSkill skill : p.getSelectedChampion().getSkills()) {
+                    if (skill.canTrigger(this, event, p)) {
+                        resolutionState.addSkill(p, skill, event);
+                        hasSkills = true;
+                    }
+                }
+            }
+        }
+
+        // Only push if there are actually skills to resolve
+        if (hasSkills) {
+            pushState(resolutionState);
+        }
+    }
+
+    /**
+     * Resolves a list of interactions sequentially.
+     */
+    public void resolveInteractions(List<AbstractInteraction> interactions) {
+        if (interactions == null || interactions.isEmpty()) return;
+        pushState(new InteractionResolutionState(interactions));
     }
 
     public void pushState(GameState newState) {

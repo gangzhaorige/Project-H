@@ -1,12 +1,12 @@
 [
-    {"id": 0, "championName": "Imbibitor Lunae", "pathId": 0, "element": "Imaginary", "curHP": 10, "maxHP": 10, "attackRange": 1, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 1, "championName": "Himeko", "pathId": 2, "element": "Fire", "curHP": 8, "maxHP": 8, "attackRange": 1, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 2, "championName": "Kafka", "pathId": 4, "element": "Lightning", "curHP": 8, "maxHP": 8, "attackRange": 1, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 3, "championName": "Bronya", "pathId": 3, "element": "Wind", "curHP": 8, "maxHP": 8, "attackRange": 3, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 4, "championName": "Clara", "pathId": 0, "element": "Physical", "curHP": 10, "maxHP": 10, "attackRange": 1, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 5, "championName": "Jing Yuan", "pathId": 2, "element": "Lightning", "curHP": 10, "maxHP": 10, "attackRange": 1, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 6, "championName": "Sparkle", "pathId": 3, "element": "Quantum", "curHP": 8, "maxHP": 8, "attackRange": 3, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 7, "championName": "Welt", "pathId": 4, "element": "Imaginary", "curHP": 8, "maxHP": 8, "attackRange": 1, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 8, "championName": "Jade", "pathId": 2, "element": "Quantum", "curHP": 8, "maxHP": 8, "attackRange": 1, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1},
-    {"id": 9, "championName": "Jing Liu", "pathId": 0, "element": "Ice", "curHP": 10, "maxHP": 10, "attackRange": 1, "specialRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1}
+    {"id": 0, "championName": "Imbibitor Lunae", "pathId": 0, "element": "Imaginary", "curHP": 10, "maxHP": 10, "attack": 2, "attackRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": []},
+    {"id": 1, "championName": "Himeko", "pathId": 2, "element": "Fire", "curHP": 8, "maxHP": 8, "attack": 2, "attackRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": []},
+    {"id": 2, "championName": "Kafka", "pathId": 4, "element": "Lightning", "curHP": 8, "maxHP": 8, "attack": 2, "attackRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": []},
+    {"id": 3, "championName": "Bronya", "pathId": 3, "element": "Wind", "curHP": 8, "maxHP": 8, "attack": 1, "attackRange": 3, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": [1]},
+    {"id": 4, "championName": "Clara", "pathId": 0, "element": "Physical", "curHP": 10, "maxHP": 10, "attack": 2, "attackRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": []},
+    {"id": 5, "championName": "Jing Yuan", "pathId": 2, "element": "Lightning", "curHP": 10, "maxHP": 10, "attack": 2, "attackRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": [3]},
+    {"id": 6, "championName": "Sparkle", "pathId": 3, "element": "Quantum", "curHP": 8, "maxHP": 8, "attack": 1, "attackRange": 3, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": [2]},
+    {"id": 7, "championName": "Welt", "pathId": 4, "element": "Imaginary", "curHP": 8, "maxHP": 8, "attack": 2, "attackRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": []},
+    {"id": 8, "championName": "Jade", "pathId": 2, "element": "Quantum", "curHP": 8, "maxHP": 8, "attack": 2, "attackRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": []},
+    {"id": 9, "championName": "Jing Liu", "pathId": 0, "element": "Ice", "curHP": 10, "maxHP": 10, "attack": 2, "attackRange": 1, "curNumOfAttack": 0, "maxNumOfAttack": 1, "specialDefenseRange": 0, "maxTarget": 1, "skillIds": []}
 ]

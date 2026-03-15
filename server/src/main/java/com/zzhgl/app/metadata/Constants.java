@@ -86,12 +86,14 @@ public class Constants {
 
     // Skills/Judgement
     public final static short CMSG_ACTIVATE_SKILL = 340;
+    public final static short CMSG_SKILL_RESPONSE = 341;
     public final static short SMSG_SKILL_ACTIVATION = 440;
     public final static short SMSG_JUDGE = 441;
     public final static short SMSG_CHANGE_JUDGEMENT = 442;
     public final static short SMSG_SWAP_JUDGEMENT = 443;
     public final static short SMSG_SHOW_TARGET_HAND = 444;
     public final static short SMSG_UPDATE_ATTACK = 445;
+    public final static short SMSG_SKILL_QUERY = 446;
 
     public final static short CMSG_CONFIRMATION = 350;
     public final static short CMSG_READY_FOR_GAME_SETUP = 351;

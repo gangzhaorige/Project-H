@@ -12,6 +12,10 @@ public class GameplayManager : MonoBehaviour
     [Header("Components")]
     public ChampionSetup championSetup;
 
+    [Header("Turn UI")]
+    public Button endTurnButton;
+    public TextMeshProUGUI turnStatusText;
+
     void Start()
     {
         GameSession.Instance.Clear();
@@ -25,7 +29,14 @@ public class GameplayManager : MonoBehaviour
         NetworkManager.Instance.AddCallback(Constants.SMSG_GAME_SETUP, OnGameSetup);
         NetworkManager.Instance.AddCallback(Constants.SMSG_CARD_DRAW, OnCardDraw);
         NetworkManager.Instance.AddCallback(Constants.SMSG_CARD_DRAW_OTHER, OnCardDrawOther);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_TURN_START, OnTurnStart);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_END_TURN, OnTurnEnd);
         
+        if (endTurnButton != null) {
+            endTurnButton.onClick.AddListener(OnEndTurnClick);
+            endTurnButton.interactable = false;
+        }
+
         // Handshake Step 1: Tell server we loaded the scene and are ready for data
         Debug.Log("[GameplayManager] Sending RequestReadyForGameSetup...");
         RequestReadyForGameSetup setupReq = new RequestReadyForGameSetup();
@@ -40,6 +51,8 @@ public class GameplayManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_GAME_SETUP);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_CARD_DRAW);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_CARD_DRAW_OTHER);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_TURN_START);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_END_TURN);
         }
     }
 
@@ -58,6 +71,41 @@ public class GameplayManager : MonoBehaviour
         if (res != null)
         {
             CardManager.Instance.HandleOtherDraw(res.PlayerId, res.CardCount);
+        }
+    }
+
+    private void OnEndTurnClick()
+    {
+        Debug.Log("[GameplayManager] Sending RequestEndTurn...");
+        RequestEndTurn req = new RequestEndTurn();
+        req.Send();
+        NetworkManager.Instance.SendRequest(req);
+        
+        if (endTurnButton != null) endTurnButton.interactable = false;
+    }
+
+    private void OnTurnStart(ExtendedEventArgs args)
+    {
+        ResponseTurnStartEventArgs res = args as ResponseTurnStartEventArgs;
+        if (res == null) return;
+
+        bool isMyTurn = (res.ActivePlayerId == Constants.USER_ID);
+        Debug.Log($"[GameplayManager] Turn started for player {res.ActivePlayerId}. My turn: {isMyTurn}");
+        
+        if (turnStatusText != null) {
+            turnStatusText.text = isMyTurn ? "YOUR TURN" : $"PLAYER {res.ActivePlayerId} TURN";
+        }
+
+        if (endTurnButton != null) {
+            endTurnButton.interactable = isMyTurn;
+        }
+    }
+
+    private void OnTurnEnd(ExtendedEventArgs args)
+    {
+        ResponseEndTurnEventArgs res = args as ResponseEndTurnEventArgs;
+        if (res != null) {
+            Debug.Log($"[GameplayManager] Turn ended for player {res.EndedPlayerId}");
         }
     }
 

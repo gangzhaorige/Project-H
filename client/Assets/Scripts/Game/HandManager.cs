@@ -10,59 +10,103 @@ public class HandManager : MonoBehaviour
     [Header("UI Containers")]
     public RectTransform handPanel;
 
-    private Dictionary<int, GameObject> cardObjects = new Dictionary<int, GameObject>();
+    [Header("Components")]
+    public DynamicHandLayout layoutHandler;
+
+    private List<GameObject> orderedCards = new List<GameObject>();
+    private Dictionary<int, GameObject> cardMap = new Dictionary<int, GameObject>();
 
     /// <summary>
-    /// Adds a list of cards to the hand.
+    /// Predicts where a card will end up in world space given its index and future total count.
     /// </summary>
-    public void AddCards(List<CardData> newCards)
+    public Vector3 GetPredictiveWorldPosition(int index, int futureTotal)
     {
-        foreach (var card in newCards)
-        {
-            AddCard(card);
-        }
+        if (layoutHandler == null) return handPanel.position;
+        Vector3 local = layoutHandler.GetLocalPosition(index, futureTotal, handPanel.rect.width);
+        return handPanel.TransformPoint(local);
     }
 
     /// <summary>
-    /// Adds a single card to the hand UI.
+    /// Registers a card that has already been instantiated and animated.
     /// </summary>
-    public void AddCard(CardData data)
+    public void RegisterAnimatedCard(CardData data, GameObject cardGO)
     {
-        if (cardObjects.ContainsKey(data.Id)) return;
+        if (cardMap.ContainsKey(data.Id))
+        {
+            Destroy(cardGO);
+            return;
+        }
 
-        GameObject cardGO = Instantiate(cardPrefab, handPanel);
+        cardGO.transform.SetParent(handPanel, true);
         cardGO.name = $"Card_{data.Type}_{data.Id}";
         
         CardSetup setup = cardGO.GetComponent<CardSetup>();
-        if (setup != null)
-        {
-            setup.Init(data.Type, data.Suit, data.Value);
-        }
+        if (setup != null) setup.Init(data.Type, data.Suit, data.Value);
 
-        cardObjects.Add(data.Id, cardGO);
+        cardMap.Add(data.Id, cardGO);
+        orderedCards.Add(cardGO);
+        
+        // Re-organize to ensure all other cards are in their correct slots
+        ReorganizeHand();
     }
 
-    /// <summary>
-    /// Removes a card from the hand UI by its ID.
-    /// </summary>
     public void RemoveCard(int cardId)
     {
-        if (cardObjects.ContainsKey(cardId))
+        if (cardMap.TryGetValue(cardId, out GameObject go))
         {
-            Destroy(cardObjects[cardId]);
-            cardObjects.Remove(cardId);
+            orderedCards.Remove(go);
+            cardMap.Remove(cardId);
+            Destroy(go);
+            ReorganizeHand();
         }
     }
 
-    /// <summary>
-    /// Clears all cards from the hand UI.
-    /// </summary>
+    public void ReorganizeHand()
+    {
+        if (layoutHandler == null) return;
+
+        var targets = layoutHandler.GetCardTransforms(orderedCards.Count, handPanel.rect.width);
+
+        for (int i = 0; i < orderedCards.Count; i++)
+        {
+            if (orderedCards[i] != null)
+            {
+                // Note: Using a shorter duration for re-aligning existing cards
+                StartCoroutine(SmoothMove(orderedCards[i].transform, targets[i].pos, targets[i].rot, 0.2f));
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator SmoothMove(Transform tr, Vector3 targetLocalPos, Quaternion targetLocalRot, float duration)
+    {
+        Vector3 startPos = tr.localPosition;
+        Quaternion startRot = tr.localRotation;
+        float elapsed = 0;
+
+        while (elapsed < duration)
+        {
+            if (tr == null) yield break;
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            t = t * t * (3f - 2f * t); // Smooth step
+
+            tr.localPosition = Vector3.Lerp(startPos, targetLocalPos, t);
+            tr.localRotation = Quaternion.Slerp(startRot, targetLocalRot, t);
+            yield return null;
+        }
+
+        if (tr != null)
+        {
+            tr.localPosition = targetLocalPos;
+            tr.localRotation = targetLocalRot;
+        }
+    }
+
     public void ClearHand()
     {
-        foreach (var card in cardObjects.Values)
-        {
-            Destroy(card);
-        }
-        cardObjects.Clear();
+        StopAllCoroutines();
+        foreach (var card in cardMap.Values) Destroy(card);
+        cardMap.Clear();
+        orderedCards.Clear();
     }
 }

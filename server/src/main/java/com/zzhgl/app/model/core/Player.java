@@ -6,6 +6,9 @@ import java.util.Queue;
 import com.zzhgl.app.core.GameClient;
 import com.zzhgl.app.networking.response.GameResponse;
 import com.zzhgl.app.model.champions.Champion;
+import com.zzhgl.app.model.skills.DrawOnDamageSkill;
+import com.zzhgl.app.model.skills.DrawTwoOnTurnBeginSkill;
+import com.zzhgl.app.model.skills.DrawOnLastCardSkill;
 
 /**
  * The Player class holds important information about the player including, most

@@ -1,5 +1,9 @@
 package com.zzhgl.app.model.champions;
 
+import com.zzhgl.app.model.skills.AbstractSkill;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The Champion class represents a game character with various combat attributes.
  */
@@ -17,6 +21,8 @@ public class Champion {
     private int maxNumOfAttack = 1;
     private int specialDefenseRange = 0;
     private int maxTarget = 1;
+    private List<AbstractSkill> skills = new ArrayList<>();
+    private List<Integer> skillIds = new ArrayList<>();
 
     public Champion() {}
 
@@ -67,4 +73,10 @@ public class Champion {
 
     public int getMaxTarget() { return maxTarget; }
     public void setMaxTarget(int maxTarget) { this.maxTarget = maxTarget; }
+
+    public List<AbstractSkill> getSkills() { return skills; }
+    public void addSkill(AbstractSkill skill) { this.skills.add(skill); }
+
+    public List<Integer> getSkillIds() { return skillIds; }
+    public void setSkillIds(List<Integer> skillIds) { this.skillIds = skillIds; }
 }

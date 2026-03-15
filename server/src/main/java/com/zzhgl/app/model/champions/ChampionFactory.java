@@ -2,6 +2,7 @@ package com.zzhgl.app.model.champions;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.zzhgl.app.model.skills.SkillFactory;
 import com.zzhgl.app.utility.Log;
 
 import java.io.InputStream;
@@ -73,6 +74,10 @@ public class ChampionFactory {
         newChamp.setCurNumOfAttack(0);
         newChamp.setSpecialDefenseRange(prototype.getSpecialDefenseRange());
         newChamp.setMaxTarget(prototype.getMaxTarget());
+        
+        // Add skills from SkillFactory
+        newChamp.setSkillIds(prototype.getSkillIds());
+        newChamp.getSkills().addAll(SkillFactory.getInstance().createSkills(prototype.getSkillIds()));
         
         return newChamp;
     }

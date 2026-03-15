@@ -1,17 +1,37 @@
 package com.zzhgl.app.model.skills;
 
+import com.zzhgl.app.model.core.GameEvent;
+import com.zzhgl.app.model.core.GameManager;
+import com.zzhgl.app.model.core.Player;
+
 /**
  * AbstractSkill represents a unique skill that can be possessed by a champion.
+ * Skills are now fully reactive to GameEvents.
  */
 public abstract class AbstractSkill {
     protected int id;
     protected String name;
+    protected boolean isOptional;
 
-    public AbstractSkill(int id, String name) {
+    public AbstractSkill(int id, String name, boolean isOptional) {
         this.id = id;
         this.name = name;
+        this.isOptional = isOptional;
     }
 
     public int getId() { return id; }
     public String getName() { return name; }
+    public boolean isOptional() { return isOptional; }
+
+    /**
+     * Checks if this this skill wants to react to the given event.
+     */
+    public abstract boolean canTrigger(GameManager game, GameEvent event, Player owner);
+
+    /**
+     * Executes the skill logic. 
+     * @param data Optional data from user response (e.g., target ID).
+     * @return true if fully resolved, false if it needs user input.
+     */
+    public abstract boolean execute(GameManager game, Player owner, GameEvent event, Object data);
 }

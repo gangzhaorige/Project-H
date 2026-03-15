@@ -1,6 +1,7 @@
 package com.zzhgl.app.model.States;
 
 import com.zzhgl.app.model.Command.Command;
+import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.utility.Log;
@@ -14,7 +15,10 @@ public class TurnBeginState implements GameState {
         Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
         Log.printf("Player %d is drawing cards.", activePlayer.getID());
 
-        // Draw 2 cards
+        // Emit TURN_BEGIN event. All reactive skills (like Beginning Wisdom) will be queued.
+        game.emitEvent(new GameEvent(GameEvent.EventType.TURN_BEGIN));
+
+        // Default: Draw 2 cards
         game.drawCards(activePlayer, 2);
 
         // Move to PlayActionState

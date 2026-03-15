@@ -1,6 +1,6 @@
 package com.zzhgl.app.model.cards;
 
-import com.zzhgl.app.model.interactions.Interaction;
+import com.zzhgl.app.model.interactions.AbstractInteraction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public abstract class AbstractNormalCard extends AbstractCard {
     /**
      * Plays the card and generates a list of interactions.
      */
-    public List<Interaction> play() {
+    public List<AbstractInteraction> play() {
         return new ArrayList<>(); // Empty for now
     }
 }
