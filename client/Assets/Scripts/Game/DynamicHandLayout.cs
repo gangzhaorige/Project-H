@@ -12,22 +12,6 @@ public class DynamicHandLayout : MonoBehaviour
     [Tooltip("Default spacing. Set equal to cardWidth for no gaps.")]
     public float cardSpacing = 200f;
 
-    private bool needsUpdate = false;
-
-    private void OnValidate()
-    {
-        needsUpdate = true;
-    }
-
-    private void Update()
-    {
-        if (needsUpdate)
-        {
-            if (handManager != null) handManager.ReorganizeHand();
-            needsUpdate = false;
-        }
-    }
-
     /// <summary>
     /// Calculates the local position for a card at a specific index within a total count.
     /// </summary>
@@ -35,11 +19,18 @@ public class DynamicHandLayout : MonoBehaviour
     {
         if (totalCount <= 0) return Vector3.zero;
 
+        // Use a fallback width if the panel hasn't initialized yet to prevent stacking at (0,0,0)
+        float effectiveWidth = panelWidth > 0 ? panelWidth : 1000f;
+
         // 1. Determine effective spacing (squeeze if hand exceeds panel width)
         float totalWidthRequired = (totalCount - 1) * cardSpacing + cardWidth;
-        float actualSpacing = (totalWidthRequired > panelWidth && totalCount > 1) 
-            ? (panelWidth - cardWidth) / (totalCount - 1) 
+        float actualSpacing = (totalWidthRequired > effectiveWidth && totalCount > 1) 
+            ? (effectiveWidth - cardWidth) / (totalCount - 1) 
             : cardSpacing;
+
+        // Prevent complete stacking: ensure cards are always offset by at least 15% of their width
+        float minSpacing = cardWidth * 0.15f;
+        actualSpacing = Mathf.Max(actualSpacing, minSpacing);
 
         // 2. Calculate centering offset
         float handWidth = (totalCount - 1) * actualSpacing;
