@@ -18,64 +18,91 @@ public class CardManager : MonoBehaviour
 
     [Header("Animation Settings")]
     public float drawAnimDuration = 0.5f;
-    public float cardSpacingOffset = 0.2f;
-
-    private int cardsCurrentlyDrawing = 0;
 
     private void Awake()
     {
         Instance = this;
     }
 
+    /// <summary>
+    /// Enqueues a local draw animation batch to the central controller.
+    /// </summary>
     public void HandleLocalDraw(List<CardData> newCards)
     {
-        int batchSize = newCards.Count;
-        int currentHandCount = GameSession.Instance.GetLocalPlayer().Hand.Count;
-        
-        for (int i = 0; i < batchSize; i++)
-        {
-            // Predict the final index this card will have in the hand
-            int finalIndex = currentHandCount + i;
-            int totalFutureCount = currentHandCount + batchSize;
-            
-            StartCoroutine(AnimateSingleLocalDraw(newCards[i], finalIndex, totalFutureCount));
-        }
+        AnimationController.Instance.AddAnimation(AnimateLocalDrawBatch(newCards));
     }
 
-    private IEnumerator AnimateSingleLocalDraw(CardData card, int finalIndex, int totalFutureCount)
-    {
-        // 1. Get the EXACT final world position from HandManager
-        Vector3 targetWorldPos = handManager.GetPredictiveWorldPosition(finalIndex, totalFutureCount);
-
-        // 2. Create the card at deck
-        GameObject animCard = Instantiate(cardPrefab, deckPosition.parent);
-        animCard.transform.position = deckPosition.position;
-        animCard.transform.rotation = deckPosition.rotation;
-        
-        // Initialize visuals immediately so it's not a white box during flight
-        CardSetup setup = animCard.GetComponent<CardSetup>();
-        if (setup != null) setup.Init(card.Type, card.Suit, card.Value);
-
-        // 3. Move directly to the final hand position
-        // We also trigger a reorganization of existing cards so they move out of the way
-        handManager.ReorganizeHand(); 
-        
-        yield return MoveCard(animCard.transform, targetWorldPos, drawAnimDuration);
-
-        // 4. Finalize
-        handManager.RegisterAnimatedCard(card, animCard);
-        GameSession.Instance.GetLocalPlayer().Hand.Add(card);
-    }
-
+    /// <summary>
+    /// Enqueues an animation batch for another player drawing cards.
+    /// </summary>
     public void HandleOtherDraw(int playerId, int cardCount)
     {
         if (GameSession.Instance.Players.TryGetValue(playerId, out PlayerData pData))
         {
-            for (int i = 0; i < cardCount; i++)
-            {
-                StartCoroutine(AnimateSingleOtherDraw(pData));
-            }
+            AnimationController.Instance.AddAnimation(AnimateOtherDrawBatch(pData, cardCount));
         }
+    }
+
+    // --- Private Animation Logic ---
+
+    private IEnumerator AnimateLocalDrawBatch(List<CardData> newCards)
+    {
+        int batchSize = newCards.Count;
+        int currentHandCount = GameSession.Instance.GetLocalPlayer().Hand.Count;
+        int totalFutureCount = currentHandCount + batchSize;
+
+        // 1. Instantly move existing cards to their new "spaced out" positions
+        handManager.ReorganizeHand(totalFutureCount);
+
+        // 2. Start all draw animations at once
+        List<Coroutine> batchRoutines = new List<Coroutine>();
+        for (int i = 0; i < batchSize; i++)
+        {
+            int finalIndex = currentHandCount + i;
+            batchRoutines.Add(StartCoroutine(AnimateSingleLocalDraw(newCards[i], finalIndex, totalFutureCount)));
+        }
+
+        // 3. Block the AnimationController queue until every card in this batch has landed
+        foreach (var routine in batchRoutines)
+        {
+            yield return routine;
+        }
+        
+        Debug.Log($"[CardManager] Local Draw Batch of {batchSize} completed.");
+    }
+
+    private IEnumerator AnimateSingleLocalDraw(CardData card, int finalIndex, int totalFutureCount)
+    {
+        Vector3 targetWorldPos = handManager.GetPredictiveWorldPosition(finalIndex, totalFutureCount);
+
+        GameObject animCard = Instantiate(cardPrefab, deckPosition.parent);
+        animCard.transform.position = deckPosition.position;
+        animCard.transform.rotation = deckPosition.rotation;
+        
+        CardSetup setup = animCard.GetComponent<CardSetup>();
+        if (setup != null) setup.Init(card.Type, card.Suit, card.Value);
+
+        yield return MoveCard(animCard.transform, targetWorldPos, drawAnimDuration);
+
+        // Finalize by giving the object to HandManager and updating local data
+        handManager.RegisterAnimatedCard(card, animCard);
+        GameSession.Instance.GetLocalPlayer().Hand.Add(card);
+    }
+
+    private IEnumerator AnimateOtherDrawBatch(PlayerData pData, int count)
+    {
+        List<Coroutine> batchRoutines = new List<Coroutine>();
+        for (int i = 0; i < count; i++)
+        {
+            batchRoutines.Add(StartCoroutine(AnimateSingleOtherDraw(pData)));
+        }
+
+        // Wait for all "other" cards to reach the player
+        foreach (var routine in batchRoutines)
+        {
+            yield return routine;
+        }
+        Debug.Log($"[CardManager] Other Draw Batch for {pData.Username} completed.");
     }
 
     private IEnumerator AnimateSingleOtherDraw(PlayerData pData)
@@ -83,19 +110,17 @@ public class CardManager : MonoBehaviour
         GameObject animCard = Instantiate(cardPrefab, deckPosition.parent);
         animCard.transform.position = deckPosition.position;
         
-        Vector3 targetPos = Vector3.zero;
-        if (pData.ChampionObject != null)
-        {
-            targetPos = pData.ChampionObject.transform.position;
-        }
+        Vector3 targetPos = (pData.ChampionObject != null) 
+            ? pData.ChampionObject.transform.position 
+            : Vector3.zero;
 
         yield return MoveCard(animCard.transform, targetPos, drawAnimDuration);
+        
         Destroy(animCard);
-
         pData.Hand.Add(new CardData { Id = -1 }); 
     }
 
-    private IEnumerator MoveCard(Transform cardTr, Vector3 targetPos, float duration)
+    public IEnumerator MoveCard(Transform cardTr, Vector3 targetPos, float duration)
     {
         Vector3 startPos = cardTr.position;
         float elapsed = 0;
@@ -103,8 +128,8 @@ public class CardManager : MonoBehaviour
         {
             if (cardTr == null) yield break;
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            t = t * t * (3f - 2f * t);
+            float t = Mathf.Clamp01(elapsed / duration);
+            t = t * t * (3f - 2f * t); // SmoothStep interpolation
             cardTr.position = Vector3.Lerp(startPos, targetPos, t);
             yield return null;
         }

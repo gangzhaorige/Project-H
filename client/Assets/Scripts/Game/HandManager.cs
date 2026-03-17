@@ -45,9 +45,6 @@ public class HandManager : MonoBehaviour
 
         cardMap.Add(data.Id, cardGO);
         orderedCards.Add(cardGO);
-        
-        // Re-organize to ensure all other cards are in their correct slots
-        ReorganizeHand();
     }
 
     public void RemoveCard(int cardId)
@@ -61,18 +58,18 @@ public class HandManager : MonoBehaviour
         }
     }
 
-    public void ReorganizeHand()
+    public void ReorganizeHand(int futureCount = -1)
     {
         if (layoutHandler == null) return;
 
-        var targets = layoutHandler.GetCardTransforms(orderedCards.Count, handPanel.rect.width);
+        int countToUse = (futureCount != -1) ? futureCount : orderedCards.Count;
+        var targets = layoutHandler.GetCardTransforms(countToUse, handPanel.rect.width);
 
         for (int i = 0; i < orderedCards.Count; i++)
         {
             if (orderedCards[i] != null)
             {
-                // Note: Using a shorter duration for re-aligning existing cards
-                StartCoroutine(SmoothMove(orderedCards[i].transform, targets[i].pos, targets[i].rot, 0.2f));
+                StartCoroutine(SmoothMove(orderedCards[i].transform, targets[i].pos, targets[i].rot, 0.3f));
             }
         }
     }
