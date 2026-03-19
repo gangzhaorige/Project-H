@@ -11,7 +11,7 @@ namespace ProjectH.Models
         public int MaxHP;
         public int CurHP;
         public int PathId;
-        public string Element;
+        public int Element;
         public int Attack;
         public int AttackRange;
         public int SpecialDefense;
@@ -70,10 +70,15 @@ namespace ProjectH.Models
 
         public string State = "";
 
+        public bool IsResponseRequired = false;
+        public string RequiredCardType = "";
+
         public void Clear()
         {
             Players.Clear();
             PlayerOrder.Clear();
+            IsResponseRequired = false;
+            RequiredCardType = "";
         }
 
         public PlayerData GetLocalPlayer()

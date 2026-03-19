@@ -1,5 +1,6 @@
 package com.zzhgl.app.model.champions;
 
+import com.google.gson.annotations.SerializedName;
 import com.zzhgl.app.model.skills.AbstractSkill;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +9,77 @@ import java.util.List;
  * The Champion class represents a game character with various combat attributes.
  */
 public class Champion {
+    // Stat IDs
+    public static final int STAT_CUR_HP = 1;
+    public static final int STAT_MAX_HP = 2;
+    public static final int STAT_ATTACK = 3;
+    public static final int STAT_ATTACK_RANGE = 4;
+    public static final int STAT_SPECIAL_RANGE = 5;
+    public static final int STAT_CUR_NUM_ATTACK = 6;
+    public static final int STAT_MAX_NUM_ATTACK = 7;
+    public static final int STAT_SPECIAL_DEFENSE_RANGE = 8;
+    public static final int STAT_MAX_TARGET = 9;
+    public static final int STAT_PATH_ID = 10;
+    public static final int STAT_ELEMENT = 11;
+
+    public enum Element {
+        @SerializedName("Physical") PHYSICAL(1),
+        @SerializedName("Fire") FIRE(2),
+        @SerializedName("Ice") ICE(3),
+        @SerializedName("Lightning") LIGHTNING(4),
+        @SerializedName("Wind") WIND(5),
+        @SerializedName("Quantum") QUANTUM(6),
+        @SerializedName("Imaginary") IMAGINARY(7);
+
+        private final int id;
+
+        Element(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Element fromId(int id) {
+            for (Element e : values()) {
+                if (e.id == id) return e;
+            }
+            return PHYSICAL;
+        }
+    }
+
+    public enum Path {
+        @SerializedName("Destruction") DESTRUCTION(0),
+        @SerializedName("Hunt") HUNT(1),
+        @SerializedName("Erudition") ERUDITION(2),
+        @SerializedName("Harmony") HARMONY(3),
+        @SerializedName("Nihility") NIHILITY(4),
+        @SerializedName("Preservation") PRESERVATION(5),
+        @SerializedName("Abundance") ABUNDANCE(6);
+
+        private final int id;
+
+        Path(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Path fromId(int id) {
+            for (Path p : values()) {
+                if (p.id == id) return p;
+            }
+            return DESTRUCTION;
+        }
+    }
+
     private int id;
     private String championName;
-    private int pathId;
-    private String element;
+    private Path path = Path.DESTRUCTION;
+    private Element element = Element.PHYSICAL;
     private int curHP;
     private int maxHP;
     private int attack = 1;
@@ -41,11 +109,11 @@ public class Champion {
     public String getChampionName() { return championName; }
     public void setChampionName(String championName) { this.championName = championName; }
 
-    public int getPathId() { return pathId; }
-    public void setPathId(int pathId) { this.pathId = pathId; }
+    public Path getPath() { return path; }
+    public void setPath(Path path) { this.path = path; }
 
-    public String getElement() { return element; }
-    public void setElement(String element) { this.element = element; }
+    public Element getElement() { return element; }
+    public void setElement(Element element) { this.element = element; }
 
     public int getCurHP() { return curHP; }
     public void setCurHP(int curHP) { this.curHP = curHP; }

@@ -2,6 +2,7 @@ package com.zzhgl.app.networking.request.authentication;
 
 import java.io.IOException;
 
+import com.zzhgl.app.core.GameServer;
 import com.zzhgl.app.metadata.Constants;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.model.core.Room;
@@ -26,7 +27,7 @@ public class RequestReconnect extends GameRequest {
         
         // If the client doesn't have a player yet, try to find one by token
         if (player == null) {
-            for (Player p : com.zzhgl.app.core.GameServer.getInstance().getActivePlayers()) {
+            for (Player p : GameServer.getInstance().getActivePlayers()) {
                 if (p.getUsername().equals(username) && token.equals(p.getSessionToken())) {
                     player = p;
                     // Associate the new socket with this player

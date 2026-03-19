@@ -9,7 +9,6 @@ public class PlayerReadyInfo {
 
 public class ResponseChampionSelectReadyEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public List<PlayerReadyInfo> Players { get; set; }
     public List<int> ChampionPool { get; set; }
 
@@ -49,7 +48,6 @@ public class ResponseChampionSelectReady : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseChampionSelectReadyEventArgs args = new ResponseChampionSelectReadyEventArgs();
         args.Status = status;
-        args.Message = message;
         args.Players = players;
         args.ChampionPool = championPool;
         return args;

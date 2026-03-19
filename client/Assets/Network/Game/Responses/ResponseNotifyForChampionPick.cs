@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 public class ResponseNotifyForChampionPickEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public int ActivePlayerId { get; set; }
     public int Timeout { get; set; }
 
@@ -28,7 +27,6 @@ public class ResponseNotifyForChampionPick : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseNotifyForChampionPickEventArgs args = new ResponseNotifyForChampionPickEventArgs();
         args.Status = status;
-        args.Message = message;
         args.ActivePlayerId = activePlayerId;
         args.Timeout = timeout;
         return args;

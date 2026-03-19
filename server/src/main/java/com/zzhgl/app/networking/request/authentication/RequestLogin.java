@@ -62,7 +62,6 @@ public class RequestLogin extends GameRequest {
             response.setPlayerId(activePlayer.getID());
             response.setUsername(username);
             response.setSessionToken(token);
-            response.setMessage("Login successful");
             
             com.zzhgl.app.model.core.Room room = activePlayer.getCurrentRoom();
             if (room != null) {
@@ -74,7 +73,6 @@ public class RequestLogin extends GameRequest {
             }
         } else {
             response.setStatus(Constants.AUTHENTICATION_FAILED);
-            response.setMessage("Invalid password");
         }
         
         responses.add(response);

@@ -19,7 +19,6 @@ public class ResponseTurnStart extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("Turn started for player " + activePlayerId);
         packet.addInt32(activePlayerId);
         return packet.getBytes();
     }

@@ -17,7 +17,6 @@ public class ResponseCreateRoom extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(status);
-        packet.addString(""); // Empty message
         if (status == Constants.SUCCESS) {
             packet.addString(roomId);
             packet.addString(roomName);

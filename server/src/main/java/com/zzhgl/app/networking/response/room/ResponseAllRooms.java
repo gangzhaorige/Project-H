@@ -18,7 +18,6 @@ public class ResponseAllRooms extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16((short)0); // Status
-        packet.addString(""); // Message
         
         if (rooms != null) {
             packet.addShort16((short) rooms.size());

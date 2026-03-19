@@ -50,7 +50,7 @@ public class DefendPromptState implements GameState {
         cancelTimer();
         
         for (Player p : game.getPlayers()) {
-            p.addResponseForUpdate(new ResponseTimerStart(defender.getID(), WINDOW_SECONDS, "Play " + requiredType + " to defend!"));
+            p.addResponseForUpdate(new ResponseTimerStart(defender.getID(), WINDOW_SECONDS, "Play " + requiredType + " to defend!", requiredType));
         }
 
         timerFuture = scheduler.schedule(() -> {

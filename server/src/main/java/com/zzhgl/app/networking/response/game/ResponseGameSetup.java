@@ -24,10 +24,8 @@ public class ResponseGameSetup extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString(""); // Add empty message
-        
-        packet.addShort16((short) players.size());
-        int index = 0;
+
+        packet.addShort16((short) players.size());        int index = 0;
         for (Player player : players) {
             packet.addInt32(player.getID());
             packet.addString(player.getUsername());
@@ -40,8 +38,8 @@ public class ResponseGameSetup extends GameResponse {
                 packet.addString(champ.getChampionName());
                 packet.addInt32(champ.getMaxHP());
                 packet.addInt32(champ.getCurHP());
-                packet.addInt32(champ.getPathId());
-                packet.addString(champ.getElement());
+                packet.addInt32(champ.getPath().getId());
+                packet.addInt32(champ.getElement().getId());
                 packet.addInt32(champ.getAttack());
                 packet.addInt32(champ.getAttackRange());
                 packet.addInt32(champ.getSpecialDefenseRange());

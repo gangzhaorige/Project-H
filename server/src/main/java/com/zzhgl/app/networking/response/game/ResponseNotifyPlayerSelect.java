@@ -18,7 +18,6 @@ public class ResponseNotifyPlayerSelect extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("Player is hovering a champion.");
         packet.addInt32(playerId);
         packet.addInt32(championId);
         return packet.getBytes();

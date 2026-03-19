@@ -63,7 +63,7 @@ public class ChampionFactory {
         Champion newChamp = new Champion();
         newChamp.setId(prototype.getId());
         newChamp.setChampionName(prototype.getChampionName());
-        newChamp.setPathId(prototype.getPathId());
+        newChamp.setPath(prototype.getPath());
         newChamp.setElement(prototype.getElement());
         newChamp.setMaxHP(prototype.getMaxHP());
         newChamp.setCurHP(prototype.getMaxHP());

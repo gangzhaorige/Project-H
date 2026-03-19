@@ -13,7 +13,7 @@ import com.zzhgl.app.networking.response.game.ResponsePlayCard;
 import com.zzhgl.app.networking.response.game.ResponseTimerCancel;
 import com.zzhgl.app.networking.response.game.ResponseTimerStart;
 import com.zzhgl.app.utility.Log;
-
+import com.zzhgl.app.model.cards.AbstractSpecialCard.SpecialType;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -52,8 +52,7 @@ public class NegationState implements GameState {
             Log.printf("No one else has Negate. Using hidden random timer: %d seconds.", duration);
         }
 
-        // Notify all players (-1) to pulse indicators as requested
-        broadcast(game, new ResponseTimerStart(-1, duration, "Any player can play NEGATE!"));
+        broadcast(game, new ResponseTimerStart(-1, duration, "Any player can play NEGATE!", SpecialType.NEGATE));
 
         timerFuture = scheduler.schedule(() -> {
             Log.printf("Negation window expired. Proceeding to resolution.");

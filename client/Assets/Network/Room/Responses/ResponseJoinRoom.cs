@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ResponseJoinRoomEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public string RoomId { get; set; }
     public string RoomName { get; set; }
 
@@ -29,7 +28,6 @@ public class ResponseJoinRoom : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseJoinRoomEventArgs args = new ResponseJoinRoomEventArgs();
         args.Status = status;
-        args.Message = message;
         args.RoomId = roomId;
         args.RoomName = roomName;
         

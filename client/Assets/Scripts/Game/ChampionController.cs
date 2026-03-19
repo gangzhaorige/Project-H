@@ -11,7 +11,7 @@ public class ChampionController : MonoBehaviour
     public int maxHP;
     public int curHP;
     public int pathId;
-    public string element;
+    public int element;
     public int attack;
     public int attackRange;
     public int specialDefense;
@@ -90,7 +90,7 @@ public class ChampionController : MonoBehaviour
 
         if (elementImageUI != null)
         {
-            elementImageUI.sprite = Resources.Load<Sprite>($"Images/Elements/{element}");
+            elementImageUI.sprite = Resources.Load<Sprite>($"Images/Elements/{GetElementName(element)}");
         }
 
         if (pathImageUI != null)
@@ -99,5 +99,20 @@ public class ChampionController : MonoBehaviour
         }
 
         Debug.Log($"Initialized {championName} UI with {curHP}/{maxHP} HP");
+    }
+
+    private string GetElementName(int elementId)
+    {
+        switch (elementId)
+        {
+            case 1: return "Physical";
+            case 2: return "Fire";
+            case 3: return "Ice";
+            case 4: return "Lightning";
+            case 5: return "Wind";
+            case 6: return "Quantum";
+            case 7: return "Imaginary";
+            default: return "Physical";
+        }
     }
 }

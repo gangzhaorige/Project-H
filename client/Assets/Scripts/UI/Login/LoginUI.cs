@@ -126,9 +126,7 @@ public class LoginUI : MonoBehaviour
                 if (statusText != null)
                 {
                     statusText.color = Color.red;
-                    statusText.text = "Login failed: " + args.Message;
                 }
-                Debug.LogWarning("Login failed: " + args.Message);
             }
         }
     }

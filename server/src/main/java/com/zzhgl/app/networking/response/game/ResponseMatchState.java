@@ -18,7 +18,6 @@ public class ResponseMatchState extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString(""); // empty message
         packet.addInt32(connectedPlayers);
         packet.addInt32(totalPlayers);
         return packet.getBytes();

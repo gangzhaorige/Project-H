@@ -16,7 +16,6 @@ public class ResponseGameState extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("");
         packet.addString(stateName); // The core data being broadcast
         return packet.getBytes();
     }

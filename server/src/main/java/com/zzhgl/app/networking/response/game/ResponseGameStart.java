@@ -14,7 +14,6 @@ public class ResponseGameStart extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("Game Started!");
         return packet.getBytes();
     }
 }

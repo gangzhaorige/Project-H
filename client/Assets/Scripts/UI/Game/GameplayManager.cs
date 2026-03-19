@@ -92,16 +92,21 @@ public class GameplayManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_STATE_CHANGE);
         }
     }
+private void OnTimerStart(ExtendedEventArgs args)
+{
+    ResponseTimerStartEventArgs res = args as ResponseTimerStartEventArgs;
+    if (res == null) return;
 
-    private void OnTimerStart(ExtendedEventArgs args)
-    {
-        ResponseTimerStartEventArgs res = args as ResponseTimerStartEventArgs;
-        if (res == null) return;
+    bool isNegationWindow = (res.PlayerId == -1);
+    bool isLocal = res.PlayerId == Constants.USER_ID;
 
-        bool isNegationWindow = (res.PlayerId == -1);
-        bool isLocal = res.PlayerId == Constants.USER_ID;
-        Debug.Log($"[GameplayManager] Timer start for player {res.PlayerId}. isLocal: {isLocal}, isNegationWindow: {isNegationWindow}, seconds: {res.Seconds}");
-        
+    GameSession.Instance.IsResponseRequired = true;
+    GameSession.Instance.RequiredCardType = res.RequiredCardType;
+
+    Debug.Log($"[GameplayManager] Timer start for player {res.PlayerId}. isLocal: {isLocal}, isNegationWindow: {isNegationWindow}, seconds: {res.Seconds}, RequiredType: {res.RequiredCardType}");
+
+    // ... (rest of method remains largely same, just adding above)
+
         // Update Indicator for everyone
         foreach (var player in GameSession.Instance.Players.Values)
         {
@@ -151,23 +156,30 @@ public class GameplayManager : MonoBehaviour
         req.Send();
         NetworkManager.Instance.SendRequest(req);
     }
+private void OnPassPriorityResponse(ExtendedEventArgs args)
+{
+    ResponsePassPriorityEventArgs res = args as ResponsePassPriorityEventArgs;
+    if (res == null) return;
 
-    private void OnPassPriorityResponse(ExtendedEventArgs args)
-    {
-        ResponsePassPriorityEventArgs res = args as ResponsePassPriorityEventArgs;
-        if (res == null) return;
+    GameSession.Instance.IsResponseRequired = false;
+    GameSession.Instance.RequiredCardType = "";
 
-        if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
-        if (timerSlider != null) timerSlider.gameObject.SetActive(false);
-        isTimerActive = false;
-    }
+    if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
+    if (timerSlider != null) timerSlider.gameObject.SetActive(false);
+    isTimerActive = false;
+}
 
-    private void OnTimerCancel(ExtendedEventArgs args)
-    {
-        isTimerActive = false;
-        if (timerSlider != null) timerSlider.gameObject.SetActive(false);
-        if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
-        if (instructionText != null) instructionText.text = "";
+private void OnTimerCancel(ExtendedEventArgs args)
+{
+    isTimerActive = false;
+    GameSession.Instance.IsResponseRequired = false;
+    GameSession.Instance.RequiredCardType = "";
+
+    if (timerSlider != null) timerSlider.gameObject.SetActive(false);
+    if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
+    if (instructionText != null) instructionText.text = "";
+
+    // ... rest of method
 
         // Clear all pulsing indicators
         foreach (var player in GameSession.Instance.Players.Values)

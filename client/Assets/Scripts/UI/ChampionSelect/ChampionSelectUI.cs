@@ -36,8 +36,8 @@ public class ChampionSelectUI : MonoBehaviour
     public class ChampionData
     {
         public int id;
-        public string name;
-        public int pathId;
+        public string championName;
+        public string path;
         public string element;
     }
 
@@ -99,7 +99,7 @@ public class ChampionSelectUI : MonoBehaviour
             ChampionList data = JsonUtility.FromJson<ChampionList>(fixedJson);
             foreach (var champ in data.champions)
             {
-                championNames[champ.id] = champ.name;
+                championNames[champ.id] = champ.championName;
                 championInfo[champ.id] = champ;
             }
         }
@@ -119,8 +119,19 @@ public class ChampionSelectUI : MonoBehaviour
         return s;
     }
 
-    private Sprite GetPathIcon(int pathId)
+    private Sprite GetPathIcon(string path)
     {
+        int pathId = 0;
+        switch (path)
+        {
+            case "Destruction": pathId = 0; break;
+            case "Hunt": pathId = 1; break;
+            case "Erudition": pathId = 2; break;
+            case "Harmony": pathId = 3; break;
+            case "Nihility": pathId = 4; break;
+            case "Preservation": pathId = 5; break;
+            case "Abundance": pathId = 6; break;
+        }
         return Resources.Load<Sprite>($"Images/Paths/{pathId}");
     }
 
@@ -256,22 +267,6 @@ public class ChampionSelectUI : MonoBehaviour
         UpdateInteractivity();
     }
 
-    private string GetPathName(int pathId)
-    {
-        switch (pathId)
-        {
-            case 0: return "Destruction";
-            case 1: return "Hunt";
-            case 2: return "Erudition";
-            case 3: return "Harmony";
-            case 4: return "Nihility";
-            case 5: return "Preservation";
-            case 6: return "Abundance";
-            case 7: return "Remembrance";
-            default: return "Unknown";
-        }
-    }
-
     private void OnPlayerHover(ExtendedEventArgs args)
     {
         ResponseNotifyPlayerSelectEventArgs res = args as ResponseNotifyPlayerSelectEventArgs;
@@ -279,9 +274,9 @@ public class ChampionSelectUI : MonoBehaviour
         {
             // Update image/text
             ChampionData info = championInfo.ContainsKey(res.ChampionId) ? championInfo[res.ChampionId] : null;
-            string displayName = info != null ? $"{info.name} ({GetPathName(info.pathId)}/{info.element})" : "Picking...";
+            string displayName = info != null ? $"{info.championName} ({info.path}/{info.element})" : "Picking...";
             Sprite sprite = GetChampionPortrait(res.ChampionId);
-            Sprite pathSprite = info != null ? GetPathIcon(info.pathId) : null;
+            Sprite pathSprite = info != null ? GetPathIcon(info.path) : null;
 
             playerPanels[res.PlayerId].UpdateChampion(displayName, sprite, pathSprite, info != null ? info.element : "");
             Debug.Log($"Player {res.PlayerId} hovered champion {res.ChampionId}");
@@ -297,9 +292,9 @@ private void OnPlayerPick(ExtendedEventArgs args)
         {
             // Lock in image/text
             ChampionData info = championInfo.ContainsKey(res.ChampionId) ? championInfo[res.ChampionId] : null;
-            string displayName = info != null ? $"{info.name} ({GetPathName(info.pathId)}/{info.element})" : "Picking...";
+            string displayName = info != null ? $"{info.championName} ({info.path}/{info.element})" : "Picking...";
             Sprite sprite = GetChampionPortrait(res.ChampionId);
-            Sprite pathSprite = info != null ? GetPathIcon(info.pathId) : null;
+            Sprite pathSprite = info != null ? GetPathIcon(info.path) : null;
 
             playerPanels[res.PlayerId].UpdateChampion(displayName, sprite, pathSprite, info != null ? info.element : "");
             playerPanels[res.PlayerId].SetLockedIn(true);

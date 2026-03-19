@@ -42,7 +42,8 @@ public class PlayActionState implements GameState {
     private synchronized void startTimer(GameManager game) {
         cancelTimer(game);
         Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
-        broadcast(game, new ResponseTimerStart(activePlayer.getID(), TIMEOUT_SECONDS, "Your turn to play cards!"));
+        broadcast(game, new ResponseTimerStart(activePlayer.getID(), TIMEOUT_SECONDS, "Your turn to play cards!", "ANY"));
+
 
         timerFuture = scheduler.schedule(() -> {
             Log.printf("Player timeout. Ending turn.");

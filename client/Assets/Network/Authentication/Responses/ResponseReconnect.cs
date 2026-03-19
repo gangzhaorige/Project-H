@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ResponseReconnectEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public string RoomId { get; set; }
     // public GameStateData StateSync { get; set; } // Placeholder
 
@@ -28,7 +27,6 @@ public class ResponseReconnect : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseReconnectEventArgs args = new ResponseReconnectEventArgs();
         args.Status = status;
-        args.Message = message;
         args.RoomId = roomId;
         
         if (status == Constants.SUCCESS) {

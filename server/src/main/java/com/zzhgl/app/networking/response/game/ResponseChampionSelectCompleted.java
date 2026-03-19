@@ -13,7 +13,6 @@ public class ResponseChampionSelectCompleted extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("Champion selection completed.");
         return packet.getBytes();
     }
 }

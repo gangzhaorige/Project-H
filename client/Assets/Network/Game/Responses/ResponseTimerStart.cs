@@ -4,6 +4,7 @@ public class ResponseTimerStartEventArgs : ExtendedEventArgs {
     public int PlayerId { get; set; }
     public int Seconds { get; set; }
     public string Message { get; set; }
+    public string RequiredCardType { get; set; }
 
     public ResponseTimerStartEventArgs() {
         Event_id = Constants.SMSG_RESPONSE_TIMER_START;
@@ -14,6 +15,7 @@ public class ResponseTimerStart : BaseNetworkResponse {
     private int playerId;
     private int seconds;
     private string instruction;
+    private string requiredCardType;
 
     public ResponseTimerStart() {
         Response_id = Constants.SMSG_RESPONSE_TIMER_START;
@@ -23,6 +25,7 @@ public class ResponseTimerStart : BaseNetworkResponse {
         playerId = DataReader.ReadInt(DataStream);
         seconds = DataReader.ReadInt(DataStream);
         instruction = DataReader.ReadString(DataStream);
+        requiredCardType = DataReader.ReadString(DataStream);
     }
 
     public override ExtendedEventArgs Process() {
@@ -30,6 +33,7 @@ public class ResponseTimerStart : BaseNetworkResponse {
         args.PlayerId = playerId;
         args.Seconds = seconds;
         args.Message = instruction;
+        args.RequiredCardType = requiredCardType;
         return args;
     }
 }

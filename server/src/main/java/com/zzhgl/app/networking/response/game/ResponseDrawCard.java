@@ -19,13 +19,11 @@ public class ResponseDrawCard extends GameResponse {
         this.responseCode = Constants.SMSG_CARD_DRAW;
         this.cards = cards;
     }
-
     @Override
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("Cards drawn successfully.");
-        
+
         packet.addShort16((short) cards.size());
         for (AbstractCard card : cards) {
             packet.addInt32(card.getId());

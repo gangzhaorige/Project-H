@@ -15,7 +15,6 @@ public class ResponseLeaveRoom extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(status);
-        packet.addString(""); // Empty message
         return packet.getBytes();
     }
 

@@ -18,10 +18,8 @@ public class ResponseNotifyForChampionPick extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("It's turn to pick.");
-        
-        packet.addInt32(activePlayerId);
-        packet.addInt32(timeout);
+
+        packet.addInt32(activePlayerId);        packet.addInt32(timeout);
 
         return packet.getBytes();
     }

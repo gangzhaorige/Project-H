@@ -21,10 +21,8 @@ public class ResponseDrawCardOther extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("Another player drew cards.");
-        
-        packet.addInt32(playerId);
-        packet.addInt32(cardCount);
+
+        packet.addInt32(playerId);        packet.addInt32(cardCount);
 
         return packet.getBytes();
     }

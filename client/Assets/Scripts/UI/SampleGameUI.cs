@@ -80,7 +80,6 @@ public class SampleGameUI : MonoBehaviour
         ResponseGameEndEventArgs args = eventArgs as ResponseGameEndEventArgs;
         if (args != null)
         {
-            SetStatus("Game Over: " + args.Message);
             Debug.Log("Game ended, returning to lobby.");
             // UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
         }

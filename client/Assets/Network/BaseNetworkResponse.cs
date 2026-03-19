@@ -7,33 +7,30 @@ using UnityEngine;
 /// All server responses extend GameResponse which writes status and message first
 /// </summary>
 public abstract class BaseNetworkResponse : NetworkResponse {
-    
+
     protected short status;
-    protected string message;
-    
+
     public short GetStatus() { return status; }
-    public string GetMessage() { return message; }
     public override sealed void Parse() {
-        // Always read status and message first (from GameResponse base class)
+        // Always read status first
         status = DataReader.ReadShort(DataStream);
-        message = DataReader.ReadString(DataStream);
 
         if(Response_id != Constants.SMSG_HEARTBEAT)
-        Debug.Log($"{GetType().Name} - Status: {status}, Message: {message}");
+        Debug.Log($"{GetType().Name} - Status: {status}");
 
         // Only continue parsing if status is 0 (success) or if derived class handles errors
         if (status == 0 || ShouldParseOnError()) {
             ParseResponseData();
         } else {
-            Debug.LogError($"{GetType().Name} failed - Status: {status}, Message: {message}");
+            Debug.LogError($"{GetType().Name} failed - Status: {status}");
         }
     }
-    
+
     /// <summary>
-    /// Override this to parse response-specific data after status and message
+    /// Override this to parse response-specific data after status
     /// </summary>
     protected abstract void ParseResponseData();
-    
+
     /// <summary>
     /// Override this to return true if response should parse data even on error status
     /// Default is false (only parse on success)
@@ -41,21 +38,16 @@ public abstract class BaseNetworkResponse : NetworkResponse {
     protected virtual bool ShouldParseOnError() {
         return false;
     }
-    
+
     /// <summary>
-    /// Utility method to add status and message to event args using reflection
+    /// Utility method to add status to event args using reflection
     /// </summary>
     protected void SetBaseEventArgs(object eventArgs) {
         var type = eventArgs.GetType();
-        
+
         var statusProperty = type.GetProperty("status");
         if (statusProperty != null && statusProperty.CanWrite) {
             statusProperty.SetValue(eventArgs, status, null);
-        }
-        
-        var messageProperty = type.GetProperty("message");
-        if (messageProperty != null && messageProperty.CanWrite) {
-            messageProperty.SetValue(eventArgs, message, null);
         }
     }
 }

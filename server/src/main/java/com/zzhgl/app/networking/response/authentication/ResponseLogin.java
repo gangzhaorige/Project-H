@@ -7,7 +7,6 @@ import com.zzhgl.app.utility.GamePacket;
 public class ResponseLogin extends GameResponse {
 
     private short status;
-    private String message = "";
     private int playerId;
     private String username;
     private String roomId = "";
@@ -22,7 +21,6 @@ public class ResponseLogin extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(status);
-        packet.addString(message);
         if (status == Constants.SUCCESS) {
             packet.addInt32(playerId);
             packet.addString(username);
@@ -39,10 +37,6 @@ public class ResponseLogin extends GameResponse {
 
     public void setStatus(short status) {
         this.status = status;
-    }
-    
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public void setPlayerId(int playerId) {

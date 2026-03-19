@@ -18,7 +18,6 @@ public class ResponseJoinRoomExisting extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16((short)0); // Success status
-        packet.addString(""); // Empty message
         packet.addInt32(playerId);
         packet.addString(username);
         return packet.getBytes();

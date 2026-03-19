@@ -72,20 +72,55 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnPlayButtonClick()
     {
-        Debug.Log($"[CardUI] INTERNAL: OnPlayButtonClick triggered for card {(cardData != null ? cardData.Id.ToString() : "NULL")}");
+        Debug.Log($"[CardUI] INTERNAL: OnPlayButtonClick for card {(cardData != null ? cardData.Id.ToString() : "NULL")}");
         
-        if (cardData == null)
+        if (cardData == null) return;
+
+        // 1. During PlayActionState: Allow playing any card with its standard requirements/targeting.
+        if (GameSession.Instance.State == "PlayActionState")
         {
-            Debug.LogError("[CardUI] Cannot play: cardData is null!");
+            HandleStandardPlay();
             return;
         }
 
-        if (CardTargetSelector.Instance == null)
+        // 2. Response Phase (Not PlayActionState): Play required card automatically without targeting.
+        if (GameSession.Instance.IsResponseRequired)
         {
-            Debug.LogError("[CardUI] Cannot play: CardTargetSelector.Instance is missing in the scene!");
+            if (cardData.Type == GameSession.Instance.RequiredCardType)
+            {
+                Debug.Log($"[CardUI] Playing required response card {cardData.Type} automatically.");
+                SendPlayRequest(new System.Collections.Generic.List<int>());
+            }
+            else
+            {
+                Debug.LogWarning($"[CardUI] Card type mismatch. Required: {GameSession.Instance.RequiredCardType}, Played: {cardData.Type}");
+            }
             return;
         }
 
-        CardTargetSelector.Instance.BeginTargeting(cardData);
+        Debug.LogWarning("[CardUI] Cannot play card: Not your turn or no response required.");
+    }
+
+    private void HandleStandardPlay()
+    {
+        // Validate targeting requirement
+        int maxTargets = CardTargetSelector.Instance.GetMaxTargets(cardData.Type);
+        if (maxTargets > 0)
+        {
+            Debug.Log($"[CardUI] Card {cardData.Type} requires {maxTargets} targets. Showing UI.");
+            CardTargetSelector.Instance.BeginTargeting(cardData);
+        }
+        else
+        {
+            Debug.Log($"[CardUI] Card {cardData.Type} requires no targets. Playing directly.");
+            SendPlayRequest(new System.Collections.Generic.List<int>());
+        }
+    }
+
+    private void SendPlayRequest(System.Collections.Generic.List<int> targetIds)
+    {
+        RequestPlayCard req = new RequestPlayCard();
+        req.Send(cardData.Id, targetIds);
+        NetworkManager.Instance.SendRequest(req);
     }
 }

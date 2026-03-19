@@ -14,6 +14,7 @@ import com.zzhgl.app.networking.response.game.ResponsePlayCard;
 import com.zzhgl.app.networking.response.game.ResponseTimerCancel;
 import com.zzhgl.app.networking.response.game.ResponseTimerStart;
 import com.zzhgl.app.utility.Log;
+import com.zzhgl.app.model.cards.AbstractNormalCard.NormalType;
 
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -49,7 +50,7 @@ public class DuelPromptState implements GameState {
         cancelTimer();
         
         for (Player p : game.getPlayers()) {
-            p.addResponseForUpdate(new ResponseTimerStart(currentResponder.getID(), WINDOW_SECONDS, "Play ATTACK to continue Duel!"));
+            p.addResponseForUpdate(new ResponseTimerStart(currentResponder.getID(), WINDOW_SECONDS, "Play ATTACK to continue Duel!", NormalType.ATTACK));
         }
 
         timerFuture = scheduler.schedule(() -> {

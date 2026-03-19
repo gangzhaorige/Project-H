@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ResponseJoinRoomExistingEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public int PlayerId { get; set; }
     public string Username { get; set; }
 
@@ -27,7 +26,6 @@ public class ResponseJoinRoomExisting : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseJoinRoomExistingEventArgs args = new ResponseJoinRoomExistingEventArgs();
         args.Status = status;
-        args.Message = message;
         args.PlayerId = playerId;
         args.Username = username;
         return args;

@@ -19,7 +19,6 @@ public class ResponseEndTurn extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("Turn ended for player " + endedPlayerId);
         packet.addInt32(endedPlayerId);
         return packet.getBytes();
     }

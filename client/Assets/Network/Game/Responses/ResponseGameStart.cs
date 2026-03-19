@@ -1,6 +1,5 @@
 public class ResponseGameStartEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
 
     public ResponseGameStartEventArgs() {
         Event_id = Constants.SMSG_GAME_START;
@@ -19,7 +18,6 @@ public class ResponseGameStart : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseGameStartEventArgs args = new ResponseGameStartEventArgs();
         args.Status = status;
-        args.Message = message;
         return args;
     }
 }

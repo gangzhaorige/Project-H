@@ -14,7 +14,6 @@ public class ResponseHeartbeat extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16((short) 0); // Status 0 (SUCCESS)
-        packet.addString(""); // Empty message
         return packet.getBytes();
     }
 }

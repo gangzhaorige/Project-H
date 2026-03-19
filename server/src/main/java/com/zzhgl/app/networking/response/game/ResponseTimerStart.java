@@ -11,22 +11,24 @@ public class ResponseTimerStart extends GameResponse {
     private int playerId;
     private int seconds;
     private String message;
+    private String requiredCardType;
 
-    public ResponseTimerStart(int playerId, int seconds, String message) {
+    public ResponseTimerStart(int playerId, int seconds, String message, Object cardType) {
         this.responseCode = Constants.SMSG_RESPONSE_TIMER_START;
         this.playerId = playerId;
         this.seconds = seconds;
         this.message = message;
+        this.requiredCardType = (cardType != null) ? cardType.toString() : "";
     }
 
     @Override
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
-        packet.addString("message");
         packet.addInt32(playerId);
         packet.addInt32(seconds);
-        packet.addString(message); // Instructional message for client
+        packet.addString(message);
+        packet.addString(requiredCardType);
         return packet.getBytes();
     }
 }

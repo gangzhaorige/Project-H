@@ -17,12 +17,9 @@ public class ResponseReconnect extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(status);
-        packet.addString(""); // Empty message matching BaseNetworkResponse
-        
-        if (status == Constants.SUCCESS) {
+
+        if (status == Constants.SUCCESS) {            
             packet.addString(roomId);
-            // TODO: Append massive game state sync data here
-            // packet.addBytes(serializedGameState);
         }
         return packet.getBytes();
     }

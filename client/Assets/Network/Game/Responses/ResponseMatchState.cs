@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ResponseMatchStateEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public int ConnectedPlayers { get; set; }
     public int TotalPlayers { get; set; }
 
@@ -27,7 +26,6 @@ public class ResponseMatchState : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseMatchStateEventArgs args = new ResponseMatchStateEventArgs();
         args.Status = status;
-        args.Message = message;
         args.ConnectedPlayers = connectedPlayers;
         args.TotalPlayers = totalPlayers;
         return args;

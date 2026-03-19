@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public class ResponseLoginEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public int PlayerId { get; set; }
     public string Username { get; set; }
     public string RoomId { get; set; }
@@ -40,7 +39,6 @@ public class ResponseLogin : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseLoginEventArgs args = new ResponseLoginEventArgs();
         args.Status = status;
-        args.Message = message;
         args.PlayerId = playerId;
         args.Username = username;
         args.RoomId = roomId;

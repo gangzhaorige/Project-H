@@ -7,7 +7,7 @@ public class ChampionSetupInfo {
     public int MaxHP;
     public int CurHP;
     public int PathId;
-    public string Element;
+    public int Element;
     public int Attack;
     public int AttackRange;
     public int SpecialDefense;
@@ -55,7 +55,7 @@ public class ResponseGameSetup : BaseNetworkResponse {
                 player.Champion.MaxHP = DataReader.ReadInt(DataStream);
                 player.Champion.CurHP = DataReader.ReadInt(DataStream);
                 player.Champion.PathId = DataReader.ReadInt(DataStream);
-                player.Champion.Element = DataReader.ReadString(DataStream);
+                player.Champion.Element = DataReader.ReadInt(DataStream);
                 player.Champion.Attack = DataReader.ReadInt(DataStream);
                 player.Champion.AttackRange = DataReader.ReadInt(DataStream);
                 player.Champion.SpecialDefense = DataReader.ReadInt(DataStream);

@@ -1,12 +1,12 @@
 [
-  { "id": 0, "name": "Imbibitor Lunae", "pathId": 0, "element": "Imaginary" },
-  { "id": 1, "name": "Himeko", "pathId": 2, "element": "Fire" },
-  { "id": 2, "name": "Kafka", "pathId": 4, "element": "Lightning" },
-  { "id": 3, "name": "Bronya", "pathId": 3, "element": "Wind" },
-  { "id": 4, "name": "Clara", "pathId": 0, "element": "Physical" },
-  { "id": 5, "name": "Jing Yuan", "pathId": 2, "element": "Lightning" },
-  { "id": 6, "name": "Sparkle", "pathId": 3, "element": "Quantum" },
-  { "id": 7, "name": "Welt", "pathId": 4, "element": "Imaginary" },
-  { "id": 8, "name": "Jade", "pathId": 2, "element": "Quantum" },
-  { "id": 9, "name": "Jing Liu", "pathId": 0, "element": "Ice" }
+  { "id": 0, "championName": "Imbibitor Lunae", "path": "Destruction", "element": "Imaginary" },
+  { "id": 1, "championName": "Himeko", "path": "Erudition", "element": "Fire" },
+  { "id": 2, "championName": "Kafka", "path": "Nihility", "element": "Lightning" },
+  { "id": 3, "championName": "Bronya", "path": "Harmony", "element": "Wind" },
+  { "id": 4, "championName": "Clara", "path": "Destruction", "element": "Physical" },
+  { "id": 5, "championName": "Jing Yuan", "path": "Erudition", "element": "Lightning" },
+  { "id": 6, "championName": "Sparkle", "path": "Harmony", "element": "Quantum" },
+  { "id": 7, "championName": "Welt", "path": "Nihility", "element": "Imaginary" },
+  { "id": 8, "championName": "Jade", "path": "Erudition", "element": "Quantum" },
+  { "id": 9, "championName": "Jing Liu", "path": "Destruction", "element": "Ice" }
 ]

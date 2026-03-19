@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ResponseNotifyPlayerPickEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public int PlayerId { get; set; }
     public int ChampionId { get; set; }
 
@@ -27,7 +26,6 @@ public class ResponseNotifyPlayerPick : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseNotifyPlayerPickEventArgs args = new ResponseNotifyPlayerPickEventArgs();
         args.Status = status;
-        args.Message = message;
         args.PlayerId = playerId;
         args.ChampionId = championId;
         return args;

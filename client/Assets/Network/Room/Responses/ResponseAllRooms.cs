@@ -9,7 +9,6 @@ public class RoomInfo {
 
 public class ResponseAllRoomsEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
-    public string Message { get; set; }
     public List<RoomInfo> Rooms { get; set; }
 
     public ResponseAllRoomsEventArgs() {
@@ -40,7 +39,6 @@ public class ResponseAllRooms : BaseNetworkResponse {
     public override ExtendedEventArgs Process() {
         ResponseAllRoomsEventArgs args = new ResponseAllRoomsEventArgs();
         args.Status = status;
-        args.Message = message;
         args.Rooms = rooms;
         return args;
     }
