@@ -39,6 +39,7 @@ public class ChampionSelectUI : MonoBehaviour
         public string championName;
         public string path;
         public string element;
+        public int additionalTargetForAttack;
     }
 
     [System.Serializable]

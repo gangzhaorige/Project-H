@@ -18,10 +18,13 @@ public class AttackCard extends AbstractNormalCard {
 
     @Override
     public boolean validate(GameManager game, Player caster, List<Integer> targetIds) {
-        if (targetIds == null || targetIds.isEmpty() || targetIds.size() > 1) return false;
+        if (targetIds == null || targetIds.isEmpty()) return false;
 
         Champion casterChamp = caster.getSelectedChampion();
         if (casterChamp == null) return false;
+
+        int maxTargets = 1 + casterChamp.getAdditionalTargetForAttack();
+        if (targetIds.size() > maxTargets) return false;
 
         // Check attack limit
         if (casterChamp.getCurNumOfAttack() >= casterChamp.getMaxNumOfAttack()) {

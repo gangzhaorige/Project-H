@@ -43,6 +43,7 @@ public class ResponseGameSetup extends GameResponse {
                 packet.addInt32(champ.getAttack());
                 packet.addInt32(champ.getAttackRange());
                 packet.addInt32(champ.getSpecialDefenseRange());
+                packet.addInt32(champ.getAdditionalTargetForAttack());
                 packet.addInt32(champ.getMaxNumOfAttack());
                 packet.addInt32(champ.getCurNumOfAttack());
             } else {

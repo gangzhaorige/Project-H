@@ -73,7 +73,7 @@ public class ChampionFactory {
         newChamp.setMaxNumOfAttack(prototype.getMaxNumOfAttack());
         newChamp.setCurNumOfAttack(0);
         newChamp.setSpecialDefenseRange(prototype.getSpecialDefenseRange());
-        newChamp.setMaxTarget(prototype.getMaxTarget());
+        newChamp.setAdditionalTargetForAttack(prototype.getAdditionalTargetForAttack());
         
         // Add skills from SkillFactory
         newChamp.setSkillIds(prototype.getSkillIds());

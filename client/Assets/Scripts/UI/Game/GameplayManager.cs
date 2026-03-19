@@ -194,6 +194,7 @@ public class GameplayManager : MonoBehaviour
                     case GameSession.STAT_ATTACK_RANGE: player.Champion.AttackRange = res.Value; break;
                     case GameSession.STAT_CUR_NUM_ATTACK: player.Champion.CurNumOfAttack = res.Value; break;
                     case GameSession.STAT_MAX_NUM_ATTACK: player.Champion.MaxNumOfAttack = res.Value; break;
+                    case GameSession.STAT_ADDITIONAL_TARGET_FOR_ATTACK: player.Champion.AdditionalTargetForAttack = res.Value; break;
                 }
 
                 // Trigger event for UI observers (like ChampionController)

@@ -15,7 +15,11 @@ namespace ProjectH.Rules
 
         public override int GetMaxTargets(CardData card)
         {
-            return 1;
+            var localPlayer = GameSession.Instance.GetLocalPlayer();
+            int additional = (localPlayer != null && localPlayer.Champion != null) 
+                ? localPlayer.Champion.AdditionalTargetForAttack 
+                : 0;
+            return 1 + additional;
         }
 
         public override bool CanTarget(CardData card, PlayerData caster, PlayerData target)

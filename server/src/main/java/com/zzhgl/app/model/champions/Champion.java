@@ -18,7 +18,7 @@ public class Champion {
     public static final int STAT_CUR_NUM_ATTACK = 6;
     public static final int STAT_MAX_NUM_ATTACK = 7;
     public static final int STAT_SPECIAL_DEFENSE_RANGE = 8;
-    public static final int STAT_MAX_TARGET = 9;
+    public static final int STAT_ADDITIONAL_TARGET_FOR_ATTACK = 9;
     public static final int STAT_PATH_ID = 10;
     public static final int STAT_ELEMENT = 11;
 
@@ -88,7 +88,7 @@ public class Champion {
     private int curNumOfAttack;
     private int maxNumOfAttack = 1;
     private int specialDefenseRange = 0;
-    private int maxTarget = 1;
+    private int additionalTargetForAttack = 0;
     private List<AbstractSkill> skills = new ArrayList<>();
     private List<Integer> skillIds = new ArrayList<>();
 
@@ -139,8 +139,8 @@ public class Champion {
     public int getSpecialDefenseRange() { return specialDefenseRange; }
     public void setSpecialDefenseRange(int specialDefenseRange) { this.specialDefenseRange = specialDefenseRange; }
 
-    public int getMaxTarget() { return maxTarget; }
-    public void setMaxTarget(int maxTarget) { this.maxTarget = maxTarget; }
+    public int getAdditionalTargetForAttack() { return additionalTargetForAttack; }
+    public void setAdditionalTargetForAttack(int additionalTargetForAttack) { this.additionalTargetForAttack = additionalTargetForAttack; }
 
     public List<AbstractSkill> getSkills() { return skills; }
     public void addSkill(AbstractSkill skill) { this.skills.add(skill); }

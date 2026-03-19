@@ -16,6 +16,7 @@ namespace ProjectH.Models
         public int AttackRange;
         public int CurNumOfAttack;
         public int MaxNumOfAttack;
+        public int AdditionalTargetForAttack;
         public int SpecialDefense;
         // Other stats can be added here
     }
@@ -137,7 +138,7 @@ namespace ProjectH.Models
         public const int STAT_CUR_NUM_ATTACK = 6;
         public const int STAT_MAX_NUM_ATTACK = 7;
         public const int STAT_SPECIAL_DEFENSE_RANGE = 8;
-        public const int STAT_MAX_TARGET = 9;
+        public const int STAT_ADDITIONAL_TARGET_FOR_ATTACK = 9;
         public const int STAT_PATH_ID = 10;
         public const int STAT_ELEMENT = 11;
 
