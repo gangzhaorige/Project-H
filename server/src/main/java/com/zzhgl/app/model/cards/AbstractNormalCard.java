@@ -26,11 +26,4 @@ public abstract class AbstractNormalCard extends AbstractCard {
     public Category getCategory() {
         return Category.NORMAL;
     }
-
-    /**
-     * Plays the card and generates a list of interactions.
-     */
-    public List<AbstractInteraction> play() {
-        return new ArrayList<>(); // Empty for now
-    }
 }

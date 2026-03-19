@@ -7,6 +7,7 @@ public class RequestPlayCard : NetworkRequest {
     }
 
     public void Send(int cardId, List<int> targetIds) {
+        Debug.Log($"[RequestPlayCard] Sending: ID={Request_id}, cardId={cardId}, targetsCount={targetIds.Count}, targetIds=[{string.Join(", ", targetIds)}]");
         Packet = new GamePacket(Request_id);
         Packet.AddInt32(cardId);
         

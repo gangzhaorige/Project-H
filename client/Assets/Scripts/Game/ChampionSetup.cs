@@ -75,7 +75,8 @@ public class ChampionSetup : MonoBehaviour
                     PathId = info.Champion.PathId,
                     Element = info.Champion.Element,
                     Attack = info.Champion.Attack,
-                    AttackRange = info.Champion.AttackRange
+                    AttackRange = info.Champion.AttackRange,
+                    SpecialDefense = info.Champion.SpecialDefense
                 };
 
                 // Spawn at the position corresponding to the visual index
@@ -88,7 +89,7 @@ public class ChampionSetup : MonoBehaviour
 
                 ChampionController controller = go.GetComponent<ChampionController>();
                 if (controller == null) controller = go.AddComponent<ChampionController>();
-                controller.Init(data.Champion);
+                controller.Init(data);
             }
 
             GameSession.Instance.Players[info.PlayerId] = data;

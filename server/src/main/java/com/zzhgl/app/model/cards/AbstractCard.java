@@ -1,5 +1,9 @@
 package com.zzhgl.app.model.cards;
 
+import com.zzhgl.app.model.core.GameManager;
+import com.zzhgl.app.model.core.Player;
+import java.util.List;
+
 /**
  * AbstractCard represents a basic card in the game.
  */
@@ -27,6 +31,13 @@ public abstract class AbstractCard {
     public int getValue() { return value; }
 
     public abstract Category getCategory();
+
+    /**
+     * Validates if the card can be played by the caster against the specified targets.
+     */
+    public abstract boolean validate(GameManager game, Player caster, List<Integer> targetIds);
+
+    public abstract void play(GameManager game, Player caster, List<Integer> targetIds);
 
     @Override
     public String toString() {

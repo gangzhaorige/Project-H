@@ -15,6 +15,11 @@ public class TurnBeginState implements GameState {
         Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
         Log.printf("Player %d is drawing cards.", activePlayer.getID());
 
+        // Reset attack count
+        if (activePlayer.getSelectedChampion() != null) {
+            activePlayer.getSelectedChampion().setCurNumOfAttack(0);
+        }
+
         // Emit TURN_BEGIN event. All reactive skills (like Beginning Wisdom) will be queued.
         game.emitEvent(new GameEvent(GameEvent.EventType.TURN_BEGIN));
 

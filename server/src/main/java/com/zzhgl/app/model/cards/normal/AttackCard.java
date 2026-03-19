@@ -1,6 +1,11 @@
 package com.zzhgl.app.model.cards.normal;
 
 import com.zzhgl.app.model.cards.AbstractNormalCard;
+import com.zzhgl.app.model.champions.Champion;
+import com.zzhgl.app.model.core.GameManager;
+import com.zzhgl.app.model.core.Player;
+import com.zzhgl.app.model.interactions.types.AttackInteraction;
+import java.util.List;
 
 /**
  * AttackCard represents a normal card used for attacking.
@@ -8,5 +13,52 @@ import com.zzhgl.app.model.cards.AbstractNormalCard;
 public class AttackCard extends AbstractNormalCard {
     public AttackCard(int id, Suit suit, int value) {
         super(id, suit, value, NormalType.ATTACK);
+    }
+
+    @Override
+    public boolean validate(GameManager game, Player caster, List<Integer> targetIds) {
+        if (targetIds == null || targetIds.isEmpty() || targetIds.size() > 1) return false;
+
+        Champion casterChamp = caster.getSelectedChampion();
+        if (casterChamp == null) return false;
+
+        // Check attack limit
+        if (casterChamp.getCurNumOfAttack() >= casterChamp.getMaxNumOfAttack()) {
+            return false;
+        }
+
+        for (int targetId : targetIds) {
+            if (caster.getID() == targetId) return false; // Cannot attack self
+
+            Player target = game.getPlayerMap().get(targetId);
+            if (target == null || target.getSelectedChampion() == null) return false;
+
+            int distance = game.getDistance(caster.getID(), targetId);
+            int effectiveDistance = distance + target.getSelectedChampion().getSpecialDefenseRange();
+            
+            if (effectiveDistance > casterChamp.getAttackRange()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void play(GameManager game, Player caster, List<Integer> targetIds) {
+        if (targetIds == null || targetIds.isEmpty()) return;
+
+        Champion casterChamp = caster.getSelectedChampion();
+        if (casterChamp != null) {
+            casterChamp.setCurNumOfAttack(casterChamp.getCurNumOfAttack() + 1);
+        }
+
+        for (int targetId : targetIds) {
+            Player target = game.getPlayerMap().get(targetId);
+            if (target != null) {
+                int damage = casterChamp != null ? casterChamp.getAttack() : 1;
+                AttackInteraction interaction = new AttackInteraction(caster, target, this, damage);
+                game.getInteractionStack().push(interaction);
+            }
+        }
     }
 }

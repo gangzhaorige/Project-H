@@ -38,6 +38,8 @@ public class GameRequestTable<T> {
         add(Constants.CMSG_READY_FOR_GAME_SETUP, "RequestReadyForGameSetup", "game");
         add(Constants.CMSG_READY_TO_PLAY, "RequestReadyToPlay", "game");
         add(Constants.CMSG_END_TURN, "RequestEndTurn", "game");
+        add(Constants.CMSG_PLAY_CARD, "RequestPlayCard", "game");
+        add(Constants.CMSG_PASS_PRIORITY, "RequestPassPriority", "game");
         add(Constants.CMSG_SKILL_RESPONSE, "RequestSkillResponse", "game");
         // Matchmaking
     }

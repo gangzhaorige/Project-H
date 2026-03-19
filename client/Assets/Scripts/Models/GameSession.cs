@@ -14,6 +14,7 @@ namespace ProjectH.Models
         public string Element;
         public int Attack;
         public int AttackRange;
+        public int SpecialDefense;
         // Other stats can be added here
     }
 
@@ -26,15 +27,48 @@ namespace ProjectH.Models
         public ChampionData Champion;
         public GameObject ChampionObject; // Reference to the spawned prefab
         public List<CardData> Hand = new List<CardData>();
+
+        public delegate void HandChanged();
+        public event HandChanged OnHandChanged;
+
+        public void AddCard(CardData card)
+        {
+            Hand.Add(card);
+            OnHandChanged?.Invoke();
+        }
+
+        public void RemoveCard(CardData card)
+        {
+            Hand.Remove(card);
+            OnHandChanged?.Invoke();
+        }
+
+        public void RemoveCardById(int cardId)
+        {
+            CardData card = Hand.Find(c => c.Id == cardId);
+            if (card != null)
+            {
+                Hand.Remove(card);
+                OnHandChanged?.Invoke();
+            }
+        }
+
+        public void ClearHand()
+        {
+            Hand.Clear();
+            OnHandChanged?.Invoke();
+        }
     }
 
     public class GameSession
     {
         private static GameSession _instance;
-        public static GameSession Instance => _instance ?? (_instance = new GameSession());
+        public static GameSession Instance => _instance ??= new GameSession();
 
         public Dictionary<int, PlayerData> Players = new Dictionary<int, PlayerData>();
         public List<int> PlayerOrder = new List<int>();
+
+        public string State = "";
 
         public void Clear()
         {

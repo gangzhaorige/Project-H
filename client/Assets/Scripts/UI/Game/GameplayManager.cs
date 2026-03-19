@@ -14,7 +14,16 @@ public class GameplayManager : MonoBehaviour
 
     [Header("Turn UI")]
     public Button endTurnButton;
+    public Button passPriorityButton;
     public TextMeshProUGUI turnStatusText;
+    public TextMeshProUGUI instructionText;
+    public TextMeshProUGUI stateText;
+    public Slider timerSlider;
+
+    private float currentTimer = 0f;
+    private float maxTimer = 0f;
+    private bool isTimerActive = false;
+
 
     void Start()
     {
@@ -25,16 +34,27 @@ public class GameplayManager : MonoBehaviour
             Debug.LogError("[GameplayManager] CRITICAL: championSetup reference is null in Start!");
         }
 
-        Debug.Log("[GameplayManager] Registering SMSG_GAME_SETUP callback.");
+        Debug.Log("[GameplayManager] Registering callbacks.");
         NetworkManager.Instance.AddCallback(Constants.SMSG_GAME_SETUP, OnGameSetup);
         NetworkManager.Instance.AddCallback(Constants.SMSG_CARD_DRAW, OnCardDraw);
         NetworkManager.Instance.AddCallback(Constants.SMSG_CARD_DRAW_OTHER, OnCardDrawOther);
         NetworkManager.Instance.AddCallback(Constants.SMSG_TURN_START, OnTurnStart);
         NetworkManager.Instance.AddCallback(Constants.SMSG_END_TURN, OnTurnEnd);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_RESPONSE_TIMER_START, OnTimerStart);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_RESPONSE_TIMER_CANCEL, OnTimerCancel);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_PASS_PRIORITY, OnPassPriorityResponse);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_STATE_CHANGE, OnGameStateResponse);
+
+        if (timerSlider != null) timerSlider.gameObject.SetActive(false);
         
         if (endTurnButton != null) {
             endTurnButton.onClick.AddListener(OnEndTurnClick);
             endTurnButton.interactable = false;
+        }
+
+        if (passPriorityButton != null) {
+            passPriorityButton.onClick.AddListener(OnPassPriorityClick);
+            passPriorityButton.gameObject.SetActive(false);
         }
 
         // Handshake Step 1: Tell server we loaded the scene and are ready for data
@@ -43,6 +63,19 @@ public class GameplayManager : MonoBehaviour
         setupReq.Send();
         NetworkManager.Instance.SendRequest(setupReq);
     }
+
+    void Update()
+    {
+        if (isTimerActive && currentTimer > 0)
+        {
+            currentTimer -= Time.deltaTime;
+            if (timerSlider != null)
+            {
+                timerSlider.value = currentTimer / maxTimer;
+            }
+        }
+    }
+    
 
     void OnDestroy()
     {
@@ -53,6 +86,97 @@ public class GameplayManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_CARD_DRAW_OTHER);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_TURN_START);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_END_TURN);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_RESPONSE_TIMER_START);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_RESPONSE_TIMER_CANCEL);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_PASS_PRIORITY);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_STATE_CHANGE);
+        }
+    }
+
+    private void OnTimerStart(ExtendedEventArgs args)
+    {
+        ResponseTimerStartEventArgs res = args as ResponseTimerStartEventArgs;
+        if (res == null) return;
+
+        bool isNegationWindow = (res.PlayerId == -1);
+        bool isLocal = res.PlayerId == Constants.USER_ID;
+        Debug.Log($"[GameplayManager] Timer start for player {res.PlayerId}. isLocal: {isLocal}, isNegationWindow: {isNegationWindow}, seconds: {res.Seconds}");
+        
+        // Update Indicator for everyone
+        foreach (var player in GameSession.Instance.Players.Values)
+        {
+            if (player.ChampionObject != null)
+            {
+                var controller = player.ChampionObject.GetComponent<ChampionController>();
+                if (controller != null)
+                {
+                    // If it's a negation window, everyone pulses. Otherwise only the active player.
+                    controller.ToggleActive(isNegationWindow || player.PlayerId == res.PlayerId);
+                }
+            }
+        }
+
+        // Show Pass button during negation window
+        if (passPriorityButton != null)
+        {
+            passPriorityButton.gameObject.SetActive(isNegationWindow || (isLocal && GameSession.Instance.State != "PlayActionState"));
+        }
+
+        // Display instructional message
+        if (instructionText != null)
+        {
+            instructionText.text = res.Message;
+        }
+
+        // Update Slider for local player or everyone during negation
+        if ((isLocal || isNegationWindow) && timerSlider != null)
+        {
+            timerSlider.gameObject.SetActive(true);
+            timerSlider.interactable = false; // Display only
+            currentTimer = res.Seconds;
+            maxTimer = (res.Seconds > 0) ? res.Seconds : 15f;
+            isTimerActive = true;
+        }
+        else if (timerSlider != null)
+        {
+            timerSlider.gameObject.SetActive(false);
+            isTimerActive = false;
+        }
+    }
+
+    private void OnPassPriorityClick()
+    {
+        Debug.Log("[GameplayManager] Sending RequestPassPriority...");
+        RequestPassPriority req = new RequestPassPriority();
+        req.Send();
+        NetworkManager.Instance.SendRequest(req);
+    }
+
+    private void OnPassPriorityResponse(ExtendedEventArgs args)
+    {
+        ResponsePassPriorityEventArgs res = args as ResponsePassPriorityEventArgs;
+        if (res == null) return;
+
+        if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
+        if (timerSlider != null) timerSlider.gameObject.SetActive(false);
+        isTimerActive = false;
+    }
+
+    private void OnTimerCancel(ExtendedEventArgs args)
+    {
+        isTimerActive = false;
+        if (timerSlider != null) timerSlider.gameObject.SetActive(false);
+        if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
+        if (instructionText != null) instructionText.text = "";
+
+        // Clear all pulsing indicators
+        foreach (var player in GameSession.Instance.Players.Values)
+        {
+            if (player.ChampionObject != null)
+            {
+                var controller = player.ChampionObject.GetComponent<ChampionController>();
+                if (controller != null) controller.ToggleActive(false);
+            }
         }
     }
 
@@ -107,6 +231,20 @@ public class GameplayManager : MonoBehaviour
         if (res != null) {
             Debug.Log($"[GameplayManager] Turn ended for player {res.EndedPlayerId}");
         }
+        
+        isTimerActive = false;
+        if (timerSlider != null) timerSlider.gameObject.SetActive(false);
+        if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
+
+        // Clear all pulsing indicators
+        foreach (var player in GameSession.Instance.Players.Values)
+        {
+            if (player.ChampionObject != null)
+            {
+                var controller = player.ChampionObject.GetComponent<ChampionController>();
+                if (controller != null) controller.ToggleActive(false);
+            }
+        }
     }
 
     private void OnGameSetup(ExtendedEventArgs args)
@@ -140,5 +278,16 @@ public class GameplayManager : MonoBehaviour
         NetworkManager.Instance.SendRequest(readyReq);
         
         Debug.Log("Game Initialization Finished. ReadyToPlay sent.");
+    }
+
+    private void OnGameStateResponse(ExtendedEventArgs args) {
+        ResponseGameStateEventArgs res = args as ResponseGameStateEventArgs;
+        if (res != null && res.Status == Constants.SUCCESS) {
+            Debug.Log("Switching to state: " + res.StateName);
+            if (stateText != null) {
+                stateText.text = res.StateName;
+            }
+            GameSession.Instance.State = res.StateName;
+        }
     }
 }

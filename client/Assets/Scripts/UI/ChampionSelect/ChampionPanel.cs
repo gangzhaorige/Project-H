@@ -35,7 +35,6 @@ public class ChampionPanel : MonoBehaviour
             {
                 championImage.rectTransform.localEulerAngles = Vector3.zero;
             }
-            championImage.gameObject.SetActive(false);
         }
 
         if (pathImage != null)
@@ -58,10 +57,6 @@ public class ChampionPanel : MonoBehaviour
                 championImage.sprite = portrait;
                 championImage.color = Color.white;
                 championImage.gameObject.SetActive(true);
-            }
-            else
-            {
-                championImage.gameObject.SetActive(false);
             }
         }
 

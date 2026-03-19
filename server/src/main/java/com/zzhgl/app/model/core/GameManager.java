@@ -1,5 +1,6 @@
 package com.zzhgl.app.model.core;
 
+import com.zzhgl.app.core.NetworkManager;
 import com.zzhgl.app.model.Command.Command;
 import com.zzhgl.app.model.States.GameState;
 import com.zzhgl.app.model.States.InteractionResolutionState;
@@ -9,6 +10,8 @@ import com.zzhgl.app.model.interactions.AbstractInteraction;
 import com.zzhgl.app.model.skills.AbstractSkill;
 import com.zzhgl.app.networking.response.game.ResponseDrawCard;
 import com.zzhgl.app.networking.response.game.ResponseDrawCardOther;
+import com.zzhgl.app.networking.response.game.ResponseGameState;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -29,6 +32,7 @@ public class GameManager {
     private Deck deck;
     private Pile drawPile;
     private Pile discardPile;
+    private InteractionStack interactionStack;
 
     public GameManager(List<Player> players) {
         this.players = players;
@@ -43,10 +47,15 @@ public class GameManager {
         this.deck = new Deck();
         this.drawPile = new Pile();
         this.discardPile = new Pile();
+        this.interactionStack = new InteractionStack();
         
         // Initialize draw pile with cards from deck
         this.drawPile.addCards(deck.getCards());
         this.drawPile.shuffle();
+    }
+
+    public InteractionStack getInteractionStack() {
+        return interactionStack;
     }
 
     public Pile getDrawPile() {
@@ -114,11 +123,57 @@ public class GameManager {
     }
 
     /**
-     * Resolves a list of interactions sequentially.
+     * Resolves the current interaction stack.
      */
-    public void resolveInteractions(List<AbstractInteraction> interactions) {
-        if (interactions == null || interactions.isEmpty()) return;
-        pushState(new InteractionResolutionState(interactions));
+    public void resolveStack() {
+        if (interactionStack.isEmpty()) return;
+        
+        // Instead of passing a list, the state now pulls from the GameManager's stack
+        pushState(new InteractionResolutionState());
+    }
+
+    public int getDistance(int p1Id, int p2Id) {
+        int idx1 = -1;
+        int idx2 = -1;
+
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).getID() == p1Id) idx1 = i;
+            if (players.get(i).getID() == p2Id) idx2 = i;
+        }
+
+        if (idx1 == -1 || idx2 == -1) return 999;
+
+        int n = players.size();
+        int diff = Math.abs(idx1 - idx2);
+        
+        // Shortest distance in a circle
+        return Math.min(diff, n - diff);
+    }
+
+    public List<Player> getAlivePlayers() {
+        List<Player> alive = new ArrayList<>();
+        for (Player p : players) {
+            if (p.getSelectedChampion() != null && p.getSelectedChampion().getCurHP() > 0) {
+                alive.add(p);
+            }
+        }
+        return alive;
+    }
+
+    public List<Player> getAlivePlayersClockwise(Player startPlayer) {
+        List<Player> alive = new ArrayList<>();
+        int startIndex = players.indexOf(startPlayer);
+        if (startIndex == -1) return alive;
+        
+        int n = players.size();
+        for (int i = 1; i <= n; i++) {
+            int index = (startIndex + i) % n;
+            Player p = players.get(index);
+            if (p.getSelectedChampion() != null && p.getSelectedChampion().getCurHP() > 0) {
+                alive.add(p);
+            }
+        }
+        return alive;
     }
 
     public void pushState(GameState newState) {
@@ -126,6 +181,10 @@ public class GameManager {
             stateStack.peek().onPause(this);
         }
         stateStack.push(newState);
+        
+        // Broadcast state change
+        broadcastGameState(newState.getClass().getSimpleName());
+        
         newState.onEnter(this);
     }
 
@@ -134,7 +193,12 @@ public class GameManager {
             stateStack.pop().onExit(this);
         }
         if (!stateStack.isEmpty()) {
-            stateStack.peek().onResume(this);
+            GameState top = stateStack.peek();
+            
+            // Broadcast state change back to the previous state
+            broadcastGameState(top.getClass().getSimpleName());
+            
+            top.onResume(this);
         }
     }
 
@@ -143,6 +207,14 @@ public class GameManager {
             stateStack.pop().onExit(this);
         }
         pushState(newState);
+    }
+
+    private void broadcastGameState(String stateName) {
+        com.zzhgl.app.networking.response.game.ResponseGameState response = 
+            new com.zzhgl.app.networking.response.game.ResponseGameState(stateName);
+        for (Player p : players) {
+            p.addResponseForUpdate(response);
+        }
     }
 
     public void handleAction(Command command) {

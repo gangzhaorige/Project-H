@@ -44,6 +44,7 @@ public class ResponseGameSetup extends GameResponse {
                 packet.addString(champ.getElement());
                 packet.addInt32(champ.getAttack());
                 packet.addInt32(champ.getAttackRange());
+                packet.addInt32(champ.getSpecialDefenseRange());
             } else {
                 packet.addInt32(-1); // No champion
             }

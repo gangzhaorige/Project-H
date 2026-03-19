@@ -1,12 +1,9 @@
 package com.zzhgl.app.networking.request.game;
 
-import com.zzhgl.app.core.GameClient;
 import com.zzhgl.app.model.Command.SkillResponseCommand;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Room;
 import com.zzhgl.app.networking.request.GameRequest;
-import com.zzhgl.app.utility.DataReader;
-
 import java.io.IOException;
 
 public class RequestSkillResponse extends GameRequest {

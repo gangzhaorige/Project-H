@@ -3,21 +3,16 @@ package com.zzhgl.app.model.States;
 import com.zzhgl.app.model.Command.Command;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.interactions.AbstractInteraction;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import com.zzhgl.app.utility.Log;
 
 /**
- * InteractionResolutionState processes a list of game interactions sequentially.
+ * InteractionResolutionState processes interactions from the GameStack sequentially.
  * This ensures that if an interaction triggers a skill, that skill is fully 
  * resolved before the next interaction starts.
  */
 public class InteractionResolutionState implements GameState {
-    private final Queue<AbstractInteraction> interactions = new LinkedList<>();
 
-    public InteractionResolutionState(List<AbstractInteraction> interactionList) {
-        this.interactions.addAll(interactionList);
+    public InteractionResolutionState() {
     }
 
     @Override
@@ -32,13 +27,18 @@ public class InteractionResolutionState implements GameState {
     }
 
     private void processNext(GameManager game) {
-        if (interactions.isEmpty()) {
+        if (game.getInteractionStack().isEmpty()) {
             game.popState();
             return;
         }
 
-        AbstractInteraction next = interactions.poll();
-        next.execute(game);
+        AbstractInteraction next = game.getInteractionStack().pop();
+        if (next.isCanceled()) {
+            Log.printf("Skipping canceled interaction from %s.", next.getCaster().getUsername());
+            processNext(game);
+            return;
+        }
+        next.evaluate(game);
         
         // If the execution didn't push a new state (like SkillResolutionState),
         // we continue to the next interaction immediately.

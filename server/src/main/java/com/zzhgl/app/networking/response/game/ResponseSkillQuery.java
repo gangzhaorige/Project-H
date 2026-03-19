@@ -23,7 +23,6 @@ public class ResponseSkillQuery extends GameResponse {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
         packet.addString("Optional skill activation query.");
-        
         packet.addInt32(skillId);
         packet.addString(skillName);
 

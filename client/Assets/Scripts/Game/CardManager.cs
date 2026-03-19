@@ -86,7 +86,7 @@ public class CardManager : MonoBehaviour
 
         // Finalize by giving the object to HandManager and updating local data
         handManager.RegisterAnimatedCard(card, animCard);
-        GameSession.Instance.GetLocalPlayer().Hand.Add(card);
+        GameSession.Instance.GetLocalPlayer().AddCard(card);
     }
 
     private IEnumerator AnimateOtherDrawBatch(PlayerData pData, int count)
@@ -117,7 +117,7 @@ public class CardManager : MonoBehaviour
         yield return MoveCard(animCard.transform, targetPos, drawAnimDuration);
         
         Destroy(animCard);
-        pData.Hand.Add(new CardData { Id = -1 }); 
+        pData.AddCard(new CardData { Id = -1 }); 
     }
 
     public IEnumerator MoveCard(Transform cardTr, Vector3 targetPos, float duration)

@@ -71,8 +71,10 @@ public class Constants {
     public static readonly short SMSG_ADD_CARD = 412;
     public static readonly short SMSG_DISCARD_CARDS = 413;
     public static readonly short SMSG_FIELD_TO_HAND = 414;
+    public static readonly short SMSG_PASS_PRIORITY = 416;
+    public static readonly short CMSG_PASS_PRIORITY = 312;
 
-    // Turn System
+    // --- Turn System ---
     public static readonly short CMSG_END_TURN = 320;
     public static readonly short SMSG_END_TURN = 420;
     public static readonly short SMSG_TURN_START = 421;

@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class ResponseGameStartEventArgs : ExtendedEventArgs {
     public short Status { get; set; }
     public string Message { get; set; }

@@ -14,6 +14,7 @@ public class ChampionController : MonoBehaviour
     public string element;
     public int attack;
     public int attackRange;
+    public int specialDefense;
 
     [Header("UI References")]
     [SerializeField] private Image championImageUI;
@@ -23,9 +24,16 @@ public class ChampionController : MonoBehaviour
     [SerializeField] private Image pathImageUI;
     [SerializeField] private TextMeshProUGUI attackTextUI;
     [SerializeField] private TextMeshProUGUI rangeTextUI;
+    [SerializeField] private TextMeshProUGUI cardCountTextUI;
+    [SerializeField] private GameObject activeIndicator;
 
-    public void Init(ChampionData data)
+    private PlayerData player;
+
+    public void Init(PlayerData pData)
     {
+        this.player = pData;
+        ChampionData data = pData.Champion;
+
         this.id = data.Id;
         this.championName = data.Name;
         this.maxHP = data.MaxHP;
@@ -34,8 +42,38 @@ public class ChampionController : MonoBehaviour
         this.element = data.Element;
         this.attack = data.Attack;
         this.attackRange = data.AttackRange;
+        this.specialDefense = data.SpecialDefense;
+
+        // Subscribe to hand changes
+        player.OnHandChanged += UpdateCardCount;
 
         UpdateVisuals();
+        UpdateCardCount();
+    }
+
+    private void OnDestroy()
+    {
+        if (player != null)
+        {
+            player.OnHandChanged -= UpdateCardCount;
+        }
+    }
+
+    private void UpdateCardCount()
+    {
+        if (cardCountTextUI != null)
+        {
+            cardCountTextUI.text = player.Hand.Count.ToString();
+        }
+    }
+
+    public void ToggleActive(bool active)
+    {
+        if (activeIndicator != null)
+        {
+            Debug.Log($"[ChampionController] {championName} active indicator -> {active}");
+            activeIndicator.SetActive(active);
+        }
     }
 
     private void UpdateVisuals()

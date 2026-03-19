@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1832895134002784317}
   - component: {fileID: 7728831390007132356}
   - component: {fileID: 6721731766475501113}
+  - component: {fileID: 6884050755297661599}
   m_Layer: 6
   m_Name: Character
   m_TagString: Untagged
@@ -110,6 +111,22 @@ MonoBehaviour:
   m_Alpha: -1
   m_Softness: -1
   m_PartOfParent: 0
+--- !u!114 &6884050755297661599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277380255856652015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48039f9c078a4a1da75eb61c6d3211e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TargetItemUI
+  nameText: {fileID: 0}
+  portraitImage: {fileID: 0}
+  selectionToggle: {fileID: 0}
+  canvasGroup: {fileID: 0}
 --- !u!1 &584981999030045010
 GameObject:
   m_ObjectHideFlags: 0

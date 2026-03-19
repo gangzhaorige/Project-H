@@ -27,14 +27,15 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_END_TURN, "ResponseEndTurn");
 		Add(Constants.SMSG_TURN_START, "ResponseTurnStart");
 		Add(Constants.SMSG_HEARTBEAT, "ResponseHeartBeat");
-		Add(Constants.SMSG_RESPONSE_TIMER_START, "ResponseTimer");
+		Add(Constants.SMSG_RESPONSE_TIMER_START, "ResponseTimerStart");
 		Add(Constants.SMSG_RESPONSE_TIMER_CANCEL, "ResponseTimerCancel");
+		Add(Constants.SMSG_PASS_PRIORITY, "ResponsePassPriority");
 		Add(Constants.SMSG_PLAYER_STATS, "ResponsePlayerStats");
 		Add(Constants.SMSG_ACTION_COMPLETED, "ResponseActionCompletedEvent");
 		Add(Constants.SMSG_SKILL_ACTIVATION, "ResponseSkillActivation");
 		Add(Constants.SMSG_JUDGE, "ResponseJudgementResult");
 		Add(Constants.SMSG_SHOW_TARGET_HAND, "ResponseShowTargetHand");
-		Add(Constants.SMSG_STATE_CHANGE, "ResponseStateChange");
+		Add(Constants.SMSG_STATE_CHANGE, "ResponseGameState");
 		Add(Constants.SMSG_UPDATE_ATTACK, "ResponseUpdateAttack");
 		Add(Constants.SMSG_ADD_CARD, "ResponseAddCard");
 		Add(Constants.SMSG_DISCARD_CARDS, "ResponseDiscardCards");

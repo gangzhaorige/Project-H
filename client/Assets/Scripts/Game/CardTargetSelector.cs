@@ -10,12 +10,7 @@ public class CardTargetSelector : MonoBehaviour
 {
     public static CardTargetSelector Instance { get; private set; }
 
-    [Header("Settings")]
-    public LayerMask targetLayer; // Ensure your Champion prefabs have a collider and are on this layer
-
     private CardData currentCard;
-    private List<int> selectedTargetIds = new List<int>();
-    private bool isTargeting = false;
 
     private void Awake()
     {
@@ -25,73 +20,82 @@ public class CardTargetSelector : MonoBehaviour
     public void BeginTargeting(CardData card)
     {
         currentCard = card;
-        selectedTargetIds.Clear();
-        isTargeting = true;
-        
-        Debug.Log($"[Targeting] Select targets for {card.Type}. (Click a champion on the field)");
-        
-        // Simple case: if it's a "Heal" or "Self" card, just send immediately for now
-        if (card.Type == "Heal")
-        {
-            SendPlayRequest();
-        }
-    }
+        int maxTargets = GetMaxTargets(card.Type);
+        Debug.Log($"[Targeting] Showing UI for {card.Type}. MaxTargets: {maxTargets}");
 
-    private void Update()
-    {
-        if (!isTargeting) return;
-
-        // Cancel targeting via right click
-        if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+        if (maxTargets == 0)
         {
-            isTargeting = false;
-            Debug.Log("[Targeting] Cancelled.");
+            ConfirmTargeting(new List<int>());
             return;
         }
-
-        // Selection via Raycast on left click
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        
+        if (TargetSelectionUI.Instance != null)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, targetLayer))
-            {
-                ChampionController controller = hit.collider.GetComponentInParent<ChampionController>();
-                if (controller != null)
-                {
-                    // Find which player this champion belongs to
-                    foreach (var pair in GameSession.Instance.Players)
-                    {
-                        if (pair.Value.ChampionObject == controller.gameObject)
-                        {
-                            OnTargetSelected(pair.Key);
-                            break;
-                        }
-                    }
-                }
-            }
+            TargetSelectionUI.Instance.Show(card);
+        }
+        else
+        {
+            Debug.LogError("[CardTargetSelector] TargetSelectionUI.Instance is missing!");
         }
     }
 
-    private void OnTargetSelected(int playerId)
-    {
-        if (selectedTargetIds.Contains(playerId)) return;
-
-        selectedTargetIds.Add(playerId);
-        Debug.Log($"[Targeting] Added target: {playerId}. Count: {selectedTargetIds.Count}");
-
-        // For now, assume most cards take 1 target
-        // We will add more complex logic for "maxTarget" later
-        SendPlayRequest();
+    public int GetMaxTargets(string type) {
+        switch (type) {
+            case "ATTACK": case "DUEL": return 1;
+            case "ARROW": case "FIRE": case "HEAL_ALL": return 0; // AOE cards skip target selection
+            case "DODGE": case "HEAL": case "NEGATE": case "DRAW": return 0; // Self/No-target cards skip target selection
+            default: return 0;
+        }
     }
 
-    private void SendPlayRequest()
+    public void ConfirmTargeting(List<int> targetIds)
     {
-        isTargeting = false;
-        
+        if (currentCard == null) return;
+
         RequestPlayCard req = new RequestPlayCard();
-        req.Send(currentCard.Id, selectedTargetIds);
+        req.Send(currentCard.Id, targetIds);
         NetworkManager.Instance.SendRequest(req);
         
-        Debug.Log($"[Targeting] Request sent for card {currentCard.Id}");
+        Debug.Log($"[Targeting] Request sent for card {currentCard.Id} with {targetIds.Count} targets.");
+        currentCard = null;
+    }
+
+    public void CancelTargeting()
+    {
+        Debug.Log("[Targeting] Cancelled.");
+        currentCard = null;
+    }
+
+    public bool CanTarget(int attackerId, int targetId)
+    {
+        if (attackerId == targetId) return false; // Cannot attack self
+
+        if (!GameSession.Instance.Players.TryGetValue(attackerId, out PlayerData attacker) ||
+            !GameSession.Instance.Players.TryGetValue(targetId, out PlayerData target))
+        {
+            return false;
+        }
+
+        int distance = GetDistance(attackerId, targetId);
+        int effectiveDistance = distance + target.Champion.SpecialDefense;
+
+        Debug.Log($"[RangeCheck] Attacker {attackerId} (Range: {attacker.Champion.AttackRange}) -> Target {targetId} (Defense: {target.Champion.SpecialDefense}). Distance: {distance}, Effective: {effectiveDistance}");
+
+        return effectiveDistance <= attacker.Champion.AttackRange;
+    }
+
+    private int GetDistance(int p1Id, int p2Id)
+    {
+        List<int> order = GameSession.Instance.PlayerOrder;
+        int idx1 = order.IndexOf(p1Id);
+        int idx2 = order.IndexOf(p2Id);
+
+        if (idx1 == -1 || idx2 == -1) return 999;
+
+        int n = order.Count;
+        int diff = Mathf.Abs(idx1 - idx2);
+        
+        // Shortest distance in a circle
+        return Mathf.Min(diff, n - diff);
     }
 }

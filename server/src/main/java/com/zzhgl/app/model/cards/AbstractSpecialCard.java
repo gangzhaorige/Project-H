@@ -9,7 +9,7 @@ import java.util.List;
  */
 public abstract class AbstractSpecialCard extends AbstractCard {
     public enum SpecialType {
-        ARROW, DUEL, DRAW, STEAL, DISMANTLE, HEAL_ALL
+        ARROW, DUEL, DRAW, STEAL, DISMANTLE, HEAL_ALL, FIRE, NEGATE
     }
 
     protected SpecialType type;
@@ -24,12 +24,5 @@ public abstract class AbstractSpecialCard extends AbstractCard {
     @Override
     public Category getCategory() {
         return Category.SPECIAL;
-    }
-
-    /**
-     * Plays the card and generates a list of interactions.
-     */
-    public List<AbstractInteraction> play() {
-        return new ArrayList<>(); // Empty for now
     }
 }

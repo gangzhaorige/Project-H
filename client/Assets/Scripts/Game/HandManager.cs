@@ -94,7 +94,17 @@ public class HandManager : MonoBehaviour
         ReorganizeHand();
     }
 
-    public void RemoveCard(int cardId)
+    public GameObject GetCardObject(int cardId)
+    {
+        if (cardMap.TryGetValue(cardId, out GameObject go)) return go;
+        return null;
+    }
+
+    /// <summary>
+    /// Unregisters a card from the hand logic without destroying it.
+    /// Used when a card is played and moves to the play field.
+    /// </summary>
+    public void UnregisterCard(int cardId)
     {
         if (cardMap.TryGetValue(cardId, out GameObject go))
         {
@@ -115,8 +125,17 @@ public class HandManager : MonoBehaviour
 
             if (hoveredCardId == cardId) hoveredCardId = -1;
 
-            Destroy(go);
+            // Reorganize the remaining cards in the hand
             ReorganizeHand();
+        }
+    }
+
+    public void RemoveCard(int cardId)
+    {
+        if (cardMap.TryGetValue(cardId, out GameObject go))
+        {
+            UnregisterCard(cardId);
+            Destroy(go);
         }
     }
 
