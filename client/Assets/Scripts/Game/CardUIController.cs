@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using ProjectH.Models;
+using ProjectH.Rules;
 
 public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -32,7 +33,7 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public void OnPointerEnter(PointerEventData eventData)
     {
         isHovered = true;
-        if (playButton != null) playButton.SetActive(true);
+        if (playButton != null) playButton.SetActive(CanShowPlayButton());
         
         // Target the hover offset
         targetYOffset = hoverYOffset;
@@ -41,6 +42,14 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
         {
             handManager.SetHoveredCard(cardData.Id);
         }
+    }
+
+    private bool CanShowPlayButton()
+    {
+        if (cardData == null) return false;
+
+        var localPlayer = GameSession.Instance.GetLocalPlayer();
+        return CardRuleManager.CanPlay(cardData, localPlayer);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -104,7 +113,7 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private void HandleStandardPlay()
     {
         // Validate targeting requirement
-        int maxTargets = CardTargetSelector.Instance.GetMaxTargets(cardData.Type);
+        int maxTargets = CardRuleManager.GetMaxTargets(cardData);
         if (maxTargets > 0)
         {
             Debug.Log($"[CardUI] Card {cardData.Type} requires {maxTargets} targets. Showing UI.");

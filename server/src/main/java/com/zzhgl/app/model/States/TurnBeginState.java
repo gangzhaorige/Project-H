@@ -1,9 +1,11 @@
 package com.zzhgl.app.model.States;
 
 import com.zzhgl.app.model.Command.Command;
+import com.zzhgl.app.model.champions.Champion;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
+import com.zzhgl.app.networking.response.game.ResponseChampionStatsUpdateInteger;
 import com.zzhgl.app.utility.Log;
 
 /**
@@ -18,6 +20,16 @@ public class TurnBeginState implements GameState {
         // Reset attack count
         if (activePlayer.getSelectedChampion() != null) {
             activePlayer.getSelectedChampion().setCurNumOfAttack(0);
+            
+            // Notify all players about the reset
+            ResponseChampionStatsUpdateInteger statsUpdate = new ResponseChampionStatsUpdateInteger(
+                activePlayer.getSelectedChampion().getId(),
+                Champion.STAT_CUR_NUM_ATTACK,
+                0
+            );
+            for (Player p : game.getPlayers()) {
+                p.addResponseForUpdate(statsUpdate);
+            }
         }
 
         // Emit TURN_BEGIN event. All reactive skills (like Beginning Wisdom) will be queued.

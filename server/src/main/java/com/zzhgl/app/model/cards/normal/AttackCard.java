@@ -5,6 +5,7 @@ import com.zzhgl.app.model.champions.Champion;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.model.interactions.types.AttackInteraction;
+import com.zzhgl.app.networking.response.game.ResponseChampionStatsUpdateInteger;
 import java.util.List;
 
 /**
@@ -50,6 +51,16 @@ public class AttackCard extends AbstractNormalCard {
         Champion casterChamp = caster.getSelectedChampion();
         if (casterChamp != null) {
             casterChamp.setCurNumOfAttack(casterChamp.getCurNumOfAttack() + 1);
+            
+            // Notify all players about the updated attack count
+            ResponseChampionStatsUpdateInteger statsUpdate = new ResponseChampionStatsUpdateInteger(
+                casterChamp.getId(),
+                Champion.STAT_CUR_NUM_ATTACK,
+                casterChamp.getCurNumOfAttack()
+            );
+            for (Player p : game.getPlayers()) {
+                p.addResponseForUpdate(statsUpdate);
+            }
         }
 
         for (int targetId : targetIds) {

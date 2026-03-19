@@ -36,6 +36,7 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_JUDGE, "ResponseJudgementResult");
 		Add(Constants.SMSG_SHOW_TARGET_HAND, "ResponseShowTargetHand");
 		Add(Constants.SMSG_STATE_CHANGE, "ResponseGameState");
+		Add(Constants.SMSG_CHAMPION_STATS_UPDATE_INTEGER, "ResponseChampionStatsUpdateInteger");
 		Add(Constants.SMSG_UPDATE_ATTACK, "ResponseUpdateAttack");
 		Add(Constants.SMSG_ADD_CARD, "ResponseAddCard");
 		Add(Constants.SMSG_DISCARD_CARDS, "ResponseDiscardCards");

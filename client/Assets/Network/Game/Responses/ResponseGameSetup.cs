@@ -11,6 +11,8 @@ public class ChampionSetupInfo {
     public int Attack;
     public int AttackRange;
     public int SpecialDefense;
+    public int MaxNumOfAttack;
+    public int CurNumOfAttack;
 }
 
 public class PlayerSetupInfo {
@@ -59,6 +61,8 @@ public class ResponseGameSetup : BaseNetworkResponse {
                 player.Champion.Attack = DataReader.ReadInt(DataStream);
                 player.Champion.AttackRange = DataReader.ReadInt(DataStream);
                 player.Champion.SpecialDefense = DataReader.ReadInt(DataStream);
+                player.Champion.MaxNumOfAttack = DataReader.ReadInt(DataStream);
+                player.Champion.CurNumOfAttack = DataReader.ReadInt(DataStream);
             }
             players.Add(player);
         }

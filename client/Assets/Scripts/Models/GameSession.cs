@@ -14,6 +14,8 @@ namespace ProjectH.Models
         public int Element;
         public int Attack;
         public int AttackRange;
+        public int CurNumOfAttack;
+        public int MaxNumOfAttack;
         public int SpecialDefense;
         // Other stats can be added here
     }
@@ -117,10 +119,27 @@ namespace ProjectH.Models
         public delegate void GameSetupCompleted();
         public event GameSetupCompleted OnGameSetupCompleted;
 
+        public delegate void ChampionStatsUpdated(int championId, int statId, int value);
+        public event ChampionStatsUpdated OnChampionStatsUpdated;
+
         public void TriggerTimerStarted(int seconds, string message, int playerId) => OnTimerStarted?.Invoke(seconds, message, playerId);
         public void TriggerTimerCancelled() => OnTimerCancelled?.Invoke();
         public void TriggerTurnStarted(int activePlayerId) => OnTurnStarted?.Invoke(activePlayerId);
         public void TriggerGameSetupCompleted() => OnGameSetupCompleted?.Invoke();
+        public void TriggerChampionStatsUpdated(int championId, int statId, int value) => OnChampionStatsUpdated?.Invoke(championId, statId, value);
+
+        // Stat IDs (Matching Server)
+        public const int STAT_CUR_HP = 1;
+        public const int STAT_MAX_HP = 2;
+        public const int STAT_ATTACK = 3;
+        public const int STAT_ATTACK_RANGE = 4;
+        public const int STAT_SPECIAL_RANGE = 5;
+        public const int STAT_CUR_NUM_ATTACK = 6;
+        public const int STAT_MAX_NUM_ATTACK = 7;
+        public const int STAT_SPECIAL_DEFENSE_RANGE = 8;
+        public const int STAT_MAX_TARGET = 9;
+        public const int STAT_PATH_ID = 10;
+        public const int STAT_ELEMENT = 11;
 
         public void Clear()
         {

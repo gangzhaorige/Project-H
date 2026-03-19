@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using ProjectH.Models;
+using ProjectH.Rules;
 
 /**
  * CardTargetSelector manages the "Targeting Mode" when a card is clicked.
@@ -20,7 +21,7 @@ public class CardTargetSelector : MonoBehaviour
     public void BeginTargeting(CardData card)
     {
         currentCard = card;
-        int maxTargets = GetMaxTargets(card.Type);
+        int maxTargets = CardRuleManager.GetMaxTargets(card);
         Debug.Log($"[Targeting] Showing UI for {card.Type}. MaxTargets: {maxTargets}");
 
         if (maxTargets == 0)
@@ -41,12 +42,7 @@ public class CardTargetSelector : MonoBehaviour
     }
 
     public int GetMaxTargets(string type) {
-        switch (type) {
-            case "ATTACK": case "DUEL": return 1;
-            case "ARROW": case "FIRE": case "HEAL_ALL": return 0; // AOE cards skip target selection
-            case "DODGE": case "HEAL": case "NEGATE": case "DRAW": return 0; // Self/No-target cards skip target selection
-            default: return 0;
-        }
+        return CardRuleManager.GetMaxTargets(new CardData { Type = type });
     }
 
     public void ConfirmTargeting(List<int> targetIds)
@@ -77,26 +73,8 @@ public class CardTargetSelector : MonoBehaviour
             return false;
         }
 
-        int distance = GetDistance(attackerId, targetId);
-        int effectiveDistance = distance + target.Champion.SpecialDefense;
+        if (currentCard == null) return true; // Default to true if no card context
 
-        Debug.Log($"[RangeCheck] Attacker {attackerId} (Range: {attacker.Champion.AttackRange}) -> Target {targetId} (Defense: {target.Champion.SpecialDefense}). Distance: {distance}, Effective: {effectiveDistance}");
-
-        return effectiveDistance <= attacker.Champion.AttackRange;
-    }
-
-    private int GetDistance(int p1Id, int p2Id)
-    {
-        List<int> order = GameSession.Instance.PlayerOrder;
-        int idx1 = order.IndexOf(p1Id);
-        int idx2 = order.IndexOf(p2Id);
-
-        if (idx1 == -1 || idx2 == -1) return 999;
-
-        int n = order.Count;
-        int diff = Mathf.Abs(idx1 - idx2);
-        
-        // Shortest distance in a circle
-        return Mathf.Min(diff, n - diff);
+        return CardRuleManager.CanTarget(currentCard, attacker, target);
     }
 }

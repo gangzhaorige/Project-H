@@ -85,6 +85,7 @@ public class Constants {
     public static readonly short SMSG_PLAYER_STATS = 432;
     public static readonly short SMSG_ACTION_COMPLETED = 433;
     public static readonly short SMSG_STATE_CHANGE = 434;
+    public static readonly short SMSG_CHAMPION_STATS_UPDATE_INTEGER = 435;
 
     // Skills/Judgement
     public static readonly short CMSG_ACTIVATE_SKILL = 340;

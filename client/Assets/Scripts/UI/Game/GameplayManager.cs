@@ -25,6 +25,7 @@ public class GameplayManager : MonoBehaviour
         NetworkManager.Instance.AddCallback(Constants.SMSG_RESPONSE_TIMER_CANCEL, OnTimerCancel);
         NetworkManager.Instance.AddCallback(Constants.SMSG_PASS_PRIORITY, OnPassPriorityResponse);
         NetworkManager.Instance.AddCallback(Constants.SMSG_STATE_CHANGE, OnGameStateResponse);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_CHAMPION_STATS_UPDATE_INTEGER, OnChampionStatsUpdate);
 
         // UI events are decoupled - UIController will listen to GameSession events
 
@@ -48,6 +49,7 @@ public class GameplayManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_RESPONSE_TIMER_CANCEL);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_PASS_PRIORITY);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_STATE_CHANGE);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_CHAMPION_STATS_UPDATE_INTEGER);
         }
     }
 
@@ -168,6 +170,36 @@ public class GameplayManager : MonoBehaviour
         if (res != null && res.Status == Constants.SUCCESS) {
             Debug.Log("[GameplayManager] State Change: " + res.StateName);
             GameSession.Instance.State = res.StateName;
+        }
+    }
+
+    private void OnChampionStatsUpdate(ExtendedEventArgs args)
+    {
+        ResponseChampionStatsUpdateIntegerEventArgs res = args as ResponseChampionStatsUpdateIntegerEventArgs;
+        if (res == null) return;
+
+        Debug.Log($"[GameplayManager] Champion {res.ChampionId} Stat {res.StatId} updated to {res.Value}");
+
+        // Find the player with this champion
+        foreach (var player in GameSession.Instance.Players.Values)
+        {
+            if (player.Champion != null && player.Champion.Id == res.ChampionId)
+            {
+                // Update local model
+                switch (res.StatId)
+                {
+                    case GameSession.STAT_CUR_HP: player.Champion.CurHP = res.Value; break;
+                    case GameSession.STAT_MAX_HP: player.Champion.MaxHP = res.Value; break;
+                    case GameSession.STAT_ATTACK: player.Champion.Attack = res.Value; break;
+                    case GameSession.STAT_ATTACK_RANGE: player.Champion.AttackRange = res.Value; break;
+                    case GameSession.STAT_CUR_NUM_ATTACK: player.Champion.CurNumOfAttack = res.Value; break;
+                    case GameSession.STAT_MAX_NUM_ATTACK: player.Champion.MaxNumOfAttack = res.Value; break;
+                }
+
+                // Trigger event for UI observers (like ChampionController)
+                GameSession.Instance.TriggerChampionStatsUpdated(res.ChampionId, res.StatId, res.Value);
+                break;
+            }
         }
     }
 }

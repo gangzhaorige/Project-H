@@ -46,6 +46,9 @@ public class ChampionController : MonoBehaviour
 
         // Subscribe to hand changes
         player.OnHandChanged += UpdateCardCount;
+        
+        // Subscribe to stat updates (Observer Pattern)
+        GameSession.Instance.OnChampionStatsUpdated += OnChampionStatsUpdated;
 
         UpdateVisuals();
         UpdateCardCount();
@@ -57,6 +60,27 @@ public class ChampionController : MonoBehaviour
         {
             player.OnHandChanged -= UpdateCardCount;
         }
+        
+        if (GameSession.Instance != null)
+        {
+            GameSession.Instance.OnChampionStatsUpdated -= OnChampionStatsUpdated;
+        }
+    }
+
+    private void OnChampionStatsUpdated(int championId, int statId, int value)
+    {
+        if (this.id != championId) return;
+
+        // Sync local component fields with updated model
+        switch (statId)
+        {
+            case GameSession.STAT_CUR_HP: this.curHP = value; break;
+            case GameSession.STAT_MAX_HP: this.maxHP = value; break;
+            case GameSession.STAT_ATTACK: this.attack = value; break;
+            case GameSession.STAT_ATTACK_RANGE: this.attackRange = value; break;
+        }
+
+        UpdateVisuals();
     }
 
     private void UpdateCardCount()
