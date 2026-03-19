@@ -9,7 +9,6 @@ public class TargetSelectionUI : MonoBehaviour
     public static TargetSelectionUI Instance { get; private set; }
 
     [Header("UI References")]
-    public GameObject panel;
     public Transform container;
     public GameObject targetItemPrefab;
     public Button confirmButton;
@@ -23,7 +22,6 @@ public class TargetSelectionUI : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        if (panel != null) panel.SetActive(false);
         
         if (confirmButton != null) confirmButton.onClick.AddListener(OnConfirmClick);
         if (cancelButton != null) cancelButton.onClick.AddListener(OnCancelClick);
@@ -33,7 +31,6 @@ public class TargetSelectionUI : MonoBehaviour
     {
         currentCard = card;
         selectedTargetIds.Clear();
-        panel.SetActive(true);
         
         if (instructionText != null)
         {
@@ -113,12 +110,12 @@ public class TargetSelectionUI : MonoBehaviour
     private void OnConfirmClick()
     {
         CardTargetSelector.Instance.ConfirmTargeting(selectedTargetIds);
-        panel.SetActive(false);
+        if (UIController.Instance != null) UIController.Instance.ShowTargetSelectionPanel(false);
     }
 
     private void OnCancelClick()
     {
-        panel.SetActive(false);
+        if (UIController.Instance != null) UIController.Instance.ShowTargetSelectionPanel(false);
         CardTargetSelector.Instance.CancelTargeting();
     }
 }

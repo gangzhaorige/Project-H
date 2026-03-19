@@ -29,13 +29,14 @@ public class CardTargetSelector : MonoBehaviour
             return;
         }
         
-        if (TargetSelectionUI.Instance != null)
+        if (UIController.Instance != null)
         {
+            UIController.Instance.ShowTargetSelectionPanel(true);
             TargetSelectionUI.Instance.Show(card);
         }
         else
         {
-            Debug.LogError("[CardTargetSelector] TargetSelectionUI.Instance is missing!");
+            Debug.LogError("[CardTargetSelector] UIController.Instance is missing!");
         }
     }
 

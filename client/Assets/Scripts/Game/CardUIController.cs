@@ -122,5 +122,8 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
         RequestPlayCard req = new RequestPlayCard();
         req.Send(cardData.Id, targetIds);
         NetworkManager.Instance.SendRequest(req);
+
+        // Immediately update UI state to avoid double-clicking or invalid actions
+        if (UIController.Instance != null) UIController.Instance.UpdateUIState();
     }
 }

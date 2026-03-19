@@ -1,34 +1,15 @@
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections.Generic;
 using ProjectH.Models;
 
 public class GameplayManager : MonoBehaviour
 {
-    [Header("UI - Loading")]
-    public GameObject loadingPanel;
-
     [Header("Components")]
     public ChampionSetup championSetup;
-
-    [Header("Turn UI")]
-    public Button endTurnButton;
-    public Button passPriorityButton;
-    public TextMeshProUGUI turnStatusText;
-    public TextMeshProUGUI instructionText;
-    public TextMeshProUGUI stateText;
-    public Slider timerSlider;
-
-    private float currentTimer = 0f;
-    private float maxTimer = 0f;
-    private bool isTimerActive = false;
-
 
     void Start()
     {
         GameSession.Instance.Clear();
-        if (loadingPanel != null) loadingPanel.SetActive(true);
 
         if (championSetup == null) {
             Debug.LogError("[GameplayManager] CRITICAL: championSetup reference is null in Start!");
@@ -45,17 +26,7 @@ public class GameplayManager : MonoBehaviour
         NetworkManager.Instance.AddCallback(Constants.SMSG_PASS_PRIORITY, OnPassPriorityResponse);
         NetworkManager.Instance.AddCallback(Constants.SMSG_STATE_CHANGE, OnGameStateResponse);
 
-        if (timerSlider != null) timerSlider.gameObject.SetActive(false);
-        
-        if (endTurnButton != null) {
-            endTurnButton.onClick.AddListener(OnEndTurnClick);
-            endTurnButton.interactable = false;
-        }
-
-        if (passPriorityButton != null) {
-            passPriorityButton.onClick.AddListener(OnPassPriorityClick);
-            passPriorityButton.gameObject.SetActive(false);
-        }
+        // UI events are decoupled - UIController will listen to GameSession events
 
         // Handshake Step 1: Tell server we loaded the scene and are ready for data
         Debug.Log("[GameplayManager] Sending RequestReadyForGameSetup...");
@@ -63,19 +34,6 @@ public class GameplayManager : MonoBehaviour
         setupReq.Send();
         NetworkManager.Instance.SendRequest(setupReq);
     }
-
-    void Update()
-    {
-        if (isTimerActive && currentTimer > 0)
-        {
-            currentTimer -= Time.deltaTime;
-            if (timerSlider != null)
-            {
-                timerSlider.value = currentTimer / maxTimer;
-            }
-        }
-    }
-    
 
     void OnDestroy()
     {
@@ -92,22 +50,22 @@ public class GameplayManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_STATE_CHANGE);
         }
     }
-private void OnTimerStart(ExtendedEventArgs args)
-{
-    ResponseTimerStartEventArgs res = args as ResponseTimerStartEventArgs;
-    if (res == null) return;
 
-    bool isNegationWindow = (res.PlayerId == -1);
-    bool isLocal = res.PlayerId == Constants.USER_ID;
+    private void OnTimerStart(ExtendedEventArgs args)
+    {
+        ResponseTimerStartEventArgs res = args as ResponseTimerStartEventArgs;
+        if (res == null) return;
 
-    GameSession.Instance.IsResponseRequired = true;
-    GameSession.Instance.RequiredCardType = res.RequiredCardType;
+        bool isNegationWindow = (res.PlayerId == -1);
+        GameSession.Instance.RequiredCardType = res.RequiredCardType;
+        GameSession.Instance.IsResponseRequired = (res.PlayerId == Constants.USER_ID || isNegationWindow);
 
-    Debug.Log($"[GameplayManager] Timer start for player {res.PlayerId}. isLocal: {isLocal}, isNegationWindow: {isNegationWindow}, seconds: {res.Seconds}, RequiredType: {res.RequiredCardType}");
+        Debug.Log($"[GameplayManager] Timer start for player {res.PlayerId}. seconds: {res.Seconds}, RequiredType: {res.RequiredCardType}");
 
-    // ... (rest of method remains largely same, just adding above)
+        // Observer Pattern: Trigger event
+        GameSession.Instance.TriggerTimerStarted(res.Seconds, res.Message, res.PlayerId);
 
-        // Update Indicator for everyone
+        // Update Indicator for everyone (Model logic)
         foreach (var player in GameSession.Instance.Players.Values)
         {
             if (player.ChampionObject != null)
@@ -115,73 +73,30 @@ private void OnTimerStart(ExtendedEventArgs args)
                 var controller = player.ChampionObject.GetComponent<ChampionController>();
                 if (controller != null)
                 {
-                    // If it's a negation window, everyone pulses. Otherwise only the active player.
                     controller.ToggleActive(isNegationWindow || player.PlayerId == res.PlayerId);
                 }
             }
         }
-
-        // Show Pass button during negation window
-        if (passPriorityButton != null)
-        {
-            passPriorityButton.gameObject.SetActive(isNegationWindow || (isLocal && GameSession.Instance.State != "PlayActionState"));
-        }
-
-        // Display instructional message
-        if (instructionText != null)
-        {
-            instructionText.text = res.Message;
-        }
-
-        // Update Slider for local player or everyone during negation
-        if ((isLocal || isNegationWindow) && timerSlider != null)
-        {
-            timerSlider.gameObject.SetActive(true);
-            timerSlider.interactable = false; // Display only
-            currentTimer = res.Seconds;
-            maxTimer = (res.Seconds > 0) ? res.Seconds : 15f;
-            isTimerActive = true;
-        }
-        else if (timerSlider != null)
-        {
-            timerSlider.gameObject.SetActive(false);
-            isTimerActive = false;
-        }
     }
 
-    private void OnPassPriorityClick()
+    private void OnPassPriorityResponse(ExtendedEventArgs args)
     {
-        Debug.Log("[GameplayManager] Sending RequestPassPriority...");
-        RequestPassPriority req = new RequestPassPriority();
-        req.Send();
-        NetworkManager.Instance.SendRequest(req);
+        ResponsePassPriorityEventArgs res = args as ResponsePassPriorityEventArgs;
+        if (res == null) return;
+
+        GameSession.Instance.IsResponseRequired = false;
+        GameSession.Instance.RequiredCardType = "";
+        
+        GameSession.Instance.TriggerTimerCancelled();
     }
-private void OnPassPriorityResponse(ExtendedEventArgs args)
-{
-    ResponsePassPriorityEventArgs res = args as ResponsePassPriorityEventArgs;
-    if (res == null) return;
 
-    GameSession.Instance.IsResponseRequired = false;
-    GameSession.Instance.RequiredCardType = "";
+    private void OnTimerCancel(ExtendedEventArgs args)
+    {
+        GameSession.Instance.IsResponseRequired = false;
+        GameSession.Instance.RequiredCardType = "";
 
-    if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
-    if (timerSlider != null) timerSlider.gameObject.SetActive(false);
-    isTimerActive = false;
-}
-
-private void OnTimerCancel(ExtendedEventArgs args)
-{
-    isTimerActive = false;
-    GameSession.Instance.IsResponseRequired = false;
-    GameSession.Instance.RequiredCardType = "";
-
-    if (timerSlider != null) timerSlider.gameObject.SetActive(false);
-    if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
-    if (instructionText != null) instructionText.text = "";
-
-    // ... rest of method
-
-        // Clear all pulsing indicators
+        GameSession.Instance.TriggerTimerCancelled();
+        
         foreach (var player in GameSession.Instance.Players.Values)
         {
             if (player.ChampionObject != null)
@@ -195,29 +110,13 @@ private void OnTimerCancel(ExtendedEventArgs args)
     private void OnCardDraw(ExtendedEventArgs args)
     {
         ResponseDrawCardEventArgs res = args as ResponseDrawCardEventArgs;
-        if (res != null)
-        {
-            CardManager.Instance.HandleLocalDraw(res.Cards);
-        }
+        if (res != null) CardManager.Instance.HandleLocalDraw(res.Cards);
     }
 
     private void OnCardDrawOther(ExtendedEventArgs args)
     {
         ResponseDrawCardOtherEventArgs res = args as ResponseDrawCardOtherEventArgs;
-        if (res != null)
-        {
-            CardManager.Instance.HandleOtherDraw(res.PlayerId, res.CardCount);
-        }
-    }
-
-    private void OnEndTurnClick()
-    {
-        Debug.Log("[GameplayManager] Sending RequestEndTurn...");
-        RequestEndTurn req = new RequestEndTurn();
-        req.Send();
-        NetworkManager.Instance.SendRequest(req);
-        
-        if (endTurnButton != null) endTurnButton.interactable = false;
+        if (res != null) CardManager.Instance.HandleOtherDraw(res.PlayerId, res.CardCount);
     }
 
     private void OnTurnStart(ExtendedEventArgs args)
@@ -225,30 +124,20 @@ private void OnTimerCancel(ExtendedEventArgs args)
         ResponseTurnStartEventArgs res = args as ResponseTurnStartEventArgs;
         if (res == null) return;
 
-        bool isMyTurn = (res.ActivePlayerId == Constants.USER_ID);
-        Debug.Log($"[GameplayManager] Turn started for player {res.ActivePlayerId}. My turn: {isMyTurn}");
-        
-        if (turnStatusText != null) {
-            turnStatusText.text = isMyTurn ? "YOUR TURN" : $"PLAYER {res.ActivePlayerId} TURN";
-        }
-
-        if (endTurnButton != null) {
-            endTurnButton.interactable = isMyTurn;
-        }
+        Debug.Log($"[GameplayManager] Turn started for player {res.ActivePlayerId}.");
+        GameSession.Instance.ActivePlayerId = res.ActivePlayerId;
+        GameSession.Instance.TriggerTurnStarted(res.ActivePlayerId);
     }
 
     private void OnTurnEnd(ExtendedEventArgs args)
     {
         ResponseEndTurnEventArgs res = args as ResponseEndTurnEventArgs;
-        if (res != null) {
-            Debug.Log($"[GameplayManager] Turn ended for player {res.EndedPlayerId}");
-        }
+        if (res != null) Debug.Log($"[GameplayManager] Turn ended for player {res.EndedPlayerId}");
         
-        isTimerActive = false;
-        if (timerSlider != null) timerSlider.gameObject.SetActive(false);
-        if (passPriorityButton != null) passPriorityButton.gameObject.SetActive(false);
+        GameSession.Instance.ActivePlayerId = -1;
+        GameSession.Instance.TriggerTimerCancelled();
 
-        // Clear all pulsing indicators
+        // Clear indicators
         foreach (var player in GameSession.Instance.Players.Values)
         {
             if (player.ChampionObject != null)
@@ -261,44 +150,23 @@ private void OnTimerCancel(ExtendedEventArgs args)
 
     private void OnGameSetup(ExtendedEventArgs args)
     {
-        Debug.Log("OnGameSetup callback received.");
         ResponseGameSetupEventArgs res = args as ResponseGameSetupEventArgs;
-        
-        if (res == null) {
-            Debug.LogError("Failed to cast args to ResponseGameSetupEventArgs");
-            return;
-        }
+        if (res == null) return;
 
-        if (championSetup == null) {
-            Debug.LogError("championSetup reference is missing in GameplayManager!");
-            return;
-        }
-
-        Debug.Log($"Starting initialization for {res.Players.Count} players.");
         championSetup.InitializeChampions(res.Players);
+        
+        GameSession.Instance.TriggerGameSetupCompleted();
 
-        FinishInitialization();
-    }
-
-    private void FinishInitialization()
-    {
-        if (loadingPanel != null) loadingPanel.SetActive(false);
-
-        // Handshake Step 2: Tell server we finished reconstruction and are ready to play
+        // Handshake Step 2
         RequestReadyToPlay readyReq = new RequestReadyToPlay();
         readyReq.Send();
         NetworkManager.Instance.SendRequest(readyReq);
-        
-        Debug.Log("Game Initialization Finished. ReadyToPlay sent.");
     }
 
     private void OnGameStateResponse(ExtendedEventArgs args) {
         ResponseGameStateEventArgs res = args as ResponseGameStateEventArgs;
         if (res != null && res.Status == Constants.SUCCESS) {
-            Debug.Log("Switching to state: " + res.StateName);
-            if (stateText != null) {
-                stateText.text = res.StateName;
-            }
+            Debug.Log("[GameplayManager] State Change: " + res.StateName);
             GameSession.Instance.State = res.StateName;
         }
     }

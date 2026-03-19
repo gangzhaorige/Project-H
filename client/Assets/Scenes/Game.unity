@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &17240688
 RectTransform:
   m_ObjectHideFlags: 0
@@ -673,9 +673,9 @@ RectTransform:
   - {fileID: 1398154885}
   - {fileID: 800626357}
   - {fileID: 921625576}
-  - {fileID: 1945358121}
   - {fileID: 726064242}
   - {fileID: 673065790}
+  - {fileID: 558263034}
   m_Father: {fileID: 1656021494}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -817,7 +817,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &425234272
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1041,7 +1041,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 556978021}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1049,11 +1049,11 @@ RectTransform:
   - {fileID: 1644964076}
   - {fileID: 1441031715}
   - {fileID: 428560074}
-  m_Father: {fileID: 1656021494}
+  m_Father: {fileID: 558263034}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -463}
+  m_AnchoredPosition: {x: -28.631958, y: 48.892548}
   m_SizeDelta: {x: 975.25, y: 121.91}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &556978023
@@ -1107,6 +1107,43 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &558263033
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 558263034}
+  m_Layer: 5
+  m_Name: TimerUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &558263034
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 558263033}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1945358121}
+  - {fileID: 556978022}
+  m_Father: {fileID: 319283639}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 28.631958, y: -511.8925}
+  m_SizeDelta: {x: 2441.4, y: 219.695}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &589554558
 GameObject:
   m_ObjectHideFlags: 0
@@ -1259,7 +1296,7 @@ GameObject:
   - component: {fileID: 673065792}
   - component: {fileID: 673065791}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: PassButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1377,7 +1414,6 @@ GameObject:
   m_Component:
   - component: {fileID: 688746752}
   - component: {fileID: 688746756}
-  - component: {fileID: 688746755}
   - component: {fileID: 688746753}
   - component: {fileID: 688746757}
   m_Layer: 5
@@ -1419,36 +1455,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Mask
   m_ShowMaskGraphic: 1
---- !u!114 &688746755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 688746751}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &688746756
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1485,7 +1491,7 @@ GameObject:
   - component: {fileID: 726064244}
   - component: {fileID: 726064243}
   m_Layer: 5
-  m_Name: Button
+  m_Name: EndTurnButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1603,7 +1609,6 @@ GameObject:
   m_Component:
   - component: {fileID: 800626357}
   - component: {fileID: 800626359}
-  - component: {fileID: 800626358}
   - component: {fileID: 800626360}
   m_Layer: 5
   m_Name: PlayFieldPanel
@@ -1631,36 +1636,6 @@ RectTransform:
   m_AnchoredPosition: {x: 57.22705, y: 45.483032}
   m_SizeDelta: {x: -1501.4, y: -1875}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &800626358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800626356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &800626359
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2035,6 +2010,59 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 980493554}
   m_CullTransparentMesh: 1
+--- !u!1 &1086245150
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1086245152}
+  - component: {fileID: 1086245151}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1086245151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086245150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e05127637861e4e10a59a4ebe1a8532a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIController
+  endTurnButton: {fileID: 726064243}
+  passButton: {fileID: 673065791}
+  turnStatusText: {fileID: 921625577}
+  instructionText: {fileID: 1945358122}
+  stateText: {fileID: 425234273}
+  timerUI: {fileID: 558263033}
+  timerSlider: {fileID: 556978023}
+  targetSelectionPanel: {fileID: 1902087781}
+  loadingPanel: {fileID: 17240687}
+--- !u!4 &1086245152
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086245150}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.01018, y: -0, z: 0.61195}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1187789697
 GameObject:
   m_ObjectHideFlags: 0
@@ -2637,7 +2665,6 @@ RectTransform:
   m_Children:
   - {fileID: 319283639}
   - {fileID: 17240688}
-  - {fileID: 556978022}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3128,7 +3155,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed613303cc00f44189e402172b489452, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TargetSelectionUI
-  panel: {fileID: 1902087781}
   container: {fileID: 2106427321}
   targetItemPrefab: {fileID: 8131730458270487668, guid: 7370e941bbedf43ef9403f905ad09b6f, type: 3}
   confirmButton: {fileID: 116725971}
@@ -3300,16 +3326,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1945358120}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 319283639}
+  m_Father: {fileID: 558263034}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 28.632, y: -569}
+  m_AnchoredPosition: {x: 0.00004196167, y: -57.10742}
   m_SizeDelta: {x: 2441.4, y: 105.48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1945358122
@@ -3522,14 +3548,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fc70e2461b2e4eeaa3418721a88d87a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameplayManager
-  loadingPanel: {fileID: 17240687}
   championSetup: {fileID: 2088677926}
-  endTurnButton: {fileID: 726064243}
-  passPriorityButton: {fileID: 673065791}
-  turnStatusText: {fileID: 921625577}
-  instructionText: {fileID: 1945358122}
-  stateText: {fileID: 425234273}
-  timerSlider: {fileID: 556978023}
 --- !u!4 &2088677928
 Transform:
   m_ObjectHideFlags: 0
@@ -3662,3 +3681,4 @@ SceneRoots:
   - {fileID: 1698248578}
   - {fileID: 189566649}
   - {fileID: 1943276322}
+  - {fileID: 1086245152}

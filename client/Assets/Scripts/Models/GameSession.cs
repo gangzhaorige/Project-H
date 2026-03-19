@@ -68,17 +68,67 @@ namespace ProjectH.Models
         public Dictionary<int, PlayerData> Players = new Dictionary<int, PlayerData>();
         public List<int> PlayerOrder = new List<int>();
 
-        public string State = "";
+        private string _state = "";
+        public string State 
+        { 
+            get => _state; 
+            set 
+            { 
+                if (_state != value) {
+                    _state = value; 
+                    OnStateChanged?.Invoke(_state);
+                }
+            }
+        }
 
-        public bool IsResponseRequired = false;
+        private bool _isResponseRequired = false;
+        public bool IsResponseRequired
+        {
+            get => _isResponseRequired;
+            set
+            {
+                if (_isResponseRequired != value) {
+                    _isResponseRequired = value;
+                    OnResponseRequirementChanged?.Invoke(_isResponseRequired);
+                }
+            }
+        }
+
         public string RequiredCardType = "";
+        public int ActivePlayerId = -1;
+        public bool IsLocalTurn => ActivePlayerId == Constants.USER_ID;
+
+        // Observer Pattern Events
+        public delegate void StateChanged(string newState);
+        public event StateChanged OnStateChanged;
+
+        public delegate void ResponseRequirementChanged(bool isRequired);
+        public event ResponseRequirementChanged OnResponseRequirementChanged;
+
+        public delegate void TimerStarted(int seconds, string message, int playerId);
+        public event TimerStarted OnTimerStarted;
+
+        public delegate void TimerCancelled();
+        public event TimerCancelled OnTimerCancelled;
+
+        public delegate void TurnStarted(int activePlayerId);
+        public event TurnStarted OnTurnStarted;
+
+        public delegate void GameSetupCompleted();
+        public event GameSetupCompleted OnGameSetupCompleted;
+
+        public void TriggerTimerStarted(int seconds, string message, int playerId) => OnTimerStarted?.Invoke(seconds, message, playerId);
+        public void TriggerTimerCancelled() => OnTimerCancelled?.Invoke();
+        public void TriggerTurnStarted(int activePlayerId) => OnTurnStarted?.Invoke(activePlayerId);
+        public void TriggerGameSetupCompleted() => OnGameSetupCompleted?.Invoke();
 
         public void Clear()
         {
             Players.Clear();
             PlayerOrder.Clear();
-            IsResponseRequired = false;
+            _isResponseRequired = false;
             RequiredCardType = "";
+            _state = "";
         }
 
         public PlayerData GetLocalPlayer()
