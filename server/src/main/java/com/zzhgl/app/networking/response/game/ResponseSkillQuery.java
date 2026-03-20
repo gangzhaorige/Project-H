@@ -9,11 +9,13 @@ import com.zzhgl.app.utility.GamePacket;
  * or needs them to provide input for a skill.
  */
 public class ResponseSkillQuery extends GameResponse {
+    private int playerId;
     private int skillId;
     private String skillName;
 
-    public ResponseSkillQuery(int skillId, String skillName) {
+    public ResponseSkillQuery(int playerId, int skillId, String skillName) {
         this.responseCode = Constants.SMSG_SKILL_QUERY;
+        this.playerId = playerId;
         this.skillId = skillId;
         this.skillName = skillName;
     }
@@ -22,9 +24,9 @@ public class ResponseSkillQuery extends GameResponse {
     public byte[] constructResponseInBytes() {
         GamePacket packet = new GamePacket(responseCode);
         packet.addShort16(Constants.SUCCESS);
+        packet.addInt32(playerId);
         packet.addInt32(skillId);
         packet.addString(skillName);
-        // packet.addString(sourceName);
         return packet.getBytes();
     }
 }

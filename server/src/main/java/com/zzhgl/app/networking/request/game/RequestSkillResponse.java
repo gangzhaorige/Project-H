@@ -8,12 +8,10 @@ import java.io.IOException;
 
 public class RequestSkillResponse extends GameRequest {
     private boolean accepted;
-    private int targetId; // Simple data example
 
     @Override
     public void parse() throws IOException {
         accepted = dataInput.readBoolean();
-        targetId = dataInput.readInt();
     }
 
     @Override
@@ -21,7 +19,7 @@ public class RequestSkillResponse extends GameRequest {
         Room room = client.getPlayer().getCurrentRoom();
         if (room != null && room.getGameManager() != null) {
             GameManager game = room.getGameManager();
-            game.handleAction(new SkillResponseCommand(client.getPlayer().getID(), accepted, targetId));
+            game.handleAction(new SkillResponseCommand(client.getPlayer().getID(), accepted, null));
         }
     }
 }

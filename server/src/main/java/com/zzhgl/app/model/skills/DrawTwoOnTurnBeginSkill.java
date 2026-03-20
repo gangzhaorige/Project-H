@@ -14,6 +14,11 @@ public class DrawTwoOnTurnBeginSkill extends AbstractSkill {
     }
 
     @Override
+    public GameEvent.EventType getSubscribedEvent() {
+        return GameEvent.EventType.TURN_BEGIN;
+    }
+
+    @Override
     public boolean canTrigger(GameManager game, GameEvent event, Player owner) {
         if (event.getType() == GameEvent.EventType.TURN_BEGIN) {
             int activeIndex = game.getActivePlayerIndex();

@@ -114,14 +114,7 @@ public class PlayActionState implements GameState {
 
             // 5. Evaluate the stack
             if (!game.getInteractionStack().isEmpty()) {
-                AbstractInteraction topInteraction = game.getInteractionStack().peek();
-                if (topInteraction != null && topInteraction.isNegatable()) {
-                    Log.printf("Top interaction is negatable. Entering NegationState.");
-                    game.pushState(new NegationState()); 
-                } else {
-                    Log.printf("Top interaction is not negatable. Resolving stack directly.");
-                    game.resolveStack();
-                }
+                game.resolveStack();
             }
         } else {
             Log.printf_e("Player %d tried to play card %d but it's not in their hand!", 

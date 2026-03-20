@@ -32,12 +32,25 @@ public class InteractionResolutionState implements GameState {
             return;
         }
 
-        AbstractInteraction next = game.getInteractionStack().pop();
+        AbstractInteraction next = game.getInteractionStack().peek();
         if (next.isCanceled()) {
+            game.getInteractionStack().pop();
             Log.printf("Skipping canceled interaction from %s.", next.getCaster().getUsername());
             processNext(game);
             return;
         }
+
+        // --- NEW: Centralized Negation Window ---
+        if (next.isNegatable() && !next.isNegationEvaluated()) {
+            Log.printf("Interaction from %s is negatable. Pushing NegationState.", next.getCaster().getUsername());
+            next.setNegationEvaluated(true);
+            game.pushState(new NegationState());
+            return;
+        }
+        // ----------------------------------------
+
+        // Actually pop it now that we are resolving its evaluation
+        game.getInteractionStack().pop();
         next.evaluate(game);
         
         // If the execution didn't push a new state (like SkillResolutionState),

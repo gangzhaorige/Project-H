@@ -12,6 +12,7 @@ namespace ProjectH.Rules
         {
             Rules.Add("ATTACK", new AttackCardRule());
             Rules.Add("DODGE", new DodgeCardRule());
+            Rules.Add("PRISON", new PrisonCardRule());
             // Add other rules as needed
         }
 

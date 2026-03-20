@@ -6,6 +6,7 @@ import com.zzhgl.app.model.Command.ReadyToPlayCommand;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.model.cards.AbstractCard;
+import com.zzhgl.app.model.skills.AbstractSkill;
 import com.zzhgl.app.networking.response.game.ResponseGameSetup;
 import com.zzhgl.app.networking.response.game.ResponseDrawCard;
 import com.zzhgl.app.networking.response.game.ResponseDrawCardOther;
@@ -93,14 +94,24 @@ public class PreGameState implements GameState {
         if (currentPhase != Phase.WAITING_FOR_READY) return;
         cancelTimer();
 
-        Log.printf("All players ready or timeout reached. Distributing starting hands.");
+        Log.printf("All players ready or timeout reached. Registering skills and distributing starting hands.");
+
+        // Register champion skills
+        for (Player p : game.getPlayers()) {
+            if (p.getSelectedChampion() != null) {
+                for (AbstractSkill skill : p.getSelectedChampion().getSkills()) {
+                    game.registerSkill(p, skill);
+                }
+            }
+        }
 
         // Give everyone 4 cards
         for (Player p : game.getPlayers()) {
             game.drawCards(p, 4);
         }
 
-        Log.printf("Starting TurnState.");        game.setState(new TurnState());
+        Log.printf("Starting TurnState.");
+        game.setState(new TurnState());
     }
 
     private void startTimer(Runnable task, int seconds) {

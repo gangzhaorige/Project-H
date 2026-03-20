@@ -34,8 +34,8 @@ public class TurnState implements GameState {
             p.addResponseForUpdate(response);
         }
 
-        // 4. Immediately transition to TurnBeginState to start this player's draw phase
-        game.setState(new TurnBeginState());
+        // 4. Immediately transition to EffectEvaluationState to evaluate lingering effects before draw phase
+        game.setState(new EffectEvaluationState());
     }
 
     @Override

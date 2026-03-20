@@ -14,6 +14,7 @@ public abstract class AbstractInteraction {
     protected AbstractCard card;
     protected boolean negatable;
     protected boolean canceled = false;
+    protected boolean negationEvaluated = false;
 
     public AbstractInteraction(Player caster, Player target, AbstractCard card, boolean negatable) {
         this.caster = caster;
@@ -28,6 +29,9 @@ public abstract class AbstractInteraction {
     public boolean isNegatable() { return negatable; }
     public boolean isCanceled() { return canceled; }
     public void cancel() { this.canceled = true; }
+
+    public boolean isNegationEvaluated() { return negationEvaluated; }
+    public void setNegationEvaluated(boolean evaluated) { this.negationEvaluated = evaluated; }
 
     /**
      * Executes the actual logic of the interaction (e.g., subtracting HP, pushing prompt states).

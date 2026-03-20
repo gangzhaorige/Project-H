@@ -14,6 +14,11 @@ public class DrawOnDamageSkill extends AbstractSkill {
     }
 
     @Override
+    public GameEvent.EventType getSubscribedEvent() {
+        return GameEvent.EventType.DAMAGE_TAKEN;
+    }
+
+    @Override
     public boolean canTrigger(GameManager game, GameEvent event, Player owner) {
         if (event.getType() == GameEvent.EventType.DAMAGE_TAKEN) {
             Player target = (Player) event.getParam("target");
@@ -24,14 +29,7 @@ public class DrawOnDamageSkill extends AbstractSkill {
 
     @Override
     public boolean execute(GameManager game, Player owner, GameEvent event, Object data) {
-        // 'data' would contain the chosen target player ID from user input
-        if (data instanceof Integer targetPlayerId) {
-            Player target = game.getPlayerMap().get(targetPlayerId);
-            if (target != null) {
-                game.drawCards(target, 2);
-                return true;
-            }
-        }
-        return false;
+        game.drawCards(owner, 2);
+        return true;
     }
 }

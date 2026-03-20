@@ -38,8 +38,15 @@ public class TurnBeginState implements GameState {
         // Default: Draw 2 cards
         game.drawCards(activePlayer, 2);
 
-        // Move to PlayActionState
-        game.setState(new PlayActionState());
+        // Check if a Judgement (like Prison) requested to skip the action phase
+        if (game.isSkipActionPhase()) {
+            Log.printf("Action phase skipped for Player %d due to active effects.", activePlayer.getID());
+            game.setSkipActionPhase(false); // Reset flag
+            game.setState(new TurnEndState());
+        } else {
+            // Move to PlayActionState
+            game.setState(new PlayActionState());
+        }
     }
 
     @Override

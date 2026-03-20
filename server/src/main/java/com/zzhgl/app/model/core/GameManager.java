@@ -15,6 +15,7 @@ import com.zzhgl.app.networking.response.game.ResponseGameState;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,12 @@ public class GameManager {
     private Pile drawPile;
     private Pile discardPile;
     private InteractionStack interactionStack;
+    private boolean skipActionPhase = false;
+
+    // Subscription-based skill registry
+    private final Map<GameEvent.EventType, List<SkillSubscription>> skillRegistry = new EnumMap<>(GameEvent.EventType.class);
+
+    public record SkillSubscription(Player owner, AbstractSkill skill) {}
 
     public GameManager(List<Player> players) {
         this.players = players;
@@ -54,9 +61,26 @@ public class GameManager {
         this.drawPile.shuffle();
     }
 
+    public void registerSkill(Player owner, AbstractSkill skill) {
+        GameEvent.EventType type = skill.getSubscribedEvent();
+        skillRegistry.computeIfAbsent(type, k -> new ArrayList<>())
+                     .add(new SkillSubscription(owner, skill));
+    }
+
+    public void unregisterSkill(Player owner, AbstractSkill skill) {
+        GameEvent.EventType type = skill.getSubscribedEvent();
+        List<SkillSubscription> subs = skillRegistry.get(type);
+        if (subs != null) {
+            subs.removeIf(s -> s.owner().equals(owner) && s.skill().equals(skill));
+        }
+    }
+
     public InteractionStack getInteractionStack() {
         return interactionStack;
     }
+
+    public boolean isSkipActionPhase() { return skipActionPhase; }
+    public void setSkipActionPhase(boolean skip) { this.skipActionPhase = skip; }
 
     public Pile getDrawPile() {
         return drawPile;
@@ -97,19 +121,24 @@ public class GameManager {
      * Emits a game event and allows all champions to react sequentially.
      */
     public void emitEvent(GameEvent event) {
+        List<SkillSubscription> subscribers = skillRegistry.get(event.getType());
+        if (subscribers == null || subscribers.isEmpty()) return;
+
         SkillResolutionState resolutionState = new SkillResolutionState();
-        int totalPlayers = players.size();
         boolean hasSkills = false;
         
-        // Loop through players starting from the active player
+        // Loop through players starting from the active player to maintain priority order
+        int totalPlayers = players.size();
         for (int i = 0; i < totalPlayers; i++) {
             int index = (activePlayerIndex + i) % totalPlayers;
             Player p = players.get(index);
             
-            if (p.getSelectedChampion() != null) {
-                for (AbstractSkill skill : p.getSelectedChampion().getSkills()) {
-                    if (skill.canTrigger(this, event, p)) {
-                        resolutionState.addSkill(p, skill, event);
+            // Check if this player is in the subscriber list for this event
+            for (SkillSubscription sub : subscribers) {
+                if (sub.owner().equals(p)) {
+                    // Subscription exists; now check if specific triggering conditions are met
+                    if (sub.skill().canTrigger(this, event, p)) {
+                        resolutionState.addSkill(p, sub.skill(), event);
                         hasSkills = true;
                     }
                 }
@@ -128,6 +157,9 @@ public class GameManager {
     public void resolveStack() {
         if (interactionStack.isEmpty()) return;
         
+        // If we're already in InteractionResolutionState, let it handle the new interactions
+        if (getCurrentState() instanceof InteractionResolutionState) return;
+
         // Instead of passing a list, the state now pulls from the GameManager's stack
         pushState(new InteractionResolutionState());
     }

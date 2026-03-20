@@ -45,6 +45,7 @@ public class CardFactory {
             case DUEL: return new DuelCard(id, suit, value);
             case FIRE: return new FireCard(id, suit, value);
             case NEGATE: return new NegateCard(id, suit, value);
+            case PRISON: return new PrisonCard(id, suit, value);
             // Default to an anonymous class for types not yet explicitly handled with a concrete class
             default: return new AbstractSpecialCard(id, suit, value, type) {
 

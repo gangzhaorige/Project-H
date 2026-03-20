@@ -9,7 +9,7 @@ import java.util.List;
  */
 public abstract class AbstractSpecialCard extends AbstractCard {
     public enum SpecialType {
-        ARROW, DUEL, DRAW, STEAL, DISMANTLE, HEAL_ALL, FIRE, NEGATE
+        ARROW, DUEL, DRAW, STEAL, DISMANTLE, HEAL_ALL, FIRE, NEGATE, PRISON
     }
 
     protected SpecialType type;

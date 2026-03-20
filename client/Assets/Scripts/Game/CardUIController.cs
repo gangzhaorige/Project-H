@@ -48,6 +48,9 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         if (cardData == null) return false;
 
+        // Debug: Allow playing any card during SkillResolutionState
+        if (GameSession.Instance.State == "SkillResolutionState") return true;
+
         var localPlayer = GameSession.Instance.GetLocalPlayer();
         return CardRuleManager.CanPlay(cardData, localPlayer);
     }
@@ -84,6 +87,13 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
         Debug.Log($"[CardUI] INTERNAL: OnPlayButtonClick for card {(cardData != null ? cardData.Id.ToString() : "NULL")}");
         
         if (cardData == null) return;
+
+        // Debug: Allow playing any card during SkillResolutionState
+        if (GameSession.Instance.State == "SkillResolutionState")
+        {
+            SendPlayRequest(new System.Collections.Generic.List<int>());
+            return;
+        }
 
         // 1. During PlayActionState: Allow playing any card with its standard requirements/targeting.
         if (GameSession.Instance.State == "PlayActionState")

@@ -24,6 +24,11 @@ public abstract class AbstractSkill {
     public boolean isOptional() { return isOptional; }
 
     /**
+     * Defines the event this skill is interested in.
+     */
+    public abstract GameEvent.EventType getSubscribedEvent();
+
+    /**
      * Checks if this this skill wants to react to the given event.
      */
     public abstract boolean canTrigger(GameManager game, GameEvent event, Player owner);
@@ -34,4 +39,11 @@ public abstract class AbstractSkill {
      * @return true if fully resolved, false if it needs user input.
      */
     public abstract boolean execute(GameManager game, Player owner, GameEvent event, Object data);
+
+    /**
+     * Called when the response timer for this skill expires.
+     */
+    public void onTimeout(GameManager game, Player owner, GameEvent event) {
+        // Default: do nothing
+    }
 }

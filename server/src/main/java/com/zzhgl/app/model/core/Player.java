@@ -2,6 +2,8 @@ package com.zzhgl.app.model.core;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.List;
+import java.util.ArrayList;
 
 import com.zzhgl.app.core.GameClient;
 import com.zzhgl.app.networking.response.GameResponse;
@@ -9,6 +11,7 @@ import com.zzhgl.app.model.champions.Champion;
 import com.zzhgl.app.model.skills.DrawOnDamageSkill;
 import com.zzhgl.app.model.skills.DrawTwoOnTurnBeginSkill;
 import com.zzhgl.app.model.skills.DrawOnLastCardSkill;
+import com.zzhgl.app.model.effects.AbstractEffect;
 
 /**
  * The Player class holds important information about the player including, most
@@ -30,6 +33,19 @@ public class Player {
     private Champion selectedChampion;
     private Hand hand;
     private int team = -1; // -1 for none, 0 for Blue, 1 for Red
+    private List<AbstractEffect> activeEffects = new ArrayList<>();
+
+    public List<AbstractEffect> getActiveEffects() {
+        return activeEffects;
+    }
+
+    public void addEffect(AbstractEffect effect) {
+        activeEffects.add(effect);
+    }
+
+    public void removeEffect(AbstractEffect effect) {
+        activeEffects.remove(effect);
+    }
 
     public int getTeam() {
         return team;

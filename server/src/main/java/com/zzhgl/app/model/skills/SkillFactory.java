@@ -23,6 +23,8 @@ public class SkillFactory {
             case 1: return new DrawTwoOnTurnBeginSkill();
             case 2: return new DrawOnDamageSkill();
             case 3: return new DrawOnLastCardSkill();
+            case 4: return new JudgementOverrideSkill();
+            case 5: return new JudgementSwapperSkill();
             default: return null;
         }
     }
