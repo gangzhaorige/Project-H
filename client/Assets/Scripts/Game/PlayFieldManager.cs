@@ -73,6 +73,8 @@ public class PlayFieldManager : MonoBehaviour
         if (NetworkManager.Instance != null)
         {
             NetworkManager.Instance.AddCallback(Constants.SMSG_PLAY_CARD, OnResponsePlayCard);
+            NetworkManager.Instance.AddCallback(Constants.SMSG_JUDGE, OnJudgementResult);
+            NetworkManager.Instance.AddCallback(Constants.SMSG_SWAP_FIELD_HAND, OnResponseSwapFieldHand);
         }
     }
 
@@ -81,7 +83,165 @@ public class PlayFieldManager : MonoBehaviour
         if (NetworkManager.Instance != null)
         {
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_PLAY_CARD);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_JUDGE);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_SWAP_FIELD_HAND);
         }
+    }
+
+    private void OnResponseSwapFieldHand(ExtendedEventArgs args)
+    {
+        ResponseSwapFieldHandEventArgs res = args as ResponseSwapFieldHandEventArgs;
+        if (res == null) return;
+
+        AnimationController.Instance.AddAnimation(AnimateSwapFieldHand(res));
+    }
+
+    private IEnumerator AnimateSwapFieldHand(ResponseSwapFieldHandEventArgs res)
+    {
+        bool isLocal = (res.CasterId == Constants.USER_ID);
+        GameObject fieldCardGO = null;
+
+        // 1. Identify the card currently on the field (the one being swapped back to hand)
+        // Note: For simplicity, assuming the target card is the most recently added to cardsOnField
+        if (cardsOnField.Count > 0)
+        {
+            fieldCardGO = cardsOnField[cardsOnField.Count - 1];
+            cardsOnField.RemoveAt(cardsOnField.Count - 1);
+        }
+
+        if (fieldCardGO != null)
+        {
+            // Disable its judge indicator immediately
+            var ui = fieldCardGO.GetComponent<CardUIController>();
+            if (ui != null) ui.HideJudgementResult();
+        }
+
+        // 2. Prepare the card coming FROM hand
+        GameObject handCardGO = null;
+        int originalIndex = -1; // --- NEW: Track original position ---
+
+        if (isLocal)
+        {
+            handCardGO = handManager.GetCardObject(res.PlayedCardId);
+            if (handCardGO != null)
+            {
+                originalIndex = handManager.GetCardIndex(res.PlayedCardId); // --- NEW: Save index ---
+                handManager.UnregisterCard(res.PlayedCardId);
+                handCardGO.transform.SetParent(playFieldPanel, true);
+            }
+        }
+
+        if (handCardGO == null)
+        {
+            // Non-local or not found: Spawn at caster's location
+            handCardGO = Instantiate(cardPrefab, playFieldPanel);
+            CardSetup setup = handCardGO.GetComponent<CardSetup>();
+            if (setup != null) setup.Init(res.PlayedCardType, res.PlayedSuit, res.PlayedValue);
+
+            if (GameSession.Instance.Players.TryGetValue(res.CasterId, out PlayerData casterData) && casterData.ChampionObject != null)
+            {
+                handCardGO.transform.position = casterData.ChampionObject.transform.position;
+            }
+        }
+
+        // --- NEW: Enable judgement image on the card coming FROM hand immediately ---
+        var newUI = handCardGO.GetComponent<CardUIController>();
+        if (newUI != null)
+        {
+            newUI.ShowJudgementResult(res.JudgeResult);
+        }
+
+        // 3. Animate the swap
+        // Card A: Field -> Hand (or destroy)
+        Vector3 handPos = Vector3.down * 500; // General direction of hand
+        if (isLocal && handManager != null)
+        {
+            // For local, we could use handManager to get a real position, but simplified for now
+        }
+
+        if (fieldCardGO != null)
+        {
+            StartCoroutine(SmoothMove(fieldCardGO.transform, handPos, Quaternion.identity, playAnimDuration));
+        }
+
+        // Card B: Hand -> Field
+        cardsOnField.Add(handCardGO);
+        ReorganizeField(); // This handles the move to playField center
+
+        yield return new WaitForSeconds(playAnimDuration);
+
+        // 4. Cleanup and Finalize
+        if (fieldCardGO != null)
+        {
+            if (isLocal)
+            {
+                // Re-register to local hand AT THE SAME POSITION
+                CardData newCard = new CardData { Id = res.SwappedCardId, Suit = res.SwappedSuit, Value = res.SwappedValue, Type = res.SwappedCardType };
+                
+                // Give the object to HandManager
+                handManager.RegisterAnimatedCardAtIndex(newCard, fieldCardGO, originalIndex);
+                
+                // Update local data model
+                GameSession.Instance.GetLocalPlayer().AddCard(newCard);
+            }
+            else
+            {
+                Destroy(fieldCardGO);
+            }
+        }
+
+        if (newUI != null) newUI.ShowJudgementResult(res.JudgeResult);
+
+        // Update Data counts
+        if (GameSession.Instance.Players.TryGetValue(res.CasterId, out PlayerData pData))
+        {
+            if (isLocal)
+            {
+                pData.RemoveCardById(res.PlayedCardId);
+                // SwappedCardId was added via handManager.AddCard above
+            }
+            else
+            {
+                // Non-local counts: card played from hand, card received to hand. Net change 0.
+            }
+        }
+    }
+
+    private void OnJudgementResult(ExtendedEventArgs args)
+    {
+        ResponseJudgementEventArgs res = args as ResponseJudgementEventArgs;
+        if (res == null) return;
+
+        AnimationController.Instance.AddAnimation(AnimateJudgement(res));
+    }
+
+    private IEnumerator AnimateJudgement(ResponseJudgementEventArgs res)
+    {
+        // 1. Instantiate judge card
+        GameObject cardGO = Instantiate(cardPrefab, playFieldPanel);
+        CardSetup setup = cardGO.GetComponent<CardSetup>();
+        if (setup != null)
+        {
+            setup.Init(res.CardType, res.Suit, res.Value);
+        }
+
+        // Start from center/top
+        cardGO.transform.localPosition = new Vector3(0, 500, 0);
+
+        // 2. Add to field and reorganize
+        cardsOnField.Add(cardGO);
+        ReorganizeField();
+
+        yield return new WaitForSeconds(playAnimDuration);
+
+        // 3. Show current evaluation result on the card
+        CardUIController uiController = cardGO.GetComponent<CardUIController>();
+        if (uiController != null)
+        {
+            uiController.ShowJudgementResult(res.JudgeResult);
+        }
+
+        yield return new WaitForSeconds(1.5f); // Duration to show the result
     }
 
     private void OnResponsePlayCard(ExtendedEventArgs args)
@@ -147,6 +307,17 @@ public class PlayFieldManager : MonoBehaviour
 
         // 3. Record the card on the field BEFORE moving so it's included in reorganization
         cardsOnField.Add(cardGO);
+
+        // --- NEW: Enable judgement image before animation if requested ---
+        if (res.ShowJudge)
+        {
+            CardUIController uiController = cardGO.GetComponent<CardUIController>();
+            if (uiController != null)
+            {
+                // Use the actual result passed in the packet
+                uiController.ShowJudgementResult(res.JudgeResult); 
+            }
+        }
 
         // 4. Reorganize everything on the field
         ReorganizeField();

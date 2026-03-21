@@ -9,6 +9,7 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [Header("UI References")]
     public GameObject playButton;
     public RectTransform cardVisualContainer; // The part that should pop up on hover
+    public Image judgeResultImage;
 
     [Header("Settings")]
     public float hoverYOffset = 50f;
@@ -26,6 +27,7 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
         
         Debug.Log($"[CardUI] Bound card {data.Id} ({data.Type}) to UI.");
         if (playButton != null) playButton.SetActive(false);
+        HideJudgementResult();
         
         targetYOffset = 0f;
     }
@@ -118,6 +120,27 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
         }
 
         Debug.LogWarning("[CardUI] Cannot play card: Not your turn or no response required.");
+    }
+
+    public void ShowJudgementResult(bool approved)
+    {
+        if (judgeResultImage == null) return;
+
+        string resultName = approved ? "1" : "0";
+        Sprite s = Resources.Load<Sprite>($"Images/cards/Judge/{resultName}");
+        if (s != null)
+        {
+            judgeResultImage.sprite = s;
+            judgeResultImage.gameObject.SetActive(true);
+        }
+    }
+
+    public void HideJudgementResult()
+    {
+        if (judgeResultImage != null)
+        {
+            judgeResultImage.gameObject.SetActive(false);
+        }
     }
 
     private void HandleStandardPlay()

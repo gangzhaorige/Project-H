@@ -4,7 +4,11 @@ import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
+import com.zzhgl.app.networking.response.game.ResponseSwapFieldHand;
 import com.zzhgl.app.utility.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -51,30 +55,55 @@ public class JudgementSwapperSkill extends AbstractSkill {
                 // Restriction: Can only swap SPADE or CLUB
                 if (handCard.getSuit() != AbstractCard.Suit.SPADE && handCard.getSuit() != AbstractCard.Suit.CLUB) {
                     Log.printf_e("Player %d tried to swap with invalid suit: %s", owner.getID(), handCard.getSuit());
-                    // We don't finish yet; maybe they can try again if there's time? 
-                    // For now let's just return false. The timer will eventually expire.
                     return false;
                 }
 
-                if (event.getData() instanceof AbstractCard oldJudgementCard) {
-                    // SWAP: remove chosen card from hand, add old judgement card to hand
-                    owner.getHand().removeCard(handCard);
-                    owner.getHand().addCard(oldJudgementCard);
-                    
-                    // Replace the event data so JudgementState picks it up as the new result
-                    event.setData(handCard);
-                    
-                    Log.printf("Player %d used %s to SWAP hand card %s with judgement card %s", 
-                               owner.getID(), getName(), handCard, oldJudgementCard);
-                    return true;
-                }
+                applyEffect(game, owner, event, handCard);
+                return true;
             }
         }
         return false;
     }
 
+    private void applyEffect(GameManager game, Player owner, GameEvent event, AbstractCard handCard) {
+        if (event.getData() instanceof AbstractCard oldJudgementCard) {
+            // SWAP: remove chosen card from hand, add old judgement card to hand
+            owner.getHand().removeCard(handCard);
+            owner.getHand().addCard(oldJudgementCard);
+            
+            // Replace the event data so JudgementState picks it up as the new result
+            event.setData(handCard);
+            
+            // Calculate current evaluation for the UI
+            boolean judgeResult = false;
+            if (game.getCurrentState() instanceof com.zzhgl.app.model.States.JudgementState judgeState) {
+                judgeResult = judgeState.getEffect().evaluateJudgement(game, handCard);
+            }
+
+            Log.printf("Player %d used %s to SWAP hand card %s with judgement card %s. New result: %b", 
+                       owner.getID(), getName(), handCard, oldJudgementCard, judgeResult);
+
+            // Notify everyone about the SWAP
+            ResponseSwapFieldHand response = new ResponseSwapFieldHand(owner.getID(), oldJudgementCard, handCard, judgeResult);
+            for (Player p : game.getPlayers()) {
+                p.addResponseForUpdate(response);
+            }
+        }
+    }
+
     @Override
     public void onTimeout(GameManager game, Player owner, GameEvent event) {
-        Log.printf("JudgementSwapperSkill timed out. No card swapped by player %d.", owner.getID());
+        // Find first SPADE or CLUB
+        Optional<AbstractCard> cardOpt = owner.getHand().getCards().stream()
+                .filter(c -> c.getSuit() == AbstractCard.Suit.SPADE || c.getSuit() == AbstractCard.Suit.CLUB)
+                .findFirst();
+
+        if (cardOpt.isPresent()) {
+            AbstractCard autoCard = cardOpt.get();
+            Log.printf("JudgementSwapperSkill timed out. Auto-swapping with: %s", autoCard);
+            applyEffect(game, owner, event, autoCard);
+        } else {
+            Log.printf("JudgementSwapperSkill timed out. No valid card to swap.");
+        }
     }
 }

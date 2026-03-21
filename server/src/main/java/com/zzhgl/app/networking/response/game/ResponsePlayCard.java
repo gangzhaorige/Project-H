@@ -19,14 +19,22 @@ public class ResponsePlayCard extends GameResponse {
     private int value;
     private String cardType;
     private List<Integer> targetIds;
+    private boolean showJudge;
+    private boolean judgeResult;
 
     public ResponsePlayCard(int playerId, AbstractCard card, List<Integer> targetIds) {
+        this(playerId, card, targetIds, false, false);
+    }
+
+    public ResponsePlayCard(int playerId, AbstractCard card, List<Integer> targetIds, boolean showJudge, boolean judgeResult) {
         this.responseCode = Constants.SMSG_PLAY_CARD;
         this.playerId = playerId;
         this.cardId = card.getId();
         this.suit = card.getSuit().ordinal();
         this.value = card.getValue();
         this.targetIds = targetIds;
+        this.showJudge = showJudge;
+        this.judgeResult = judgeResult;
         
         this.cardType = "Standard";
         if (card instanceof AbstractNormalCard normal) {
@@ -51,6 +59,9 @@ public class ResponsePlayCard extends GameResponse {
         for (int id : targetIds) {
             packet.addInt32(id);
         }
+
+        packet.addBoolean(showJudge);
+        packet.addBoolean(judgeResult);
 
         return packet.getBytes();
     }

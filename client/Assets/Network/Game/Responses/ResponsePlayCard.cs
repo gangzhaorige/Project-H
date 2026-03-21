@@ -10,6 +10,8 @@ public class ResponsePlayCardEventArgs : ExtendedEventArgs {
     public int Value { get; set; }
     public string CardType { get; set; }
     public List<int> TargetIds { get; set; }
+    public bool ShowJudge { get; set; }
+    public bool JudgeResult { get; set; }
 
     public ResponsePlayCardEventArgs() {
         Event_id = Constants.SMSG_PLAY_CARD;
@@ -24,6 +26,8 @@ public class ResponsePlayCard : BaseNetworkResponse {
     private int value;
     private string cardType;
     private List<int> targetIds = new List<int>();
+    private bool showJudge;
+    private bool judgeResult;
 
     public ResponsePlayCard() {
         Response_id = Constants.SMSG_PLAY_CARD;
@@ -40,6 +44,9 @@ public class ResponsePlayCard : BaseNetworkResponse {
         for (int i = 0; i < targetCount; i++) {
             targetIds.Add(DataReader.ReadInt(DataStream));
         }
+
+        showJudge = DataReader.ReadBool(DataStream);
+        judgeResult = DataReader.ReadBool(DataStream);
     }
 
     public override ExtendedEventArgs Process() {
@@ -51,6 +58,8 @@ public class ResponsePlayCard : BaseNetworkResponse {
         args.Value = value;
         args.CardType = cardType;
         args.TargetIds = targetIds;
+        args.ShowJudge = showJudge;
+        args.JudgeResult = judgeResult;
         return args;
     }
 }

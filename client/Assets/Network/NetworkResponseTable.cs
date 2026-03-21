@@ -34,7 +34,7 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_ACTION_COMPLETED, "ResponseActionCompletedEvent");
 		Add(Constants.SMSG_SKILL_ACTIVATION, "ResponseSkillActivation");
 		Add(Constants.SMSG_SKILL_QUERY, "ResponseSkillQuery");
-		Add(Constants.SMSG_JUDGE, "ResponseJudgementResult");
+		Add(Constants.SMSG_JUDGE, "ResponseJudgement");
 		Add(Constants.SMSG_SHOW_TARGET_HAND, "ResponseShowTargetHand");
 		Add(Constants.SMSG_STATE_CHANGE, "ResponseGameState");
 		Add(Constants.SMSG_CHAMPION_STATS_UPDATE_INTEGER, "ResponseChampionStatsUpdateInteger");
@@ -43,6 +43,7 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_DISCARD_CARDS, "ResponseDiscardCards");
 		Add(Constants.SMSG_CHANGE_JUDGEMENT, "ResponseChangeJudgement");
 		Add(Constants.SMSG_SWAP_JUDGEMENT, "ResponseSwapJudgement");
+		Add(Constants.SMSG_SWAP_FIELD_HAND, "ResponseSwapFieldHand");
 		Add(Constants.SMSG_FIELD_TO_HAND, "ResponseFieldToHand");
 
         // Room System

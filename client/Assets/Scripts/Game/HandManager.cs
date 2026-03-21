@@ -100,6 +100,51 @@ public class HandManager : MonoBehaviour
         return null;
     }
 
+    public int GetCardIndex(int cardId)
+    {
+        if (cardMap.TryGetValue(cardId, out GameObject go))
+        {
+            return orderedCards.IndexOf(go);
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Registers a card that has already been instantiated and animated at a specific index.
+    /// </summary>
+    public void RegisterAnimatedCardAtIndex(CardData data, GameObject cardGO, int index)
+    {
+        if (cardMap.ContainsKey(data.Id))
+        {
+            Destroy(cardGO);
+            return;
+        }
+
+        // Set parent and restore world position manually
+        Vector3 worldPos = cardGO.transform.position;
+        Quaternion worldRot = cardGO.transform.rotation;
+        cardGO.transform.SetParent(handPanel, false);
+        cardGO.transform.position = worldPos;
+        cardGO.transform.rotation = worldRot;
+
+        cardGO.name = $"Card_{data.Type}_{data.Id}";
+        
+        CardSetup setup = cardGO.GetComponent<CardSetup>();
+        if (setup != null) setup.Init(data.Type, data.Suit, data.Value);
+
+        CardUIController ui = cardGO.GetComponent<CardUIController>();
+        if (ui != null) ui.Bind(data);
+
+        cardMap.Add(data.Id, cardGO);
+        
+        // Insert at specified index
+        int insertIdx = Mathf.Clamp(index, 0, orderedCards.Count);
+        orderedCards.Insert(insertIdx, cardGO);
+        orderedCardIds.Insert(insertIdx, data.Id);
+
+        ReorganizeHand();
+    }
+
     /// <summary>
     /// Unregisters a card from the hand logic without destroying it.
     /// Used when a card is played and moves to the play field.

@@ -9,7 +9,7 @@ import java.util.List;
  */
 public abstract class AbstractCard {
     public enum Suit {
-        SPADE, DIAMOND, HEART, CLUB
+        SPADE, HEART, CLUB, DIAMOND
     }
 
     public enum Category {

@@ -3,7 +3,6 @@ package com.zzhgl.app.model.core;
 import java.util.ArrayList;
 import java.util.List;
 import com.zzhgl.app.model.cards.AbstractCard;
-import com.zzhgl.app.model.cards.AbstractNormalCard;
 import com.zzhgl.app.model.cards.AbstractSpecialCard;
 import com.zzhgl.app.model.cards.CardFactory;
 

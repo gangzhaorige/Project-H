@@ -5,6 +5,7 @@ import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.effects.AbstractEffect;
+import com.zzhgl.app.networking.response.game.ResponseJudgement;
 import com.zzhgl.app.utility.Log;
 
 public class JudgementState implements GameState {
@@ -18,6 +19,10 @@ public class JudgementState implements GameState {
 
     public void setJudgementCard(AbstractCard card) {
         this.judgementCard = card;
+    }
+
+    public AbstractEffect getEffect() {
+        return effect;
     }
 
     @Override
@@ -36,6 +41,9 @@ public class JudgementState implements GameState {
 
         Log.printf("Judgement card drawn: %s", judgementCard);
 
+        // Broadcast current evaluation
+        broadcastCurrentResult(game);
+
         // 2. Emit event for JudgementOverride skills
         lastEvent = new GameEvent(GameEvent.EventType.BEFORE_JUDGEMENT_RESOLVE);
         lastEvent.setData(judgementCard); 
@@ -46,6 +54,16 @@ public class JudgementState implements GameState {
         // If no skill triggers, emitEvent does nothing and we just call finishJudgement immediately.
         if (game.getCurrentState() == this) {
             finishJudgement(game);
+        }
+    }
+
+    private void broadcastCurrentResult(GameManager game) {
+        if (judgementCard != null) {
+            boolean triggered = effect.evaluateJudgement(game, judgementCard);
+            ResponseJudgement res = new ResponseJudgement(judgementCard, triggered);
+            for (com.zzhgl.app.model.core.Player p : game.getPlayers()) {
+                p.addResponseForUpdate(res);
+            }
         }
     }
 

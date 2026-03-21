@@ -4,8 +4,10 @@ import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
+import com.zzhgl.app.networking.response.game.ResponsePlayCard;
 import com.zzhgl.app.utility.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +65,18 @@ public class JudgementOverrideSkill extends AbstractSkill {
         // Replace the event data so JudgementState picks it up
         event.setData(newCard);
         Log.printf("Player %d used %s to override judgement with %s", owner.getID(), getName(), newCard);
+
+        // Calculate current evaluation for the UI
+        boolean judgeResult = false;
+        if (game.getCurrentState() instanceof com.zzhgl.app.model.States.JudgementState judgeState) {
+            judgeResult = judgeState.getEffect().evaluateJudgement(game, newCard);
+        }
+
+        // Notify everyone that a card was played for judgement override
+        ResponsePlayCard response = new ResponsePlayCard(owner.getID(), newCard, new ArrayList<>(), true, judgeResult);
+        for (Player p : game.getPlayers()) {
+            p.addResponseForUpdate(response);
+        }
     }
 
     @Override

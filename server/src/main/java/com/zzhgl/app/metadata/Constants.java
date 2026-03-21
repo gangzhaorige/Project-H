@@ -97,6 +97,7 @@ public class Constants {
     public final static short SMSG_SHOW_TARGET_HAND = 444;
     public final static short SMSG_UPDATE_ATTACK = 445;
     public final static short SMSG_SKILL_QUERY = 446;
+    public final static short SMSG_SWAP_FIELD_HAND = 447;
 
     public final static short CMSG_CONFIRMATION = 350;
     public final static short CMSG_READY_FOR_GAME_SETUP = 351;

@@ -22,9 +22,9 @@ public class CardSetup : MonoBehaviour
         if (topValueText != null) topValueText.text = valueStr;
         if (botValueText != null) botValueText.text = valueStr;
 
-        // 3. Set Value/Suit Color (Hearts and Diamonds are usually red)
-        // Assuming 0=Spade, 1=Diamond, 2=Heart, 3=Club (based on your folder 0-3)
-        Color cardColor = (suit == 1 || suit == 2) ? Color.red : Color.black;
+        // 3. Set Value/Suit Color (Hearts and Diamonds are red)
+        // 0=Spade (Dark), 1=Heart (Red), 2=Club (Dark), 3=Diamond (Red)
+        Color cardColor = (suit == 1 || suit == 3) ? Color.red : Color.black;
         if (topValueText != null) topValueText.color = cardColor;
         if (botValueText != null) botValueText.color = cardColor;
 
