@@ -70,11 +70,6 @@ public class SkillQueryUI : MonoBehaviour
 
     private void OnResponse(bool accepted)
     {
-        if (accepted && AudioManager.Instance != null)
-        {
-            AudioManager.Instance.PlaySkillSFX();
-        }
-
         RequestSkillResponse req = new RequestSkillResponse();
         req.Send(accepted);
         NetworkManager.Instance.SendRequest(req);

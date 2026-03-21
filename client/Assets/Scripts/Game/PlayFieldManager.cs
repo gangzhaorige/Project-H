@@ -225,9 +225,6 @@ public class PlayFieldManager : MonoBehaviour
         cardsOnField.Add(handCardGO);
         ReorganizeField(); // This handles the move to playField center
 
-        // --- NEW: Play Audio for Swap ---
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardPlaySFX();
-
         yield return new WaitForSeconds(playAnimDuration);
 
         // 4. Cleanup and Finalize
@@ -291,9 +288,6 @@ public class PlayFieldManager : MonoBehaviour
         // 2. Add to field and reorganize
         cardsOnField.Add(cardGO);
         ReorganizeField();
-
-        // --- NEW: Play Audio for Judgement Reveal ---
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardPlaySFX();
 
         yield return new WaitForSeconds(playAnimDuration);
 
@@ -384,9 +378,6 @@ public class PlayFieldManager : MonoBehaviour
 
         // 4. Reorganize everything on the field
         ReorganizeField();
-
-        // --- NEW: Play Audio for Card Play ---
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardPlaySFX();
 
         // Wait for the duration of the play animation
         yield return new WaitForSeconds(playAnimDuration);

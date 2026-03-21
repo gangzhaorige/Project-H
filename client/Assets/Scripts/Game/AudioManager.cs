@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class AudioManager : MonoBehaviour
 {
@@ -7,44 +7,53 @@ public class AudioManager : MonoBehaviour
 
     [Header("Audio Sources")]
     public AudioSource bgmSource;
-    public AudioSource sfxSource;
 
-    [Header("Audio Clips")]
-    public AudioClip bgmClip;
-    public AudioClip cardPlayClip;
-    public AudioClip skillActivationClip;
-    public AudioClip buttonClickClip;
+    [Header("BGM Clips")]
+    public AudioClip loginBGM;
+    public AudioClip champSelectBGM;
+    public AudioClip gameplayBGM;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
     {
-        if (bgmSource != null && bgmClip != null)
+        PlayBGMForCurrentScene();
+    }
+
+    private void PlayBGMForCurrentScene()
+    {
+        if (bgmSource == null) return;
+
+        string sceneName = SceneManager.GetActiveScene().name;
+        AudioClip clipToPlay = null;
+
+        // Automatically select clip based on scene name
+        switch (sceneName)
         {
-            bgmSource.clip = bgmClip;
+            case "Login":
+            case "Start":
+                clipToPlay = loginBGM;
+                break;
+            case "ChampSelect":
+                clipToPlay = champSelectBGM;
+                break;
+            case "Game":
+                clipToPlay = gameplayBGM;
+                break;
+        }
+
+        if (clipToPlay != null)
+        {
+            bgmSource.clip = clipToPlay;
             bgmSource.loop = true;
             bgmSource.Play();
         }
-    }
-
-    public void PlaySFX(AudioClip clip)
-    {
-        if (sfxSource != null && clip != null)
+        else
         {
-            sfxSource.PlayOneShot(clip);
+            Debug.LogWarning($"[AudioManager] No BGM clip assigned for scene: {sceneName}");
         }
     }
-
-    public void PlayCardPlaySFX() => PlaySFX(cardPlayClip);
-    public void PlaySkillSFX() => PlaySFX(skillActivationClip);
-    public void PlayButtonSFX() => PlaySFX(buttonClickClip);
 }
