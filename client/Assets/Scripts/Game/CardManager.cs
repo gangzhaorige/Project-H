@@ -82,6 +82,9 @@ public class CardManager : MonoBehaviour
         CardSetup setup = animCard.GetComponent<CardSetup>();
         if (setup != null) setup.Init(card.Type, card.Suit, card.Value);
 
+        // --- NEW: Play Audio for Local Draw ---
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardDrawSFX();
+
         yield return MoveCard(animCard.transform, targetWorldPos, drawAnimDuration);
 
         // Finalize by giving the object to HandManager and updating local data
@@ -109,6 +112,9 @@ public class CardManager : MonoBehaviour
     {
         GameObject animCard = Instantiate(cardPrefab, deckPosition.parent);
         animCard.transform.position = deckPosition.position;
+
+        // --- NEW: Play Audio for Other Draw ---
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardDrawSFX();
         
         Vector3 targetPos = (pData.ChampionObject != null) 
             ? pData.ChampionObject.transform.position 

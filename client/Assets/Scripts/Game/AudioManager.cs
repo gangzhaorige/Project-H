@@ -7,30 +7,57 @@ public class AudioManager : MonoBehaviour
 
     [Header("Audio Sources")]
     public AudioSource bgmSource;
+    public AudioSource sfxSource;
 
     [Header("BGM Clips")]
     public AudioClip loginBGM;
     public AudioClip champSelectBGM;
     public AudioClip gameplayBGM;
 
+    [Header("SFX Clips")]
+    public AudioClip cardHoverClip;
+    public AudioClip cardDrawClip;
+
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
+        DontDestroyOnLoad(gameObject); // Persist across scenes
+    }
+
+    private void OnEnable()
+    {
+        // Subscribe to the sceneLoaded event
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe to avoid memory leaks
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        PlayBGMForScene(scene.name);
     }
 
     private void Start()
     {
-        PlayBGMForCurrentScene();
+        // Initial play for the first scene
+        PlayBGMForScene(SceneManager.GetActiveScene().name);
     }
 
-    private void PlayBGMForCurrentScene()
+    private void PlayBGMForScene(string sceneName)
     {
         if (bgmSource == null) return;
 
-        string sceneName = SceneManager.GetActiveScene().name;
         AudioClip clipToPlay = null;
 
-        // Automatically select clip based on scene name
         switch (sceneName)
         {
             case "Login":
@@ -47,13 +74,42 @@ public class AudioManager : MonoBehaviour
 
         if (clipToPlay != null)
         {
-            bgmSource.clip = clipToPlay;
-            bgmSource.loop = true;
-            bgmSource.Play();
+            ChangeBGM(clipToPlay);
         }
         else
         {
-            Debug.LogWarning($"[AudioManager] No BGM clip assigned for scene: {sceneName}");
+            // Optional: stop music if entering a scene with no music (like Lobby)
+            // bgmSource.Stop();
+            Debug.Log($"[AudioManager] No BGM clip assigned for scene: {sceneName}");
+        }
+    }
+
+    public void ChangeBGM(AudioClip newClip)
+    {
+        if (bgmSource == null || newClip == null) return;
+
+        // Only change if it's a different clip
+        if (bgmSource.clip == newClip && bgmSource.isPlaying) return;
+
+        bgmSource.Stop();
+        bgmSource.clip = newClip;
+        bgmSource.loop = true;
+        bgmSource.Play();
+    }
+
+    public void PlayCardHoverSFX()
+    {
+        if (sfxSource != null && cardHoverClip != null)
+        {
+            sfxSource.PlayOneShot(cardHoverClip);
+        }
+    }
+
+    public void PlayCardDrawSFX()
+    {
+        if (sfxSource != null && cardDrawClip != null)
+        {
+            sfxSource.PlayOneShot(cardDrawClip);
         }
     }
 }

@@ -40,6 +40,11 @@ public class CardUIController : MonoBehaviour, IPointerEnterHandler, IPointerExi
         // Target the hover offset
         targetYOffset = hoverYOffset;
 
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayCardHoverSFX();
+        }
+
         if (handManager != null && cardData != null)
         {
             handManager.SetHoveredCard(cardData.Id);
