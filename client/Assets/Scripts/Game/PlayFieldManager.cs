@@ -75,6 +75,7 @@ public class PlayFieldManager : MonoBehaviour
             NetworkManager.Instance.AddCallback(Constants.SMSG_PLAY_CARD, OnResponsePlayCard);
             NetworkManager.Instance.AddCallback(Constants.SMSG_JUDGE, OnJudgementResult);
             NetworkManager.Instance.AddCallback(Constants.SMSG_SWAP_FIELD_HAND, OnResponseSwapFieldHand);
+            NetworkManager.Instance.AddCallback(Constants.SMSG_DISCARD_CARDS, OnResponseDiscardCard);
         }
     }
 
@@ -85,7 +86,63 @@ public class PlayFieldManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_PLAY_CARD);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_JUDGE);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_SWAP_FIELD_HAND);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_DISCARD_CARDS);
         }
+    }
+
+    private void OnResponseDiscardCard(ExtendedEventArgs args)
+    {
+        ResponseDiscardCardEventArgs res = args as ResponseDiscardCardEventArgs;
+        if (res == null) return;
+
+        AnimationController.Instance.AddAnimation(AnimateDiscardCard(res));
+    }
+
+    private IEnumerator AnimateDiscardCard(ResponseDiscardCardEventArgs res)
+    {
+        GameObject cardGO = null;
+        bool isLocal = (res.PlayerId == Constants.USER_ID);
+
+        if (isLocal)
+        {
+            cardGO = handManager.GetCardObject(res.CardId);
+            if (cardGO != null)
+            {
+                handManager.UnregisterCard(res.CardId);
+                cardGO.transform.SetParent(playFieldPanel, true);
+            }
+        }
+
+        // Update counts
+        if (GameSession.Instance.Players.TryGetValue(res.PlayerId, out PlayerData pData))
+        {
+            if (isLocal) pData.RemoveCardById(res.CardId);
+            else pData.RemoveCardById(-1);
+        }
+
+        if (cardGO == null)
+        {
+            cardGO = Instantiate(cardPrefab, playFieldPanel);
+            CardSetup setup = cardGO.GetComponent<CardSetup>();
+            if (setup != null) setup.Init(res.CardType, res.Suit, res.Value);
+
+            if (pData != null && pData.ChampionObject != null)
+                cardGO.transform.position = pData.ChampionObject.transform.position;
+        }
+
+        // Show Judge result if requested
+        if (res.ShowJudge)
+        {
+            var ui = cardGO.GetComponent<CardUIController>();
+            if (ui != null) ui.ShowJudgementResult(res.JudgeResult);
+        }
+
+        cardsOnField.Add(cardGO);
+        ReorganizeField();
+
+        yield return new WaitForSeconds(playAnimDuration);
+        
+        // Note: No Audio for Discard as requested.
     }
 
     private void OnResponseSwapFieldHand(ExtendedEventArgs args)
@@ -168,6 +225,9 @@ public class PlayFieldManager : MonoBehaviour
         cardsOnField.Add(handCardGO);
         ReorganizeField(); // This handles the move to playField center
 
+        // --- NEW: Play Audio for Swap ---
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardPlaySFX();
+
         yield return new WaitForSeconds(playAnimDuration);
 
         // 4. Cleanup and Finalize
@@ -231,6 +291,9 @@ public class PlayFieldManager : MonoBehaviour
         // 2. Add to field and reorganize
         cardsOnField.Add(cardGO);
         ReorganizeField();
+
+        // --- NEW: Play Audio for Judgement Reveal ---
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardPlaySFX();
 
         yield return new WaitForSeconds(playAnimDuration);
 
@@ -321,6 +384,9 @@ public class PlayFieldManager : MonoBehaviour
 
         // 4. Reorganize everything on the field
         ReorganizeField();
+
+        // --- NEW: Play Audio for Card Play ---
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardPlaySFX();
 
         // Wait for the duration of the play animation
         yield return new WaitForSeconds(playAnimDuration);
