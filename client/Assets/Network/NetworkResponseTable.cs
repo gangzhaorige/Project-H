@@ -32,7 +32,7 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_PASS_PRIORITY, "ResponsePassPriority");
 		Add(Constants.SMSG_PLAYER_STATS, "ResponsePlayerStats");
 		Add(Constants.SMSG_ACTION_COMPLETED, "ResponseActionCompletedEvent");
-		Add(Constants.SMSG_SKILL_ACTIVATION, "ResponseSkillActivation");
+		Add(Constants.SMSG_SKILL_ACTIVATION, "ResponseSkillActivated");
 		Add(Constants.SMSG_SKILL_QUERY, "ResponseSkillQuery");
 		Add(Constants.SMSG_JUDGE, "ResponseJudgement");
 		Add(Constants.SMSG_SHOW_TARGET_HAND, "ResponseShowTargetHand");

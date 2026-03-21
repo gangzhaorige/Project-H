@@ -7,6 +7,7 @@ import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.model.skills.AbstractSkill;
+import com.zzhgl.app.networking.response.game.ResponseSkillActivated;
 import com.zzhgl.app.networking.response.game.ResponseSkillQuery;
 import com.zzhgl.app.networking.response.game.ResponseTimerCancel;
 import com.zzhgl.app.networking.response.game.ResponseTimerStart;
@@ -78,8 +79,19 @@ public class SkillResolutionState implements GameState {
         } else {
             Log.printf("Automatically executing skill %s for player %d", next.skill.getName(), next.owner.getID());
             next.skill.execute(game, next.owner, next.event, null);
+            notifySkillActivation(game, next.owner, next.skill);
             queue.poll();
             resolveNext(game);
+        }
+    }
+
+    private void notifySkillActivation(GameManager game, Player owner, AbstractSkill skill) {
+        if (owner.getSelectedChampion() != null) {
+            java.util.List<AbstractSkill> skills = owner.getSelectedChampion().getSkills();
+            int index = skills.indexOf(skill);
+            if (index != -1) {
+                broadcast(game, new ResponseSkillActivated(owner.getID(), index));
+            }
         }
     }
 
@@ -124,6 +136,7 @@ public class SkillResolutionState implements GameState {
                 if (respCmd.isAccepted()) {
                     boolean finished = current.skill.execute(game, current.owner, current.event, respCmd.getData());
                     if (finished) {
+                        notifySkillActivation(game, current.owner, current.skill);
                         queue.poll(); // Remove resolved skill
                         resolveNext(game); // Move to next in queue
                     } else {
@@ -142,6 +155,7 @@ public class SkillResolutionState implements GameState {
                 // Pass card ID as data to the skill
                 boolean finished = current.skill.execute(game, current.owner, current.event, playCmd.getCardId());
                 if (finished) {
+                    notifySkillActivation(game, current.owner, current.skill);
                     cancelTimer(game);
                     queue.poll();
                     resolveNext(game);
