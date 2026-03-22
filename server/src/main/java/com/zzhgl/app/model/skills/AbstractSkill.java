@@ -1,8 +1,10 @@
 package com.zzhgl.app.model.skills;
 
+import com.zzhgl.app.model.actions.GameAction;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
+import java.util.List;
 
 /**
  * AbstractSkill represents a unique skill that can be possessed by a champion.
@@ -34,11 +36,11 @@ public abstract class AbstractSkill {
     public abstract boolean canTrigger(GameManager game, GameEvent event, Player owner);
 
     /**
-     * Executes the skill logic. 
+     * Returns a list of actions this skill performs.
      * @param data Optional data from user response (e.g., target ID).
-     * @return true if fully resolved, false if it needs user input.
+     * @return List of GameActions to be executed by the state machine.
      */
-    public abstract boolean execute(GameManager game, Player owner, GameEvent event, Object data);
+    public abstract List<GameAction> execute(GameManager game, Player owner, GameEvent event, Object data);
 
     /**
      * Called when the response timer for this skill expires.
@@ -47,3 +49,4 @@ public abstract class AbstractSkill {
         // Default: do nothing
     }
 }
+

@@ -68,28 +68,42 @@ public class JudgementState implements GameState {
     }
 
     private void finishJudgement(GameManager game) {
-        // Evaluate the condition
+        // 1. The effect is consumed whether it triggered or not.
+        effect.getTarget().removeEffect(effect);
+
+        // 2. Evaluate the condition and queue consequences BEFORE popping
         if (judgementCard != null) {
             boolean triggered = effect.evaluateJudgement(game, judgementCard);
             if (triggered) {
-                effect.applyConsequence(game);
+                java.util.List<com.zzhgl.app.model.actions.GameAction> actions = effect.applyConsequence(game, judgementCard);
+                if (actions != null) {
+                    game.getActionQueue().addAll(actions);
+                }
             }
-            // Put the judgement card in the discard pile
-            game.getDiscardPile().addCard(judgementCard);
+
+            // 3. Check if card is still "available" (not in any hand) before discarding.
+            boolean inAnyHand = false;
+            for (com.zzhgl.app.model.core.Player p : game.getPlayers()) {
+                if (p.getHand().getCards().contains(judgementCard)) {
+                    inAnyHand = true;
+                    break;
+                }
+            }
+
+            if (!inAnyHand) {
+                // Put the judgement card in the discard pile
+                game.getDiscardPile().addCard(judgementCard);
+            }
         }
 
-        // The effect is consumed whether it triggered or not
-        effect.getTarget().removeEffect(effect);
+        // 4. Add a non-blocking wait to allow client animations to finish
+        game.getActionQueue().add(new com.zzhgl.app.model.actions.WaitAction(1000));
 
-        // We are done with this effect's judgement. Pop back to EffectEvaluationState.
+        // 5. We are done with THIS judgement state. Pop last.
+        // This ensures the ActionQueue is populated when the parent state (e.g. SkillResolutionState) resumes.
         game.popState();
     }
 
-    @Override
-    public void handleAction(GameManager game, Command command) {
-        // Players don't send standard commands here. If they override, it's via SkillResponseCommand 
-        // which is handled by the SkillResolutionState that gets pushed above this.
-    }
 
     @Override
     public void onExit(GameManager game) {
@@ -112,5 +126,11 @@ public class JudgementState implements GameState {
         }
         
         finishJudgement(game);
+    }
+
+    @Override
+    public void handleAction(GameManager game, Command command) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleAction'");
     }
 }

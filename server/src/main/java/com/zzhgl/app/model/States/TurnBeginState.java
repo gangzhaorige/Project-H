@@ -15,7 +15,7 @@ public class TurnBeginState implements GameState {
     @Override
     public void onEnter(GameManager game) {
         Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
-        Log.printf("Player %d is drawing cards.", activePlayer.getID());
+        Log.printf("Player %d turn begin.", activePlayer.getID());
 
         // Reset attack count
         if (activePlayer.getSelectedChampion() != null) {
@@ -35,8 +35,24 @@ public class TurnBeginState implements GameState {
         // Emit TURN_BEGIN event. All reactive skills (like Beginning Wisdom) will be queued.
         game.emitEvent(new GameEvent(GameEvent.EventType.TURN_BEGIN));
 
-        // Default: Draw 2 cards
-        game.drawCards(activePlayer, 2);
+        // If a skill (like Seele's MyTurn) was triggered, it pushes SkillResolutionState.
+        // We wait until it's finished and we resume.
+        if (game.getCurrentState() == this) {
+            proceedToDraw(game);
+        }
+    }
+
+    private void proceedToDraw(GameManager game) {
+        Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
+        
+        // Draw cards only if not skipped by a skill
+        if (!game.isSkipDrawPhase()) {
+            Log.printf("Player %d is drawing 2 cards.", activePlayer.getID());
+            game.drawCards(activePlayer, 2);
+        } else {
+            Log.printf("Player %d skipped draw phase via skill.", activePlayer.getID());
+            game.setSkipDrawPhase(false); // Reset flag
+        }
 
         // Check if a Judgement (like Prison) requested to skip the action phase
         if (game.isSkipActionPhase()) {
@@ -56,8 +72,13 @@ public class TurnBeginState implements GameState {
     public void onExit(GameManager game) {}
 
     @Override
-    public void onPause(GameManager game) {}
+    public void onPause(GameManager game) {
+        Log.printf("TurnBeginState paused.");
+    }
 
     @Override
-    public void onResume(GameManager game) {}
+    public void onResume(GameManager game) {
+        Log.printf("TurnBeginState resumed.");
+        proceedToDraw(game);
+    }
 }

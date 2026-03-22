@@ -118,35 +118,44 @@ public class PlayFieldManager : MonoBehaviour
         var ui = cardGO.GetComponent<CardUIController>();
         if (ui != null) ui.HideJudgementResult();
 
-        // 3. Animate to Hand
-        Vector3 targetPos = Vector3.down * 500;
         if (isLocal)
         {
-            // Position in local hand
-            targetPos = handManager.GetPredictiveWorldPosition(handManager.GetCardIndex(-1) + 1, GameSession.Instance.GetLocalPlayer().Hand.Count + 1);
+            // 3. Local Player: Register immediately to animate alongside hand reorganization
+            CardData data = new CardData { Id = res.CardId, Suit = res.Suit, Value = res.Value, Type = res.CardType };
+            
+            // HandManager reparents the card, maintains its world position, and starts moving it to its final slot
+            // while simultaneously adjusting all other cards.
+            handManager.RegisterAnimatedCard(data, cardGO);
+            GameSession.Instance.GetLocalPlayer().AddCard(data);
+
+            // Wait for HandManager's standard layout animation duration (typically 0.3s)
+            yield return new WaitForSeconds(0.3f);
         }
         else
         {
+            // 3. Non-Local Player: Determine Target Position
+            Vector3 targetLocalPos = Vector3.zero;
+
             // Position of caster's champion
             if (GameSession.Instance.Players.TryGetValue(res.CasterId, out PlayerData pData) && pData.ChampionObject != null)
             {
-                targetPos = pData.ChampionObject.transform.position;
+                // The Champion is in 3D world space. 
+                // Since playFieldPanel is in a World Space Canvas, we can convert the Champion's world position 
+                // directly into the panel's local space.
+                targetLocalPos = playFieldPanel.InverseTransformPoint(pData.ChampionObject.transform.position);
             }
-        }
+            else
+            {
+                // Fallback: move off-screen
+                targetLocalPos = new Vector3(0, -1000, 0);
+            }
 
-        yield return SmoothMove(cardGO.transform, targetPos, Quaternion.identity, playAnimDuration);
+            // 4. Animate towards champion
+            yield return SmoothMove(cardGO.transform, targetLocalPos, Quaternion.identity, playAnimDuration);
 
-        // 4. Register and Cleanup
-        if (isLocal)
-        {
-            CardData data = new CardData { Id = res.CardId, Suit = res.Suit, Value = res.Value, Type = res.CardType };
-            handManager.RegisterAnimatedCard(data, cardGO);
-            GameSession.Instance.GetLocalPlayer().AddCard(data);
-        }
-        else
-        {
+            // 5. Cleanup
             Destroy(cardGO);
-            if (GameSession.Instance.Players.TryGetValue(res.CasterId, out PlayerData pData))
+            if (GameSession.Instance.Players.TryGetValue(res.CasterId, out pData))
             {
                 pData.AddCard(new CardData { Id = -1 });
             }

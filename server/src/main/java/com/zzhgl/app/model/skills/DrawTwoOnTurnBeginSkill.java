@@ -1,8 +1,11 @@
 package com.zzhgl.app.model.skills;
 
+import com.zzhgl.app.model.actions.DrawCardAction;
+import com.zzhgl.app.model.actions.GameAction;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
+import java.util.List;
 
 /**
  * Skill 1: Draw 2 cards during start turn (Automatic).
@@ -29,8 +32,7 @@ public class DrawTwoOnTurnBeginSkill extends AbstractSkill {
     }
 
     @Override
-    public boolean execute(GameManager game, Player owner, GameEvent event, Object data) {
-        game.drawCards(owner, 2);
-        return true;
+    public List<GameAction> execute(GameManager game, Player owner, GameEvent event, Object data) {
+        return List.of(new DrawCardAction(owner, 2));
     }
 }

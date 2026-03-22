@@ -1,9 +1,12 @@
 package com.zzhgl.app.model.effects;
 
+import com.zzhgl.app.model.actions.GameAction;
+import com.zzhgl.app.model.actions.SetFlagAction;
 import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.utility.Log;
+import java.util.List;
 
 public class PrisonEffect extends AbstractEffect {
 
@@ -24,8 +27,8 @@ public class PrisonEffect extends AbstractEffect {
     }
 
     @Override
-    public void applyConsequence(GameManager game) {
+    public List<GameAction> applyConsequence(GameManager game, AbstractCard judgementCard) {
         Log.printf("Prison effect activated! Player %d loses their action phase.", target.getID());
-        game.setSkipActionPhase(true); // Requires adding this flag to GameManager
+        return List.of(new SetFlagAction("skipActionPhase", GameManager::setSkipActionPhase, true));
     }
 }

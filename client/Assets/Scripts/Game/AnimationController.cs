@@ -34,9 +34,6 @@ public class AnimationController : MonoBehaviour
         // Execute it and wait until it is completely finished
         yield return StartCoroutine(nextAnim);
 
-        // --- NEW: Global delay between animations ---
-        yield return new WaitForSeconds(1.0f);
-
         isProcessing = false;
     }
 

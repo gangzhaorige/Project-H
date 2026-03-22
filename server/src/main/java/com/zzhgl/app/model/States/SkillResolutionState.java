@@ -3,6 +3,7 @@ package com.zzhgl.app.model.States;
 import com.zzhgl.app.model.Command.Command;
 import com.zzhgl.app.model.Command.PlayCardCommand;
 import com.zzhgl.app.model.Command.SkillResponseCommand;
+import com.zzhgl.app.model.actions.GameAction;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
@@ -15,6 +16,7 @@ import com.zzhgl.app.utility.Log;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -22,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * SkillResolutionState manages a queue of skills that were triggered by an event.
- * It resolves them one by one in order.
+ * It resolves them one by one in order using an Action Queue.
  */
 public class SkillResolutionState implements GameState {
     
@@ -30,6 +32,7 @@ public class SkillResolutionState implements GameState {
         Player owner;
         AbstractSkill skill;
         GameEvent event;
+        boolean isWaitingForInput = false;
 
         PendingSkill(Player owner, AbstractSkill skill, GameEvent event) {
             this.owner = owner;
@@ -59,30 +62,61 @@ public class SkillResolutionState implements GameState {
     private synchronized void resolveNext(GameManager game) {
         cancelTimer(game);
 
+        // 1. If there are existing actions to process, do them first
+        if (!game.getActionQueue().isEmpty()) {
+            executeActionQueue(game);
+            return;
+        }
+
+        // 2. If no more skills to resolve, finish
         if (queue.isEmpty()) {
-            game.popState();
+            if (game.getCurrentState() == this) {
+                game.popState();
+            }
             return;
         }
 
         PendingSkill next = queue.peek();
+        
+        // 3. If waiting for card selection/input, don't re-query
+        if (next.isWaitingForInput) {
+            startTimer(game);
+            return;
+        }
+
+        // 4. Handle Skill Trigger
         if (next.skill.isOptional()) {
             Log.printf("Querying player %d for optional skill %s", next.owner.getID(), next.skill.getName());
-            
-            // Broadcast timer to everyone so they see the progress
             broadcast(game, new ResponseTimerStart(next.owner.getID(), SKILL_TIMEOUT_SECONDS, "Decision: " + next.skill.getName(), "ANY"));
-            
-            // Specifically notify the owner
             next.owner.addResponseForUpdate(new ResponseSkillQuery(next.owner.getID(), next.skill.getId(), next.skill.getName()));
-            
             startTimer(game);
-            // Wait for handleAction (SkillResponseCommand or PlayCardCommand)
         } else {
             Log.printf("Automatically executing skill %s for player %d", next.skill.getName(), next.owner.getID());
-            next.skill.execute(game, next.owner, next.event, null);
+            List<GameAction> actions = next.skill.execute(game, next.owner, next.event, null);
+            if (actions != null) {
+                game.getActionQueue().addAll(actions);
+            }
             notifySkillActivation(game, next.owner, next.skill);
             queue.poll();
-            resolveNext(game);
+            executeActionQueue(game);
         }
+    }
+
+    private void executeActionQueue(GameManager game) {
+        while (!game.getActionQueue().isEmpty()) {
+            GameAction action = game.getActionQueue().poll();
+            action.execute(game);
+            System.out.println(action.getClass().getName());
+            // If the action blocks (e.g. pushes a state), we stop here.
+            // When that state pops, onResume will be called and we will continue.
+            if (action.isBlocking() || game.getCurrentState() != this) {
+                System.out.println("HEERE!");
+                return;
+            }
+        }
+        
+        // If queue emptied and we didn't push a state, move to next skill
+        resolveNext(game);
     }
 
     private void notifySkillActivation(GameManager game, Player owner, AbstractSkill skill) {
@@ -112,7 +146,6 @@ public class SkillResolutionState implements GameState {
     private synchronized void handleTimeout(GameManager game) {
         PendingSkill current = queue.poll();
         if (current != null) {
-            Log.printf("Skill %s timed out for player %d. Calling onTimeout.", current.skill.getName(), current.owner.getID());
             current.skill.onTimeout(game, current.owner, current.event);
         }
         resolveNext(game);
@@ -129,41 +162,39 @@ public class SkillResolutionState implements GameState {
         PendingSkill current = queue.peek();
         if (current == null) return;
 
-        if (command instanceof SkillResponseCommand respCmd) {
-            if (respCmd.getPlayerId() == current.owner.getID()) {
-                cancelTimer(game);
+        if (command instanceof SkillResponseCommand respCmd && respCmd.getPlayerId() == current.owner.getID()) {
+            cancelTimer(game);
+            if (respCmd.isAccepted()) {
+                current.isWaitingForInput = false;
+                List<GameAction> actions = current.skill.execute(game, current.owner, current.event, respCmd.getData());
                 
-                if (respCmd.isAccepted()) {
-                    boolean finished = current.skill.execute(game, current.owner, current.event, respCmd.getData());
-                    if (finished) {
-                        notifySkillActivation(game, current.owner, current.skill);
-                        queue.poll(); // Remove resolved skill
-                        resolveNext(game); // Move to next in queue
-                    } else {
-                        // Skill needs more input (e.g. a PlayCardCommand)
-                        // Restart timer for the second phase of the skill
-                        startTimer(game);
-                        broadcast(game, new ResponseTimerStart(current.owner.getID(), SKILL_TIMEOUT_SECONDS, "Skill Input: " + current.skill.getName(), "ANY"));
-                    }
-                } else {
-                    queue.poll(); // Refused
-                    resolveNext(game);
-                }
-            }
-        } else if (command instanceof PlayCardCommand playCmd) {
-            if (playCmd.getPlayerId() == current.owner.getID()) {
-                // Pass card ID as data to the skill
-                boolean finished = current.skill.execute(game, current.owner, current.event, playCmd.getCardId());
-                if (finished) {
+                if (actions != null && !actions.isEmpty()) {
+                    game.getActionQueue().addAll(actions);
                     notifySkillActivation(game, current.owner, current.skill);
-                    cancelTimer(game);
                     queue.poll();
-                    resolveNext(game);
+                    executeActionQueue(game);
                 } else {
-                    // Invalid input or more needed. 
-                    // DO NOT cancel or restart timer. Let the original timer continue.
-                    Log.printf("Skill execution for %s returned false. Invalid input? Timer continues.", current.skill.getName());
+                    // Skill returned null/empty but was accepted - likely needs more input (PlayCard)
+                    current.isWaitingForInput = true;
+                    startTimer(game);
+                    broadcast(game, new ResponseTimerStart(current.owner.getID(), SKILL_TIMEOUT_SECONDS, "Skill Input: " + current.skill.getName(), "ANY"));
                 }
+            } else {
+                queue.poll();
+                resolveNext(game);
+            }
+        } else if (command instanceof PlayCardCommand playCmd && playCmd.getPlayerId() == current.owner.getID()) {
+            current.isWaitingForInput = false;
+            List<GameAction> actions = current.skill.execute(game, current.owner, current.event, playCmd.getCardId());
+            if (actions != null && !actions.isEmpty()) {
+                game.getActionQueue().addAll(actions);
+                notifySkillActivation(game, current.owner, current.skill);
+                cancelTimer(game);
+                queue.poll();
+                executeActionQueue(game);
+            } else {
+                current.isWaitingForInput = true;
+                Log.printf("Skill execution for %s returned null/empty. Invalid input? Timer continues.", current.skill.getName());
             }
         }
     }
@@ -181,8 +212,7 @@ public class SkillResolutionState implements GameState {
 
     @Override
     public void onResume(GameManager game) {
-        // If we resumed (e.g. from an interaction or card play triggered by the skill),
-        // we might still have skills in the queue to resolve.
+        // Continue with action queue or next skill
         resolveNext(game);
     }
 }

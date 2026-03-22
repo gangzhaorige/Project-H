@@ -1,10 +1,11 @@
 package com.zzhgl.app.model.skills;
 
+import com.zzhgl.app.model.actions.GameAction;
+import com.zzhgl.app.model.actions.JudgementOverrideAction;
 import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
-import com.zzhgl.app.networking.response.game.ResponseDiscardCard;
 import com.zzhgl.app.utility.Log;
 
 import java.util.List;
@@ -26,56 +27,28 @@ public class JudgementOverrideSkill extends AbstractSkill {
 
     @Override
     public boolean canTrigger(GameManager game, GameEvent event, Player owner) {
-        // Anyone with this skill can trigger it when a judgement is about to resolve
-        // (Alternatively, you could limit it to the person affected by the judgement)
         return event.getType() == GameEvent.EventType.BEFORE_JUDGEMENT_RESOLVE && owner.getHand().size() > 0;
     }
 
     @Override
-    public boolean execute(GameManager game, Player owner, GameEvent event, Object data) {
-        // Step 1: Player accepted the skill but hasn't picked a card yet
+    public List<GameAction> execute(GameManager game, Player owner, GameEvent event, Object data) {
+        // Step 1: Player accepted but hasn't picked a card yet
         if (data == null) {
-            Log.printf("Player %d accepted %s. Waiting for card selection.", owner.getID(), getName());
-            return false; // Not finished, wait for PlayCardCommand
+            return null; // Signals SkillResolutionState to wait for further input
         }
 
-        // Step 2: Player picked a card (sent via SkillResponseCommand or PlayCardCommand)
+        // Step 2: Player picked a card (Integer cardId)
         if (data instanceof Integer cardId) {
             Optional<AbstractCard> cardOpt = owner.getHand().getCards().stream()
                     .filter(c -> c.getId() == cardId)
                     .findFirst();
 
             if (cardOpt.isPresent()) {
-                applyEffect(game, owner, event, cardOpt.get());
-                return true; // Finished!
+                // Return a single atomic action that performs the override
+                return List.of(new JudgementOverrideAction(owner, event, cardOpt.get()));
             }
         }
-        return false;
-    }
-
-    private void applyEffect(GameManager game, Player owner, GameEvent event, AbstractCard newCard) {
-        owner.getHand().removeCard(newCard);
-        
-        // Put the previous judgement card into discard pile (optional, depends on rules)
-        if (event.getData() instanceof AbstractCard oldCard) {
-            game.getDiscardPile().addCard(oldCard);
-        }
-
-        // Replace the event data so JudgementState picks it up
-        event.setData(newCard);
-        Log.printf("Player %d used %s to override judgement with %s", owner.getID(), getName(), newCard);
-
-        // Calculate current evaluation for the UI
-        boolean judgeResult = false;
-        if (game.getCurrentState() instanceof com.zzhgl.app.model.States.JudgementState judgeState) {
-            judgeResult = judgeState.getEffect().evaluateJudgement(game, newCard);
-        }
-
-        // Notify everyone that a card was discarded for judgement override
-        ResponseDiscardCard response = new ResponseDiscardCard(owner.getID(), newCard, true, judgeResult);
-        for (Player p : game.getPlayers()) {
-            p.addResponseForUpdate(response);
-        }
+        return null;
     }
 
     @Override
@@ -83,10 +56,8 @@ public class JudgementOverrideSkill extends AbstractSkill {
         List<AbstractCard> cards = owner.getHand().getCards();
         if (!cards.isEmpty()) {
             AbstractCard lastCard = cards.get(cards.size() - 1);
-            Log.printf("JudgementOverrideSkill timed out. Auto-using LAST card: %s", lastCard);
-            applyEffect(game, owner, event, lastCard);
-        } else {
-            Log.printf("JudgementOverrideSkill timed out. Hand is empty, no effect applied.");
+            Log.printf("JudgementOverrideSkill timed out. Auto-using LAST card.");
+            game.getActionQueue().add(new JudgementOverrideAction(owner, event, lastCard));
         }
     }
 }

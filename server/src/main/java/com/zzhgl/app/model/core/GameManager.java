@@ -12,13 +12,16 @@ import com.zzhgl.app.networking.response.game.ResponseDrawCard;
 import com.zzhgl.app.networking.response.game.ResponseDrawCardOther;
 import com.zzhgl.app.networking.response.game.ResponseGameState;
 
+import com.zzhgl.app.model.actions.GameAction;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * GameManager handles the game logic and state.
@@ -30,11 +33,13 @@ public class GameManager {
     private int turnCounter;
     private boolean inGame;
     private Deque<GameState> stateStack;
+    private Queue<GameAction> actionQueue = new LinkedList<>();
     private Deck deck;
     private Pile drawPile;
     private Pile discardPile;
     private InteractionStack interactionStack;
     private boolean skipActionPhase = false;
+    private boolean skipDrawPhase = false;
 
     // Subscription-based skill registry
     private final Map<GameEvent.EventType, List<SkillSubscription>> skillRegistry = new EnumMap<>(GameEvent.EventType.class);
@@ -79,8 +84,19 @@ public class GameManager {
         return interactionStack;
     }
 
+    public Queue<GameAction> getActionQueue() {
+        return actionQueue;
+    }
+
+    public boolean hasBlockingAction() {
+        return actionQueue.stream().anyMatch(GameAction::isBlocking);
+    }
+
     public boolean isSkipActionPhase() { return skipActionPhase; }
     public void setSkipActionPhase(boolean skip) { this.skipActionPhase = skip; }
+
+    public boolean isSkipDrawPhase() { return skipDrawPhase; }
+    public void setSkipDrawPhase(boolean skip) { this.skipDrawPhase = skip; }
 
     public Pile getDrawPile() {
         return drawPile;
