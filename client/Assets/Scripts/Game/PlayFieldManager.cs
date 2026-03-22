@@ -76,6 +76,7 @@ public class PlayFieldManager : MonoBehaviour
             NetworkManager.Instance.AddCallback(Constants.SMSG_JUDGE, OnJudgementResult);
             NetworkManager.Instance.AddCallback(Constants.SMSG_SWAP_FIELD_HAND, OnResponseSwapFieldHand);
             NetworkManager.Instance.AddCallback(Constants.SMSG_DISCARD_CARDS, OnResponseDiscardCard);
+            NetworkManager.Instance.AddCallback(Constants.SMSG_FIELD_TO_HAND, OnResponseFieldToHand);
         }
     }
 
@@ -87,6 +88,68 @@ public class PlayFieldManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_JUDGE);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_SWAP_FIELD_HAND);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_DISCARD_CARDS);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_FIELD_TO_HAND);
+        }
+    }
+
+    private void OnResponseFieldToHand(ExtendedEventArgs args)
+    {
+        ResponseFieldToHandEventArgs res = args as ResponseFieldToHandEventArgs;
+        if (res == null) return;
+
+        AnimationController.Instance.AddAnimation(AnimateFieldToHand(res));
+    }
+
+    private IEnumerator AnimateFieldToHand(ResponseFieldToHandEventArgs res)
+    {
+        bool isLocal = (res.CasterId == Constants.USER_ID);
+        GameObject cardGO = null;
+
+        // 1. Find the card on the field (most recently added)
+        if (cardsOnField.Count > 0)
+        {
+            cardGO = cardsOnField[cardsOnField.Count - 1];
+            cardsOnField.RemoveAt(cardsOnField.Count - 1);
+        }
+
+        if (cardGO == null) yield break;
+
+        // 2. Hide judge indicator
+        var ui = cardGO.GetComponent<CardUIController>();
+        if (ui != null) ui.HideJudgementResult();
+
+        // 3. Animate to Hand
+        Vector3 targetPos = Vector3.down * 500;
+        if (isLocal)
+        {
+            // Position in local hand
+            targetPos = handManager.GetPredictiveWorldPosition(handManager.GetCardIndex(-1) + 1, GameSession.Instance.GetLocalPlayer().Hand.Count + 1);
+        }
+        else
+        {
+            // Position of caster's champion
+            if (GameSession.Instance.Players.TryGetValue(res.CasterId, out PlayerData pData) && pData.ChampionObject != null)
+            {
+                targetPos = pData.ChampionObject.transform.position;
+            }
+        }
+
+        yield return SmoothMove(cardGO.transform, targetPos, Quaternion.identity, playAnimDuration);
+
+        // 4. Register and Cleanup
+        if (isLocal)
+        {
+            CardData data = new CardData { Id = res.CardId, Suit = res.Suit, Value = res.Value, Type = res.CardType };
+            handManager.RegisterAnimatedCard(data, cardGO);
+            GameSession.Instance.GetLocalPlayer().AddCard(data);
+        }
+        else
+        {
+            Destroy(cardGO);
+            if (GameSession.Instance.Players.TryGetValue(res.CasterId, out PlayerData pData))
+            {
+                pData.AddCard(new CardData { Id = -1 });
+            }
         }
     }
 

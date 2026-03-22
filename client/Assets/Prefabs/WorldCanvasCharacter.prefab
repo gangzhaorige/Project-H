@@ -222,7 +222,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -17.28003, y: 0.11999512}
-  m_SizeDelta: {x: 488.4241, y: 668.7585}
+  m_SizeDelta: {x: 488, y: 668}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7753943418051225401
 Canvas:
@@ -269,7 +269,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &7390493355349393224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,7 +304,7 @@ MonoBehaviour:
   maxHP: 0
   curHP: 0
   pathId: 0
-  element: 
+  element: 0
   attack: 0
   attackRange: 0
   specialDefense: 0

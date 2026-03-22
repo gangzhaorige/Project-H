@@ -66,14 +66,16 @@ public class ChampionFactory {
         newChamp.setPath(prototype.getPath());
         newChamp.setElement(prototype.getElement());
         newChamp.setMaxHP(prototype.getMaxHP());
-        newChamp.setCurHP(prototype.getMaxHP());
+        newChamp.setCurHP(prototype.getMaxHP()); // Reset to Max
         newChamp.setAttack(prototype.getAttack());
         newChamp.setAttackRange(prototype.getAttackRange());
-        newChamp.setSpecialRange(prototype.getSpecialRange());
-        newChamp.setMaxNumOfAttack(prototype.getMaxNumOfAttack());
+        
+        // Defaults for simplified JSON
+        newChamp.setSpecialRange(0);
+        newChamp.setMaxNumOfAttack(1);
         newChamp.setCurNumOfAttack(0);
-        newChamp.setSpecialDefenseRange(prototype.getSpecialDefenseRange());
-        newChamp.setAdditionalTargetForAttack(prototype.getAdditionalTargetForAttack());
+        newChamp.setSpecialDefenseRange(0);
+        newChamp.setAdditionalTargetForAttack(0);
         
         // Add skills from SkillFactory
         newChamp.setSkillIds(prototype.getSkillIds());

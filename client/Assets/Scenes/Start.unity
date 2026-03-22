@@ -539,6 +539,7 @@ MonoBehaviour:
   champSelectBGM: {fileID: 8300000, guid: f10c09b5f2dbe48c587e6ddcf15a56b0, type: 3}
   gameplayBGM: {fileID: 8300000, guid: cf26c041c22614cd4badbf115e511f69, type: 3}
   cardHoverClip: {fileID: 8300000, guid: 3e3808a16aa7444b4af0b12e5c694da3, type: 3}
+  cardDrawClip: {fileID: 8300000, guid: 096bcf4c17f3a4a958c30da14676e9bb, type: 3}
 --- !u!4 &1851306107
 Transform:
   m_ObjectHideFlags: 0

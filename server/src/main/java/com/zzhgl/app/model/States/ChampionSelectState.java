@@ -37,7 +37,7 @@ public class ChampionSelectState implements GameState {
 
     public ChampionSelectState() {
         this.availableChampions = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 9; i++) {
             availableChampions.add(i);
         }
         this.scheduler = Executors.newSingleThreadScheduledExecutor();

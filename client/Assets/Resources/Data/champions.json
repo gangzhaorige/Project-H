@@ -1,12 +1,11 @@
 [
-  { "id": 0, "championName": "Imbibitor Lunae", "path": "Destruction", "element": "Imaginary", "additionalTargetForAttack": 0 },
-  { "id": 1, "championName": "Himeko", "path": "Erudition", "element": "Fire", "additionalTargetForAttack": 2 },
-  { "id": 2, "championName": "Kafka", "path": "Nihility", "element": "Lightning", "additionalTargetForAttack": 0 },
-  { "id": 3, "championName": "Bronya", "path": "Harmony", "element": "Wind", "additionalTargetForAttack": 0 },
-  { "id": 4, "championName": "Clara", "path": "Destruction", "element": "Physical", "additionalTargetForAttack": 0 },
-  { "id": 5, "championName": "Jing Yuan", "path": "Erudition", "element": "Lightning", "additionalTargetForAttack": 0 },
-  { "id": 6, "championName": "Sparkle", "path": "Harmony", "element": "Quantum", "additionalTargetForAttack": 0 },
-  { "id": 7, "championName": "Welt", "path": "Nihility", "element": "Imaginary", "additionalTargetForAttack": 0 },
-  { "id": 8, "championName": "Jade", "path": "Erudition", "element": "Quantum", "additionalTargetForAttack": 0 },
-  { "id": 9, "championName": "Jing Liu", "path": "Destruction", "element": "Ice", "additionalTargetForAttack": 0 }
+    {"id": 0, "championName": "Bronya", "path": "Harmony", "element": "Wind"},
+    {"id": 1, "championName": "Clara", "path": "Destruction", "element": "Physical"},
+    {"id": 2, "championName": "Gepard", "path": "Preservation", "element": "Ice"},
+    {"id": 3, "championName": "Himeko", "path": "Erudition", "element": "Fire"},
+    {"id": 4, "championName": "Welt", "path": "Nihility", "element": "Imaginary"},
+    {"id": 5, "championName": "BaiLu", "path": "Abundance", "element": "Lightning"},
+    {"id": 6, "championName": "Yanqing", "path": "Hunt", "element": "Ice"},
+    {"id": 7, "championName": "Seele", "path": "Hunt", "element": "Quantum"},
+    {"id": 8, "championName": "Trailblazer (Physical)", "path": "Destruction", "element": "Physical"}
 ]

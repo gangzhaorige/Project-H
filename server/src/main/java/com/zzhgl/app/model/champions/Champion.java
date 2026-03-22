@@ -85,7 +85,7 @@ public class Champion {
     private int attack = 1;
     private int attackRange = 1;
     private int specialRange = 1;
-    private int curNumOfAttack;
+    private int curNumOfAttack = 0;
     private int maxNumOfAttack = 1;
     private int specialDefenseRange = 0;
     private int additionalTargetForAttack = 0;
@@ -99,7 +99,6 @@ public class Champion {
         this.championName = championName;
         this.maxHP = maxHP;
         this.curHP = maxHP;
-        this.curNumOfAttack = 0;
     }
 
     // Getters and Setters
