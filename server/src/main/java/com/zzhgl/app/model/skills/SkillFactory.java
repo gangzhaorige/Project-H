@@ -27,6 +27,7 @@ public class SkillFactory {
             case 5: return new JudgementSwapperSkill();
             case 6: return new MyTurnSkill();
             case 7: return new SvarogsRevengeSkill();
+            case 8: return new OneWithTheSwordSkill();
             default: return null;
         }
     }

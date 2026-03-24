@@ -95,6 +95,7 @@ public class HandManager : MonoBehaviour
         CardUIController ui = cardGO.GetComponent<CardUIController>();
         if (ui != null) 
         {
+            ui.enabled = true; // Enable interaction when in hand
             ui.Bind(data, this);
         }
         else
@@ -149,7 +150,11 @@ public class HandManager : MonoBehaviour
         if (setup != null) setup.Init(data.Type, data.Suit, data.Value);
 
         CardUIController ui = cardGO.GetComponent<CardUIController>();
-        if (ui != null) ui.Bind(data, this);
+        if (ui != null) 
+        {
+            ui.enabled = true; // Enable interaction when in hand
+            ui.Bind(data, this);
+        }
 
         cardMap.Add(data.Id, cardGO);
         

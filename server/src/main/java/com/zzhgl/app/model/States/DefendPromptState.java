@@ -64,6 +64,11 @@ public class DefendPromptState implements GameState {
 
     private void applyDamage(GameManager game) {
         DamageInteraction dmg = new DamageInteraction(attacker, defender, sourceInteraction.getCard(), damageAmount);
+        
+        // Add context for skills like Yanqing's passive
+        dmg.setExtraParam("sourceInteractionType", sourceInteraction.getClass().getSimpleName());
+        dmg.setExtraParam("requiredType", requiredType);
+        
         // We push to the stack so it resolves properly through modifiers
         game.getInteractionStack().push(dmg);
     }

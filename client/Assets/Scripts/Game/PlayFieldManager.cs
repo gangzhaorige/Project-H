@@ -181,6 +181,11 @@ public class PlayFieldManager : MonoBehaviour
             if (cardGO != null)
             {
                 handManager.UnregisterCard(res.CardId);
+                
+                // Disable interaction script when moving to field
+                var ui = cardGO.GetComponent<CardUIController>();
+                if (ui != null) ui.enabled = false;
+
                 cardGO.transform.SetParent(playFieldPanel, true);
             }
         }
@@ -256,6 +261,11 @@ public class PlayFieldManager : MonoBehaviour
             {
                 originalIndex = handManager.GetCardIndex(res.PlayedCardId); // --- NEW: Save index ---
                 handManager.UnregisterCard(res.PlayedCardId);
+
+                // Disable interaction script when moving to field
+                var ui = handCardGO.GetComponent<CardUIController>();
+                if (ui != null) ui.enabled = false;
+
                 handCardGO.transform.SetParent(playFieldPanel, true);
             }
         }
@@ -354,6 +364,10 @@ public class PlayFieldManager : MonoBehaviour
             setup.Init(res.CardType, res.Suit, res.Value);
         }
 
+        // Disable interaction script while on field
+        var ui = cardGO.GetComponent<CardUIController>();
+        if (ui != null) ui.enabled = false;
+
         // Start from center/top
         cardGO.transform.localPosition = new Vector3(0, 500, 0);
 
@@ -395,6 +409,11 @@ public class PlayFieldManager : MonoBehaviour
             {
                 // Unregister from hand so it doesn't get reorganized
                 handManager.UnregisterCard(res.CardId);
+
+                // Disable interaction script when moving to field
+                var ui = cardGO.GetComponent<CardUIController>();
+                if (ui != null) ui.enabled = false;
+
                 // Move to play field parent but keep world position for now
                 cardGO.transform.SetParent(playFieldPanel, true);
             }
