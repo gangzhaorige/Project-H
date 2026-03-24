@@ -4,6 +4,8 @@ using ProjectH.Models;
 
 public class HandManager : MonoBehaviour
 {
+    public static HandManager Instance { get; private set; }
+
     [Header("Prefabs")]
     public GameObject cardPrefab;
 
@@ -13,34 +15,48 @@ public class HandManager : MonoBehaviour
     [Header("Components")]
     public DynamicHandLayout layoutHandler;
 
-    [Header("Hover Settings")]
-    public float hoverYOffset = 40f;
-
     private List<GameObject> orderedCards = new List<GameObject>();
     private List<int> orderedCardIds = new List<int>();
     private Dictionary<int, GameObject> cardMap = new Dictionary<int, GameObject>();
     private Dictionary<int, Coroutine> activeCoroutines = new Dictionary<int, Coroutine>();
-    private int hoveredCardId = -1;
+    private List<int> selectedCardIds = new List<int>();
 
-    public void SetHoveredCard(int cardId)
+    public delegate void SelectionChanged();
+    public event SelectionChanged OnSelectionChanged;
+
+    private void Awake()
     {
-        if (hoveredCardId == cardId) return;
-        hoveredCardId = cardId;
-        
-        // Just bring to front, don't re-run full layout
-        if (cardMap.TryGetValue(cardId, out GameObject cardGO))
-        {
-            cardGO.transform.SetAsLastSibling();
-        }
+        Instance = this;
     }
 
-    public void ClearHoveredCard(int cardId)
+    public void ToggleCardSelection(int cardId)
     {
-        if (hoveredCardId == cardId)
+        if (selectedCardIds.Contains(cardId))
         {
-            hoveredCardId = -1;
-            // No need to reorganize, CardUIController will reset its own container
+            selectedCardIds.Remove(cardId);
         }
+        else
+        {
+            selectedCardIds.Add(cardId);
+        }
+
+        OnSelectionChanged?.Invoke();
+    }
+
+    public bool IsSelected(int cardId)
+    {
+        return selectedCardIds.Contains(cardId);
+    }
+
+    public List<int> GetSelectedCardIds()
+    {
+        return new List<int>(selectedCardIds);
+    }
+
+    public void ClearSelection()
+    {
+        selectedCardIds.Clear();
+        OnSelectionChanged?.Invoke();
     }
 
     /// <summary>
@@ -79,7 +95,7 @@ public class HandManager : MonoBehaviour
         CardUIController ui = cardGO.GetComponent<CardUIController>();
         if (ui != null) 
         {
-            ui.Bind(data);
+            ui.Bind(data, this);
         }
         else
         {
@@ -133,7 +149,7 @@ public class HandManager : MonoBehaviour
         if (setup != null) setup.Init(data.Type, data.Suit, data.Value);
 
         CardUIController ui = cardGO.GetComponent<CardUIController>();
-        if (ui != null) ui.Bind(data);
+        if (ui != null) ui.Bind(data, this);
 
         cardMap.Add(data.Id, cardGO);
         
@@ -168,8 +184,6 @@ public class HandManager : MonoBehaviour
                 activeCoroutines.Remove(cardId);
             }
 
-            if (hoveredCardId == cardId) hoveredCardId = -1;
-
             // Reorganize the remaining cards in the hand
             ReorganizeHand();
         }
@@ -198,12 +212,6 @@ public class HandManager : MonoBehaviour
             {
                 int cardId = orderedCardIds[i];
                 Vector3 targetPos = targets[i].pos;
-
-                // Move hovered card to front so it's not hidden by neighbors
-                if (cardId == hoveredCardId)
-                {
-                    cardGO.transform.SetAsLastSibling();
-                }
 
                 // Stop previous movement to avoid "Animation Conflict" (stacking)
                 if (activeCoroutines.TryGetValue(cardId, out Coroutine co))
@@ -251,6 +259,6 @@ public class HandManager : MonoBehaviour
         orderedCards.Clear();
         orderedCardIds.Clear();
         activeCoroutines.Clear();
-        hoveredCardId = -1;
+        selectedCardIds.Clear();
     }
 }

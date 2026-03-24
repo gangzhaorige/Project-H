@@ -25,6 +25,16 @@ public class DamageInteraction extends AbstractInteraction {
             int newHp = Math.max(0, targetChamp.getCurHP() - amount);
             targetChamp.setCurHP(newHp);
             
+            // Broadcast HP update
+            com.zzhgl.app.networking.response.game.ResponseChampionStatsUpdateInteger statsUpdate = new com.zzhgl.app.networking.response.game.ResponseChampionStatsUpdateInteger(
+                targetChamp.getId(),
+                Champion.STAT_CUR_HP,
+                newHp
+            );
+            for (Player p : game.getPlayers()) {
+                p.addResponseForUpdate(statsUpdate);
+            }
+
             // Emit the event so skills can react
             game.emitEvent(new GameEvent(GameEvent.EventType.DAMAGE_TAKEN)
                 .setParam("target", target)

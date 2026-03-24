@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using ProjectH.Models;
 
 public class SkillQueryUI : MonoBehaviour
 {
@@ -54,6 +55,7 @@ public class SkillQueryUI : MonoBehaviour
         if (res.PlayerId != Constants.USER_ID) return;
 
         currentSkillId = res.SkillId;
+        GameSession.Instance.TriggerSkillQuery(res.SkillId);
         Show($"Do you want to activate '{res.SkillName}'?");
     }
 
@@ -74,6 +76,7 @@ public class SkillQueryUI : MonoBehaviour
         req.Send(accepted);
         NetworkManager.Instance.SendRequest(req);
         
+        GameSession.Instance.TriggerSkillQueryAnswered();
         Hide();
     }
 }

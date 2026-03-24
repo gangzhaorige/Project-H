@@ -18,6 +18,7 @@ namespace ProjectH.Models
         public int MaxNumOfAttack;
         public int AdditionalTargetForAttack;
         public int SpecialDefense;
+        public List<int> SkillIds = new List<int>();
         // Other stats can be added here
     }
 
@@ -123,11 +124,19 @@ namespace ProjectH.Models
         public delegate void ChampionStatsUpdated(int championId, int statId, int value);
         public event ChampionStatsUpdated OnChampionStatsUpdated;
 
+        public delegate void SkillQuery(int skillId);
+        public event SkillQuery OnSkillQuery;
+
+        public delegate void SkillQueryAnswered();
+        public event SkillQueryAnswered OnSkillQueryAnswered;
+
         public void TriggerTimerStarted(int seconds, string message, int playerId) => OnTimerStarted?.Invoke(seconds, message, playerId);
         public void TriggerTimerCancelled() => OnTimerCancelled?.Invoke();
         public void TriggerTurnStarted(int activePlayerId) => OnTurnStarted?.Invoke(activePlayerId);
         public void TriggerGameSetupCompleted() => OnGameSetupCompleted?.Invoke();
         public void TriggerChampionStatsUpdated(int championId, int statId, int value) => OnChampionStatsUpdated?.Invoke(championId, statId, value);
+        public void TriggerSkillQuery(int skillId) => OnSkillQuery?.Invoke(skillId);
+        public void TriggerSkillQueryAnswered() => OnSkillQueryAnswered?.Invoke();
 
         // Stat IDs (Matching Server)
         public const int STAT_CUR_HP = 1;

@@ -13,7 +13,7 @@ import java.util.List;
 public class DrawTwoOnTurnBeginSkill extends AbstractSkill {
     
     public DrawTwoOnTurnBeginSkill() {
-        super(1, "Beginning Wisdom", false);
+        super(1, "Military Might", false);
     }
 
     @Override

@@ -55,6 +55,12 @@ public class CardTargetSelector : MonoBehaviour
         
         Debug.Log($"[Targeting] Request sent for card {currentCard.Id} with {targetIds.Count} targets.");
         currentCard = null;
+
+        // Clear selection in HandManager after playing
+        if (HandManager.Instance != null)
+        {
+            HandManager.Instance.ClearSelection();
+        }
     }
 
     public void CancelTargeting()

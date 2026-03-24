@@ -48,7 +48,7 @@ public class JudgementState implements GameState {
         lastEvent = new GameEvent(GameEvent.EventType.BEFORE_JUDGEMENT_RESOLVE);
         lastEvent.setData(judgementCard); 
         game.emitEvent(lastEvent);
-
+        
         // If a skill triggers, it will push SkillResolutionState.
         // Once that state pops, it will call onResume here.
         // If no skill triggers, emitEvent does nothing and we just call finishJudgement immediately.
@@ -95,13 +95,12 @@ public class JudgementState implements GameState {
                 game.getDiscardPile().addCard(judgementCard);
             }
         }
-
-        // 4. Add a non-blocking wait to allow client animations to finish
-        game.getActionQueue().add(new com.zzhgl.app.model.actions.WaitAction(1000));
-
-        // 5. We are done with THIS judgement state. Pop last.
-        // This ensures the ActionQueue is populated when the parent state (e.g. SkillResolutionState) resumes.
         game.popState();
+
+        // If actions were added (e.g. AddCardToHand), ensure they are processed with pacing
+        if (!game.getActionQueue().isEmpty()) {
+            game.pushState(new ActionResolveState());
+        }
     }
 
 

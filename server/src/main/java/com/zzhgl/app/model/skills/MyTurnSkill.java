@@ -21,7 +21,7 @@ import java.util.List;
 public class MyTurnSkill extends AbstractSkill {
 
     public MyTurnSkill() {
-        super(6, "My Turn", true); // ID 6, Optional
+        super(6, "Resurgence", true); // ID 6, Optional
     }
 
     @Override

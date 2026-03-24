@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * SkillResolutionState manages a queue of skills that were triggered by an event.
- * It resolves them one by one in order using an Action Queue.
+ * It resolves them one by one. If a skill produces actions, it pushes ActionResolveState.
  */
 public class SkillResolutionState implements GameState {
     
@@ -62,9 +62,9 @@ public class SkillResolutionState implements GameState {
     private synchronized void resolveNext(GameManager game) {
         cancelTimer(game);
 
-        // 1. If there are existing actions to process, do them first
+        // 1. If there are existing actions to process, push ActionResolveState
         if (!game.getActionQueue().isEmpty()) {
-            executeActionQueue(game);
+            game.pushState(new ActionResolveState());
             return;
         }
 
@@ -93,30 +93,17 @@ public class SkillResolutionState implements GameState {
         } else {
             Log.printf("Automatically executing skill %s for player %d", next.skill.getName(), next.owner.getID());
             List<GameAction> actions = next.skill.execute(game, next.owner, next.event, null);
-            if (actions != null) {
-                game.getActionQueue().addAll(actions);
-            }
-            notifySkillActivation(game, next.owner, next.skill);
-            queue.poll();
-            executeActionQueue(game);
-        }
-    }
+            
+            queue.poll(); // Skill evaluated
 
-    private void executeActionQueue(GameManager game) {
-        while (!game.getActionQueue().isEmpty()) {
-            GameAction action = game.getActionQueue().poll();
-            action.execute(game);
-            System.out.println(action.getClass().getName());
-            // If the action blocks (e.g. pushes a state), we stop here.
-            // When that state pops, onResume will be called and we will continue.
-            if (action.isBlocking() || game.getCurrentState() != this) {
-                System.out.println("HEERE!");
-                return;
+            if (actions != null && !actions.isEmpty()) {
+                game.getActionQueue().addAll(actions);
+                notifySkillActivation(game, next.owner, next.skill);
+                game.pushState(new ActionResolveState());
+            } else {
+                resolveNext(game);
             }
         }
-        
-        // If queue emptied and we didn't push a state, move to next skill
-        resolveNext(game);
     }
 
     private void notifySkillActivation(GameManager game, Player owner, AbstractSkill skill) {
@@ -172,7 +159,7 @@ public class SkillResolutionState implements GameState {
                     game.getActionQueue().addAll(actions);
                     notifySkillActivation(game, current.owner, current.skill);
                     queue.poll();
-                    executeActionQueue(game);
+                    game.pushState(new ActionResolveState());
                 } else {
                     // Skill returned null/empty but was accepted - likely needs more input (PlayCard)
                     current.isWaitingForInput = true;
@@ -191,7 +178,7 @@ public class SkillResolutionState implements GameState {
                 notifySkillActivation(game, current.owner, current.skill);
                 cancelTimer(game);
                 queue.poll();
-                executeActionQueue(game);
+                game.pushState(new ActionResolveState());
             } else {
                 current.isWaitingForInput = true;
                 Log.printf("Skill execution for %s returned null/empty. Invalid input? Timer continues.", current.skill.getName());
@@ -212,7 +199,7 @@ public class SkillResolutionState implements GameState {
 
     @Override
     public void onResume(GameManager game) {
-        // Continue with action queue or next skill
+        // Continue with next skill or finish
         resolveNext(game);
     }
 }

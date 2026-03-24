@@ -7,5 +7,8 @@
     {"id": 5, "championName": "BaiLu", "path": "Abundance", "element": "Lightning"},
     {"id": 6, "championName": "Yanqing", "path": "Hunt", "element": "Ice"},
     {"id": 7, "championName": "Seele", "path": "Hunt", "element": "Quantum"},
-    {"id": 8, "championName": "Trailblazer (Physical)", "path": "Destruction", "element": "Physical"}
+    {"id": 8, "championName": "Trailblazer (Physical)", "path": "Destruction", "element": "Physical"},
+    {"id": 9, "championName": "JingYuan", "path": "Erudition", "element": "Lightning"},
+    {"id": 10, "championName": "Jade", "path": "Erudition", "element": "Quantum"},
+    {"id": 11, "championName": "Black Swan", "path": "Nihility", "element": "Wind"}
 ]

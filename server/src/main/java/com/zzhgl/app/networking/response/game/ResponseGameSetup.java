@@ -46,6 +46,15 @@ public class ResponseGameSetup extends GameResponse {
                 packet.addInt32(champ.getAdditionalTargetForAttack());
                 packet.addInt32(champ.getMaxNumOfAttack());
                 packet.addInt32(champ.getCurNumOfAttack());
+
+                // Add skills
+                java.util.List<com.zzhgl.app.model.skills.AbstractSkill> skills = champ.getSkills();
+                packet.addInt32(skills != null ? skills.size() : 0);
+                if (skills != null) {
+                    for (com.zzhgl.app.model.skills.AbstractSkill skill : skills) {
+                        packet.addInt32(skill.getId());
+                    }
+                }
             } else {
                 packet.addInt32(-1); // No champion
             }

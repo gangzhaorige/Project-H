@@ -107,7 +107,7 @@ public class PreGameState implements GameState {
 
         // Give everyone 4 cards
         for (Player p : game.getPlayers()) {
-            game.drawCards(p, 4);
+            game.drawCards(p, 0);
         }
 
         Log.printf("Starting TurnState.");

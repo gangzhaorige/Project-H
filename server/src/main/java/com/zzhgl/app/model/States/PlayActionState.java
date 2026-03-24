@@ -5,6 +5,7 @@ import com.zzhgl.app.model.Command.EndTurnCommand;
 import com.zzhgl.app.model.Command.PlayCardCommand;
 import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.cards.AbstractNormalCard;
+import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.model.interactions.AbstractInteraction;
@@ -105,7 +106,7 @@ public class PlayActionState implements GameState {
 
             // 3. Play the card, pushing interactions to the stack
             card.play(game, player, cmd.getTargetIds());
-            
+            game.emitEvent(new GameEvent(GameEvent.EventType.CARD_PLAYED));
             // 4. Notify everyone
             ResponsePlayCard response = new ResponsePlayCard(player.getID(), card, cmd.getTargetIds());
             for (Player p : game.getPlayers()) {

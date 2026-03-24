@@ -13,7 +13,7 @@ import java.util.List;
 public class DrawOnDamageSkill extends AbstractSkill {
     
     public DrawOnDamageSkill() {
-        super(2, "Vengeful Draw", true);
+        super(2, "The Hero with a Thousand Faces", true);
     }
 
     @Override

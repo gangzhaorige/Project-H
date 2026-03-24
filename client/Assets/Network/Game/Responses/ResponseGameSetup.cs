@@ -14,6 +14,7 @@ public class ChampionSetupInfo {
     public int AdditionalTargetForAttack;
     public int MaxNumOfAttack;
     public int CurNumOfAttack;
+    public List<int> SkillIds = new List<int>();
 }
 
 public class PlayerSetupInfo {
@@ -65,6 +66,11 @@ public class ResponseGameSetup : BaseNetworkResponse {
                 player.Champion.AdditionalTargetForAttack = DataReader.ReadInt(DataStream);
                 player.Champion.MaxNumOfAttack = DataReader.ReadInt(DataStream);
                 player.Champion.CurNumOfAttack = DataReader.ReadInt(DataStream);
+                
+                int skillCount = DataReader.ReadInt(DataStream);
+                for (int j = 0; j < skillCount; j++) {
+                    player.Champion.SkillIds.Add(DataReader.ReadInt(DataStream));
+                }
             }
             players.Add(player);
         }

@@ -1,9 +1,5 @@
 package com.zzhgl.app.model.cards;
 
-import com.zzhgl.app.model.interactions.AbstractInteraction;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * AbstractSpecialCard represents specialized effects like Arrow, Duel, or Draw.
  */

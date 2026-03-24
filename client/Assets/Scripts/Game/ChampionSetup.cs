@@ -6,6 +6,10 @@ public class ChampionSetup : MonoBehaviour
 {
     [Header("Prefabs")]
     public GameObject championPrefab; // Base champion prefab
+    public GameObject skillPrefab;
+
+    [Header("UI Containers")]
+    public Transform skillContainer;
 
     private Vector3[] spawnPositions = new Vector3[]
     {
@@ -79,7 +83,8 @@ public class ChampionSetup : MonoBehaviour
                     SpecialDefense = info.Champion.SpecialDefense,
                     AdditionalTargetForAttack = info.Champion.AdditionalTargetForAttack,
                     MaxNumOfAttack = info.Champion.MaxNumOfAttack,
-                    CurNumOfAttack = info.Champion.CurNumOfAttack
+                    CurNumOfAttack = info.Champion.CurNumOfAttack,
+                    SkillIds = info.Champion.SkillIds
                 };
 
                 // Spawn at the position corresponding to the visual index
@@ -93,6 +98,30 @@ public class ChampionSetup : MonoBehaviour
                 ChampionController controller = go.GetComponent<ChampionController>();
                 if (controller == null) controller = go.AddComponent<ChampionController>();
                 controller.Init(data);
+
+                // Instantiate Skills ONLY for the local player
+                if (info.PlayerId == Constants.USER_ID && skillPrefab != null && skillContainer != null && data.Champion.SkillIds != null)
+                {
+                    foreach (int skillId in data.Champion.SkillIds)
+                    {
+                        SkillSO skillSO = Resources.Load<SkillSO>($"Data/Skills/{skillId}");
+                        if (skillSO != null)
+                        {
+                            GameObject skillGo = Instantiate(skillPrefab, skillContainer);
+                            skillGo.name = $"Skill_{skillSO.skillName}";
+                            
+                            SkillUIController skillUI = skillGo.GetComponent<SkillUIController>();
+                            if (skillUI != null)
+                            {
+                                skillUI.Init(skillSO);
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[ChampionSetup] SkillSO with ID {skillId} not found in Resources/Data/Skills/");
+                        }
+                    }
+                }
             }
 
             GameSession.Instance.Players[info.PlayerId] = data;
