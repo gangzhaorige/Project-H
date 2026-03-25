@@ -153,8 +153,7 @@ public class SkillResolutionState implements GameState {
             cancelTimer(game);
             if (respCmd.isAccepted()) {
                 current.isWaitingForInput = false;
-                List<GameAction> actions = current.skill.execute(game, current.owner, current.event, respCmd.getData());
-                
+                List<GameAction> actions = current.skill.execute(game, current.owner, current.event, respCmd.getSkillId());
                 if (actions != null && !actions.isEmpty()) {
                     game.getActionQueue().addAll(actions);
                     notifySkillActivation(game, current.owner, current.skill);
