@@ -26,4 +26,10 @@ public class StandardCard extends AbstractCard {
     public void play(GameManager game, Player caster, List<Integer> targetIds) {
         // Basic standard card does nothing on play
     }
+
+    @Override
+    public int getEnumId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getEnumId'");
+    }
 }

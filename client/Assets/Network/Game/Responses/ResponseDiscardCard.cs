@@ -7,7 +7,7 @@ public class ResponseDiscardCardEventArgs : ExtendedEventArgs {
     public int CardId { get; set; }
     public int Suit { get; set; }
     public int Value { get; set; }
-    public string CardType { get; set; }
+    public int CardType { get; set; }
     public bool ShowJudge { get; set; }
     public bool JudgeResult { get; set; }
 
@@ -21,7 +21,7 @@ public class ResponseDiscardCard : BaseNetworkResponse {
     private int cardId;
     private int suit;
     private int value;
-    private string cardType;
+    private int cardType;
     private bool showJudge;
     private bool judgeResult;
 
@@ -34,7 +34,7 @@ public class ResponseDiscardCard : BaseNetworkResponse {
         cardId = DataReader.ReadInt(DataStream);
         suit = DataReader.ReadInt(DataStream);
         value = DataReader.ReadInt(DataStream);
-        cardType = DataReader.ReadString(DataStream);
+        cardType = DataReader.ReadInt(DataStream);
         showJudge = DataReader.ReadBool(DataStream);
         judgeResult = DataReader.ReadBool(DataStream);
     }

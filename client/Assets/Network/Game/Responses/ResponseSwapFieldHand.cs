@@ -8,13 +8,13 @@ public class ResponseSwapFieldHandEventArgs : ExtendedEventArgs {
     public int SwappedCardId { get; set; }
     public int SwappedSuit { get; set; }
     public int SwappedValue { get; set; }
-    public string SwappedCardType { get; set; }
+    public int SwappedCardType { get; set; }
 
     // Played Card (Hand -> Field)
     public int PlayedCardId { get; set; }
     public int PlayedSuit { get; set; }
     public int PlayedValue { get; set; }
-    public string PlayedCardType { get; set; }
+    public int PlayedCardType { get; set; }
 
     public bool JudgeResult { get; set; }
 
@@ -27,10 +27,10 @@ public class ResponseSwapFieldHand : BaseNetworkResponse {
     private int casterId;
     
     private int sCardId, sSuit, sValue;
-    private string sType;
+    private int sType;
 
     private int pCardId, pSuit, pValue;
-    private string pType;
+    private int pType;
 
     private bool judgeResult;
 
@@ -45,13 +45,13 @@ public class ResponseSwapFieldHand : BaseNetworkResponse {
         sCardId = DataReader.ReadInt(DataStream);
         sSuit = DataReader.ReadInt(DataStream);
         sValue = DataReader.ReadInt(DataStream);
-        sType = DataReader.ReadString(DataStream);
+        sType = DataReader.ReadInt(DataStream);
 
         // Played
         pCardId = DataReader.ReadInt(DataStream);
         pSuit = DataReader.ReadInt(DataStream);
         pValue = DataReader.ReadInt(DataStream);
-        pType = DataReader.ReadString(DataStream);
+        pType = DataReader.ReadInt(DataStream);
 
         judgeResult = DataReader.ReadBool(DataStream);
     }

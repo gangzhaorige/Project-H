@@ -1,16 +1,17 @@
 package com.zzhgl.app.model.cards;
 
-import com.zzhgl.app.model.interactions.AbstractInteraction;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * AbstractNormalCard represents common actions like Attack, Dodge, or Heal.
  */
 public abstract class AbstractNormalCard extends AbstractCard {
     public enum NormalType {
-        ATTACK, DODGE, HEAL
+        ATTACK(1), 
+        DODGE(2), 
+        HEAL(3);
+
+        private final int id;
+        NormalType(int id) { this.id = id; }
+        public int getId() { return id; }
     }
 
     protected NormalType type;
@@ -21,6 +22,11 @@ public abstract class AbstractNormalCard extends AbstractCard {
     }
 
     public NormalType getNormalType() { return type; }
+
+    @Override
+    public int getEnumId() {
+        return type.getId();
+    }
 
     @Override
     public Category getCategory() {

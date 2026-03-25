@@ -17,7 +17,7 @@ public class ResponsePlayCard extends GameResponse {
     private int cardId;
     private int suit;
     private int value;
-    private String cardType;
+    private int cardType;
     private List<Integer> targetIds;
     private boolean showJudge;
     private boolean judgeResult;
@@ -36,12 +36,7 @@ public class ResponsePlayCard extends GameResponse {
         this.showJudge = showJudge;
         this.judgeResult = judgeResult;
         
-        this.cardType = "Standard";
-        if (card instanceof AbstractNormalCard normal) {
-            this.cardType = normal.getNormalType().name();
-        } else if (card instanceof AbstractSpecialCard special) {
-            this.cardType = special.getSpecialType().name();
-        }
+        this.cardType = card.getEnumId();
     }
 
     @Override
@@ -53,7 +48,7 @@ public class ResponsePlayCard extends GameResponse {
         packet.addInt32(cardId);
         packet.addInt32(suit);
         packet.addInt32(value);
-        packet.addString(cardType);
+        packet.addInt32(cardType);
         
         packet.addShort16((short) targetIds.size());
         for (int id : targetIds) {

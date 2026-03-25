@@ -6,7 +6,7 @@ public class ResponseFieldToHandEventArgs : ExtendedEventArgs {
     public int CardId { get; set; }
     public int Suit { get; set; }
     public int Value { get; set; }
-    public string CardType { get; set; }
+    public int CardType { get; set; }
 
     public ResponseFieldToHandEventArgs() {
         Event_id = Constants.SMSG_FIELD_TO_HAND;
@@ -18,7 +18,7 @@ public class ResponseFieldToHand : BaseNetworkResponse {
     private int cardId;
     private int suit;
     private int value;
-    private string cardType;
+    private int cardType;
 
     public ResponseFieldToHand() {
         Response_id = Constants.SMSG_FIELD_TO_HAND;
@@ -29,7 +29,7 @@ public class ResponseFieldToHand : BaseNetworkResponse {
         cardId = DataReader.ReadInt(DataStream);
         suit = DataReader.ReadInt(DataStream);
         value = DataReader.ReadInt(DataStream);
-        cardType = DataReader.ReadString(DataStream);
+        cardType = DataReader.ReadInt(DataStream);
     }
 
     public override ExtendedEventArgs Process() {

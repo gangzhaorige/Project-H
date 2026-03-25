@@ -26,7 +26,7 @@ public class ResponseDrawCard : BaseNetworkResponse {
             card.Id = DataReader.ReadInt(DataStream);
             card.Suit = DataReader.ReadInt(DataStream);
             card.Value = DataReader.ReadInt(DataStream);
-            card.Type = DataReader.ReadString(DataStream);
+            card.Type = DataReader.ReadInt(DataStream);
             cards.Add(card);
         }
     }

@@ -32,6 +32,8 @@ public abstract class AbstractCard {
 
     public abstract Category getCategory();
 
+    public abstract int getEnumId();
+
     /**
      * Validates if the card can be played by the caster against the specified targets.
      */

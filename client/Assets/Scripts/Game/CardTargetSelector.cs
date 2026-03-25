@@ -60,7 +60,7 @@ public class CardTargetSelector : MonoBehaviour
         }
     }
 
-    public int GetMaxTargets(string type) {
+    public int GetMaxTargets(int type) {
         return CardRuleManager.GetMaxTargets(new CardData { Type = type });
     }
 

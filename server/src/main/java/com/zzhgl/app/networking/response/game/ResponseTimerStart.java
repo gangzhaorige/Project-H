@@ -1,6 +1,8 @@
 package com.zzhgl.app.networking.response.game;
 
 import com.zzhgl.app.metadata.Constants;
+import com.zzhgl.app.model.cards.AbstractNormalCard;
+import com.zzhgl.app.model.cards.AbstractSpecialCard;
 import com.zzhgl.app.networking.response.GameResponse;
 import com.zzhgl.app.utility.GamePacket;
 
@@ -11,14 +13,23 @@ public class ResponseTimerStart extends GameResponse {
     private int playerId;
     private int seconds;
     private String message;
-    private String requiredCardType;
+    private int requiredCardType;
 
     public ResponseTimerStart(int playerId, int seconds, String message, Object cardType) {
         this.responseCode = Constants.SMSG_RESPONSE_TIMER_START;
         this.playerId = playerId;
         this.seconds = seconds;
         this.message = message;
-        this.requiredCardType = (cardType != null) ? cardType.toString() : "";
+        
+        if (cardType instanceof AbstractNormalCard.NormalType normal) {
+            this.requiredCardType = normal.getId();
+        } else if (cardType instanceof AbstractSpecialCard.SpecialType special) {
+            this.requiredCardType = special.getId();
+        } else if ("ANY".equals(cardType)) {
+            this.requiredCardType = -1;
+        } else {
+            this.requiredCardType = 0;
+        }
     }
 
     @Override
@@ -28,7 +39,7 @@ public class ResponseTimerStart extends GameResponse {
         packet.addInt32(playerId);
         packet.addInt32(seconds);
         packet.addString(message);
-        packet.addString(requiredCardType);
+        packet.addInt32(requiredCardType);
         return packet.getBytes();
     }
 }

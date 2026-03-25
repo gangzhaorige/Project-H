@@ -68,28 +68,28 @@ public class CardFactory {
     /**
      * Creates an Equipment Card.
      */
-    public AbstractEquipmentCard createEquipmentCard(int id, AbstractCard.Suit suit, int value) {
-        return new AbstractEquipmentCard(id, suit, value) {
+    // public AbstractEquipmentCard createEquipmentCard(int id, AbstractCard.Suit suit, int value) {
+    //     return new AbstractEquipmentCard(id, suit, value) {
 
-            @Override
-            public void onEquip(Champion champion) {
-                // Implementation for specific equipment
-            }
+    //         @Override
+    //         public void onEquip(Champion champion) {
+    //             // Implementation for specific equipment
+    //         }
 
-            @Override
-            public void onRemove(Champion champion) {
-                // Implementation for specific equipment
-            }
+    //         @Override
+    //         public void onRemove(Champion champion) {
+    //             // Implementation for specific equipment
+    //         }
 
-            @Override
-            public boolean validate(GameManager game, Player caster, List<Integer> targetIds) {
-                return true; // Equipment usually targets self and is always valid to play if in hand
-            }
+    //         @Override
+    //         public boolean validate(GameManager game, Player caster, List<Integer> targetIds) {
+    //             return true; // Equipment usually targets self and is always valid to play if in hand
+    //         }
 
-            @Override
-            public void play(GameManager game, Player caster, List<Integer> targetIds) {
-                // Equipment is usually played to equip, handled elsewhere or we push an EquipInteraction
-            }
-        };
-    }
+    //         @Override
+    //         public void play(GameManager game, Player caster, List<Integer> targetIds) {
+    //             // Equipment is usually played to equip, handled elsewhere or we push an EquipInteraction
+    //         }
+    //     };
+    // }
 }

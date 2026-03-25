@@ -93,7 +93,7 @@ public class CardManager : MonoBehaviour
                 if (setup != null)
                 {
                     if (res.ShowDetails) setup.Init(cardData.Type, cardData.Suit, cardData.Value);
-                    else setup.Init("Standard", 0, 0); // Hidden
+                    else setup.Init(0, 0, 0); // Hidden
                 }
             }
 

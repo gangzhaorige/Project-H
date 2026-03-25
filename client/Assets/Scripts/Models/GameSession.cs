@@ -100,7 +100,7 @@ namespace ProjectH.Models
             }
         }
 
-        public string RequiredCardType = "";
+        public int RequiredCardType = 0;
         public int ActivePlayerId = -1;
         public bool IsLocalTurn => ActivePlayerId == Constants.USER_ID;
 
@@ -170,7 +170,7 @@ namespace ProjectH.Models
             Players.Clear();
             PlayerOrder.Clear();
             _isResponseRequired = false;
-            RequiredCardType = "";
+            RequiredCardType = 0;
             _state = "";
         }
 

@@ -37,11 +37,20 @@ public class TargetSelectionUI : MonoBehaviour
         
         if (instructionText != null)
         {
-            instructionText.text = $"Select targets for {card.Type} (Max: {CardTargetSelector.Instance.GetMaxTargets(card.Type)})";
+            instructionText.text = $"Select targets for {GetCardTypeName(card.Type)} (Max: {CardTargetSelector.Instance.GetMaxTargets(card.Type)})";
         }
 
         RefreshList();
         UpdateConfirmButton();
+    }
+
+    private string GetCardTypeName(int type)
+    {
+        if (System.Enum.IsDefined(typeof(CardData.NormalType), type))
+            return ((CardData.NormalType)type).ToString();
+        if (System.Enum.IsDefined(typeof(CardData.SpecialType), type))
+            return ((CardData.SpecialType)type).ToString();
+        return "Unknown";
     }
 
     public void ShowForSkill(int skillId, int maxTargets)
@@ -75,7 +84,7 @@ public class TargetSelectionUI : MonoBehaviour
             if (pData.PlayerId == Constants.USER_ID) continue;
 
             bool inRange = true;
-            if (currentCard != null && currentCard.Type == "ATTACK")
+            if (currentCard != null && currentCard.Type == (int)CardData.NormalType.ATTACK)
             {
                 inRange = CardTargetSelector.Instance.CanTarget(Constants.USER_ID, pData.PlayerId);
                 
@@ -124,7 +133,7 @@ public class TargetSelectionUI : MonoBehaviour
             if (currentCard != null)
             {
                 // Allow confirm if at least one target is selected (or 0 if card allows it, but usually 1+)
-                confirmButton.interactable = selectedTargetIds.Count > 0 || (currentCard.Type == "HEAL" && selectedTargetIds.Count == 0);
+                confirmButton.interactable = selectedTargetIds.Count > 0 || (currentCard.Type == (int)CardData.NormalType.HEAL && selectedTargetIds.Count == 0);
             }
             else if (currentSkillId != -1)
             {

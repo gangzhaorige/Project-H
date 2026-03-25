@@ -29,15 +29,7 @@ public class ResponseDrawCard extends GameResponse {
             packet.addInt32(card.getId());
             packet.addInt32(card.getSuit().ordinal());
             packet.addInt32(card.getValue());
-            
-            // Send the Type string for client visualization
-            String type = "Standard";
-            if (card instanceof AbstractNormalCard normal) {
-                type = normal.getNormalType().name();
-            } else if (card instanceof AbstractSpecialCard special) {
-                type = special.getSpecialType().name();
-            }
-            packet.addString(type);
+            packet.addInt32(card.getEnumId());
         }
 
         return packet.getBytes();

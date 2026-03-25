@@ -12,10 +12,12 @@ public class CardSetup : MonoBehaviour
     [SerializeField] private TextMeshProUGUI botValueText;
     [SerializeField] private TextMeshProUGUI cardTypeText;
 
-    public void Init(string cardType, int suit, int value)
+    public void Init(int cardType, int suit, int value)
     {
+        string typeName = GetCardTypeName(cardType);
+
         // 1. Set Card Type Text
-        if (cardTypeText != null) cardTypeText.text = cardType;
+        if (cardTypeText != null) cardTypeText.text = typeName;
 
         // 2. Set Value Text (1=A, 11=J, 12=Q, 13=K)
         string valueStr = GetValueString(value);
@@ -41,12 +43,21 @@ public class CardSetup : MonoBehaviour
 
         // 5. Load Main Card Illustration based on type
         // Normalizing type name to match file (e.g. "Attack" -> "attack")
-        string resourcePath = $"Images/cards/{cardType.ToLower()}";
+        string resourcePath = $"Images/cards/images/{typeName.ToLower()}";
         Sprite mainSprite = Resources.Load<Sprite>(resourcePath);
         if (cardMainImage != null && mainSprite != null)
         {
             cardMainImage.sprite = mainSprite;
         }
+    }
+
+    private string GetCardTypeName(int type)
+    {
+        if (System.Enum.IsDefined(typeof(ProjectH.Models.CardData.NormalType), type))
+            return ((ProjectH.Models.CardData.NormalType)type).ToString();
+        if (System.Enum.IsDefined(typeof(ProjectH.Models.CardData.SpecialType), type))
+            return ((ProjectH.Models.CardData.SpecialType)type).ToString();
+        return "Standard";
     }
 
     private string GetValueString(int value)

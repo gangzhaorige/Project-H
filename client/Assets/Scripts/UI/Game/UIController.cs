@@ -258,7 +258,7 @@ public class UIController : MonoBehaviour
 
         // A "forced" response is one where a specific card type is required (e.g. Duel, Defend, Negate)
         // In PlayActionState, the "ANY" timer is NOT a forced response phase.
-        bool isForcedResponse = isResponseRequired && (GameSession.Instance.RequiredCardType != "ANY");
+        bool isForcedResponse = isResponseRequired && (GameSession.Instance.RequiredCardType != -1);
 
         // 1. End Turn Button: Only visible during local player's PlayActionState if no forced response is pending
         bool canEndTurn = (currentState == "PlayActionState" && isLocalTurn && !isForcedResponse);

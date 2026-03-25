@@ -96,7 +96,7 @@ public class GameplayManager : MonoBehaviour
         if (res == null) return;
 
         GameSession.Instance.IsResponseRequired = false;
-        GameSession.Instance.RequiredCardType = "";
+        GameSession.Instance.RequiredCardType = 0;
         
         GameSession.Instance.TriggerTimerCancelled();
     }
@@ -104,7 +104,7 @@ public class GameplayManager : MonoBehaviour
     private void OnTimerCancel(ExtendedEventArgs args)
     {
         GameSession.Instance.IsResponseRequired = false;
-        GameSession.Instance.RequiredCardType = "";
+        GameSession.Instance.RequiredCardType = 0;
 
         GameSession.Instance.TriggerTimerCancelled();
         

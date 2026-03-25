@@ -5,20 +5,20 @@ namespace ProjectH.Rules
 {
     public static class CardRuleManager
     {
-        private static readonly Dictionary<string, ICardRule> Rules = new Dictionary<string, ICardRule>();
+        private static readonly Dictionary<int, ICardRule> Rules = new Dictionary<int, ICardRule>();
         private static readonly ICardRule DefaultRule = new DefaultCardRule();
 
         static CardRuleManager()
         {
-            Rules.Add("ATTACK", new AttackCardRule());
-            Rules.Add("DODGE", new DodgeCardRule());
-            Rules.Add("PRISON", new PrisonCardRule());
-            Rules.Add("STEAL", new StealCardRule());
-            Rules.Add("DISMANTLE", new DismantleCardRule());
+            Rules.Add((int)CardData.NormalType.ATTACK, new AttackCardRule());
+            Rules.Add((int)CardData.NormalType.DODGE, new DodgeCardRule());
+            Rules.Add((int)CardData.SpecialType.PRISON, new PrisonCardRule());
+            Rules.Add((int)CardData.SpecialType.STEAL, new StealCardRule());
+            Rules.Add((int)CardData.SpecialType.DISMANTLE, new DismantleCardRule());
             // Add other rules as needed
         }
 
-        public static ICardRule GetRule(string cardType)
+        public static ICardRule GetRule(int cardType)
         {
             if (Rules.TryGetValue(cardType, out var rule))
             {
