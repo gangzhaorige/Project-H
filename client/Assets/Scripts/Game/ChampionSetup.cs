@@ -21,6 +21,57 @@ public class ChampionSetup : MonoBehaviour
         new Vector3(-17.49f, 0.1f, 0.21f)
     };
 
+    private Dictionary<Transform, Coroutine> activeMoveCoroutines = new Dictionary<Transform, Coroutine>();
+
+    public void UpdateChampionPositions(List<int> newOrder)
+    {
+        if (newOrder == null || newOrder.Count == 0) return;
+
+        int totalPlayers = newOrder.Count;
+        int localIdIndex = newOrder.IndexOf(Constants.USER_ID);
+        if (localIdIndex == -1) localIdIndex = 0;
+
+        for (int i = 0; i < totalPlayers; i++)
+        {
+            int playerId = newOrder[i];
+            if (GameSession.Instance.Players.TryGetValue(playerId, out PlayerData data))
+            {
+                if (data.ChampionObject != null)
+                {
+                    int visualIndex = (i - localIdIndex + totalPlayers) % totalPlayers;
+                    Vector3 targetPos = (visualIndex < spawnPositions.Length) ? spawnPositions[visualIndex] : Vector3.zero;
+                    
+                    Transform targetTr = data.ChampionObject.transform;
+                    if (activeMoveCoroutines.TryGetValue(targetTr, out Coroutine existing))
+                    {
+                        if (existing != null) StopCoroutine(existing);
+                    }
+                    activeMoveCoroutines[targetTr] = StartCoroutine(MoveChampionRoutine(targetTr, targetPos, 0.5f));
+                }
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator MoveChampionRoutine(Transform tr, Vector3 targetPos, float duration)
+    {
+        Vector3 startPos = tr.position;
+        float elapsed = 0;
+        while (elapsed < duration)
+        {
+            if (tr == null) break;
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            t = t * t * (3f - 2f * t); // SmoothStep
+            tr.position = Vector3.Lerp(startPos, targetPos, t);
+            yield return null;
+        }
+        if (tr != null)
+        {
+            tr.position = targetPos;
+            activeMoveCoroutines.Remove(tr);
+        }
+    }
+
     public void InitializeChampions(List<PlayerSetupInfo> players)
     {
         Debug.Log($"InitializeChampions called with {players.Count} players.");

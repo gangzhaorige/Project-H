@@ -125,7 +125,14 @@ public class CardManager : MonoBehaviour
 
     private IEnumerator MoveAndFinalize(GameObject cardGO, CardData data, Vector3 targetPos, bool isReceiver, PlayerData receiver)
     {
-        yield return MoveCard(cardGO.transform, targetPos, drawAnimDuration);
+        if (CardAnimationManager.Instance != null)
+        {
+            yield return CardAnimationManager.Instance.SmoothMoveWorld(cardGO.transform, targetPos, drawAnimDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(drawAnimDuration);
+        }
 
         if (isReceiver)
         {
@@ -136,6 +143,7 @@ public class CardManager : MonoBehaviour
         else
         {
             // Target/Observer: destroy
+            if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(cardGO);
             Destroy(cardGO);
             if (receiver != null) receiver.AddCard(new CardData { Id = -1 });
         }
@@ -178,10 +186,16 @@ public class CardManager : MonoBehaviour
         CardSetup setup = animCard.GetComponent<CardSetup>();
         if (setup != null) setup.Init(card.Type, card.Suit, card.Value);
 
-        // --- NEW: Play Audio for Local Draw ---
         if (AudioManager.Instance != null) AudioManager.Instance.PlayCardDrawSFX();
 
-        yield return MoveCard(animCard.transform, targetWorldPos, drawAnimDuration);
+        if (CardAnimationManager.Instance != null)
+        {
+            yield return CardAnimationManager.Instance.SmoothMoveWorld(animCard.transform, targetWorldPos, drawAnimDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(drawAnimDuration);
+        }
 
         // Finalize by giving the object to HandManager and updating local data
         handManager.RegisterAnimatedCard(card, animCard);
@@ -209,32 +223,23 @@ public class CardManager : MonoBehaviour
         GameObject animCard = Instantiate(cardPrefab, deckPosition.parent);
         animCard.transform.position = deckPosition.position;
 
-        // --- NEW: Play Audio for Other Draw ---
         if (AudioManager.Instance != null) AudioManager.Instance.PlayCardDrawSFX();
         
         Vector3 targetPos = (pData.ChampionObject != null) 
             ? pData.ChampionObject.transform.position 
             : Vector3.zero;
 
-        yield return MoveCard(animCard.transform, targetPos, drawAnimDuration);
+        if (CardAnimationManager.Instance != null)
+        {
+            yield return CardAnimationManager.Instance.SmoothMoveWorld(animCard.transform, targetPos, drawAnimDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(drawAnimDuration);
+        }
         
+        if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(animCard);
         Destroy(animCard);
         pData.AddCard(new CardData { Id = -1 }); 
-    }
-
-    public IEnumerator MoveCard(Transform cardTr, Vector3 targetPos, float duration)
-    {
-        Vector3 startPos = cardTr.position;
-        float elapsed = 0;
-        while (elapsed < duration)
-        {
-            if (cardTr == null) yield break;
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            t = t * t * (3f - 2f * t); // SmoothStep interpolation
-            cardTr.position = Vector3.Lerp(startPos, targetPos, t);
-            yield return null;
-        }
-        if (cardTr != null) cardTr.position = targetPos;
     }
 }

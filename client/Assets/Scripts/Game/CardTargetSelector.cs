@@ -12,6 +12,8 @@ public class CardTargetSelector : MonoBehaviour
     public static CardTargetSelector Instance { get; private set; }
 
     private CardData currentCard;
+    private int currentSkillId = -1;
+    private List<int> discardCardIds = new List<int>();
 
     private void Awake()
     {
@@ -21,6 +23,7 @@ public class CardTargetSelector : MonoBehaviour
     public void BeginTargeting(CardData card)
     {
         currentCard = card;
+        currentSkillId = -1;
         int maxTargets = CardRuleManager.GetMaxTargets(card);
         Debug.Log($"[Targeting] Showing UI for {card.Type}. MaxTargets: {maxTargets}");
 
@@ -41,12 +44,34 @@ public class CardTargetSelector : MonoBehaviour
         }
     }
 
+    public void BeginTargetingForSkill(int skillId, List<int> discards)
+    {
+        currentSkillId = skillId;
+        currentCard = null;
+        this.discardCardIds = discards;
+
+        // Bronya's skill ID 10 targets 1 champion
+        int maxTargets = (skillId == 10) ? 1 : 0;
+
+        if (UIController.Instance != null)
+        {
+            UIController.Instance.ShowTargetSelectionPanel(true);
+            TargetSelectionUI.Instance.ShowForSkill(skillId, maxTargets);
+        }
+    }
+
     public int GetMaxTargets(string type) {
         return CardRuleManager.GetMaxTargets(new CardData { Type = type });
     }
 
     public void ConfirmTargeting(List<int> targetIds)
     {
+        if (currentSkillId != -1)
+        {
+            ConfirmTargetingForSkill(targetIds);
+            return;
+        }
+
         if (currentCard == null) return;
 
         RequestPlayCard req = new RequestPlayCard();
@@ -57,6 +82,22 @@ public class CardTargetSelector : MonoBehaviour
         currentCard = null;
 
         // Clear selection in HandManager after playing
+        if (HandManager.Instance != null)
+        {
+            HandManager.Instance.ClearSelection();
+        }
+    }
+
+    private void ConfirmTargetingForSkill(List<int> targetIds)
+    {
+        RequestActivateSkill req = new RequestActivateSkill();
+        req.Send(currentSkillId, discardCardIds, targetIds);
+        NetworkManager.Instance.SendRequest(req);
+
+        Debug.Log($"[Targeting] Request sent for skill {currentSkillId} with {targetIds.Count} targets.");
+        currentSkillId = -1;
+        discardCardIds.Clear();
+
         if (HandManager.Instance != null)
         {
             HandManager.Instance.ClearSelection();

@@ -48,6 +48,7 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_SELECT_CARDS_FROM_OPPONENT, "ResponseSelectCardsFromOpponent");
 		Add(Constants.SMSG_SELECT_CARDS, "ResponseSelectCards");
 		Add(Constants.SMSG_MOVE_CARD, "ResponseMoveCard");
+		Add(Constants.SMSG_UPDATE_PLAYER_ORDER, "ResponseUpdatePlayerOrder");
 
         // Room System
         Add(Constants.SMSG_CREATE_ROOM, "ResponseCreateRoom");

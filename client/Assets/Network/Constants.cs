@@ -102,6 +102,7 @@ public class Constants {
     public static readonly short SMSG_SWAP_FIELD_HAND = 447;
     public static readonly short SMSG_SELECT_CARDS_FROM_OPPONENT = 448;
     public static readonly short SMSG_MOVE_CARD = 449;
+    public static readonly short SMSG_UPDATE_PLAYER_ORDER = 450;
 
     public static readonly short CMSG_CONFIRMATION = 350;
     public static readonly short CMSG_READY_FOR_GAME_SETUP = 351;

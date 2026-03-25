@@ -22,6 +22,7 @@ public class NetworkRequestTable {
 		Add(Constants.CMSG_END_TURN, "RequestEndTurn");
 		Add(Constants.CMSG_PASS_PRIORITY, "RequestPassPriority");
 		Add(Constants.CMSG_SKILL_RESPONSE, "RequestSkillResponse");
+		Add(Constants.CMSG_ACTIVATE_SKILL, "RequestActivateSkill");
 		Add(Constants.CMSG_SELECT_CARDS, "RequestSelectCards");
 		Add(Constants.CMSG_CONFIRMATION, "RequestConfirmation");
 

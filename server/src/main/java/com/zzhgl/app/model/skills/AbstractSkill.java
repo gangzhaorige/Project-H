@@ -43,6 +43,25 @@ public abstract class AbstractSkill {
     public abstract List<GameAction> execute(GameManager game, Player owner, GameEvent event, Object data);
 
     /**
+     * Validates if the skill can be manually activated.
+     * @param discardCardIds List of card IDs to discard for cost.
+     * @param targetIds List of player IDs targeted by the skill.
+     * @return true if valid, false otherwise.
+     */
+    public boolean validateActivation(GameManager game, Player owner, List<Integer> discardCardIds, List<Integer> targetIds) {
+        return false; // Default: cannot be manually activated
+    }
+
+    /**
+     * Executes the skill manually (Active skills) by pushing an interaction to the stack.
+     * @param discardCardIds List of card IDs to discard for cost.
+     * @param targetIds List of player IDs targeted by the skill.
+     */
+    public void activate(GameManager game, Player owner, List<Integer> discardCardIds, List<Integer> targetIds) {
+        // Default implementation does nothing
+    }
+
+    /**
      * Called when the response timer for this skill expires.
      */
     public void onTimeout(GameManager game, Player owner, GameEvent event) {

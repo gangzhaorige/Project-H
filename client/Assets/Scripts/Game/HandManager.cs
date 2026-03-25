@@ -18,7 +18,6 @@ public class HandManager : MonoBehaviour
     private List<GameObject> orderedCards = new List<GameObject>();
     private List<int> orderedCardIds = new List<int>();
     private Dictionary<int, GameObject> cardMap = new Dictionary<int, GameObject>();
-    private Dictionary<int, Coroutine> activeCoroutines = new Dictionary<int, Coroutine>();
     private List<int> selectedCardIds = new List<int>();
 
     public delegate void SelectionChanged();
@@ -183,10 +182,9 @@ public class HandManager : MonoBehaviour
 
             cardMap.Remove(cardId);
 
-            if (activeCoroutines.TryGetValue(cardId, out Coroutine co))
+            if (CardAnimationManager.Instance != null)
             {
-                StopCoroutine(co);
-                activeCoroutines.Remove(cardId);
+                CardAnimationManager.Instance.StopAllAnimationsFor(go);
             }
 
             // Reorganize the remaining cards in the hand
@@ -215,55 +213,26 @@ public class HandManager : MonoBehaviour
             GameObject cardGO = orderedCards[i];
             if (cardGO != null)
             {
-                int cardId = orderedCardIds[i];
                 Vector3 targetPos = targets[i].pos;
-
-                // Stop previous movement to avoid "Animation Conflict" (stacking)
-                if (activeCoroutines.TryGetValue(cardId, out Coroutine co))
+                
+                if (CardAnimationManager.Instance != null)
                 {
-                    StopCoroutine(co);
+                    StartCoroutine(CardAnimationManager.Instance.SmoothMoveLocal(cardGO.transform, targetPos, targets[i].rot, 0.3f));
                 }
-
-                activeCoroutines[cardId] = StartCoroutine(SmoothMove(cardGO.transform, targetPos, targets[i].rot, 0.3f, cardId));
             }
         }
     }
 
-    private System.Collections.IEnumerator SmoothMove(Transform tr, Vector3 targetLocalPos, Quaternion targetLocalRot, float duration, int cardId)
-    {
-        Vector3 startPos = tr.localPosition;
-        Quaternion startRot = tr.localRotation;
-        float elapsed = 0;
-
-        while (elapsed < duration)
-        {
-            if (tr == null) yield break;
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            t = t * t * (3f - 2f * t); // Smooth step
-
-            tr.localPosition = Vector3.Lerp(startPos, targetLocalPos, t);
-            tr.localRotation = Quaternion.Slerp(startRot, targetLocalRot, t);
-            yield return null;
-        }
-
-        if (tr != null)
-        {
-            tr.localPosition = targetLocalPos;
-            tr.localRotation = targetLocalRot;
-        }
-
-        activeCoroutines.Remove(cardId);
-    }
-
     public void ClearHand()
     {
-        StopAllCoroutines();
-        foreach (var card in cardMap.Values) Destroy(card);
+        foreach (var card in cardMap.Values)
+        {
+            if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(card);
+            Destroy(card);
+        }
         cardMap.Clear();
         orderedCards.Clear();
         orderedCardIds.Clear();
-        activeCoroutines.Clear();
         selectedCardIds.Clear();
     }
 }

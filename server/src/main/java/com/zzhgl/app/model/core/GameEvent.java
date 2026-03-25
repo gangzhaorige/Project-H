@@ -13,6 +13,7 @@ public class GameEvent {
         DAMAGE_TAKEN,
         CARD_PLAYED,
         CARD_DISCARDED,
+        SKILL_ACTIVATED,
         BEFORE_JUDGEMENT_RESOLVE
     }
 

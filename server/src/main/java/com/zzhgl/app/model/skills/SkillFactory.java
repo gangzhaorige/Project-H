@@ -29,6 +29,7 @@ public class SkillFactory {
             case 7: return new SvarogsRevengeSkill();
             case 8: return new OneWithTheSwordSkill();
             case 9: return new VisionaryPredationSkill();
+            case 10: return new CombatRedeploymentSkill();
             default: return null;
         }
     }

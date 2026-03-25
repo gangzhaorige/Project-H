@@ -1,5 +1,5 @@
 [
-    {"id": 0, "championName": "Bronya", "path": "Harmony", "element": "Wind", "maxHP": 8, "attack": 1, "attackRange": 3, "skillIds": [1]},
+    {"id": 0, "championName": "Bronya", "path": "Harmony", "element": "Wind", "maxHP": 8, "attack": 1, "attackRange": 3, "skillIds": [1, 10]},
     {"id": 1, "championName": "Clara", "path": "Destruction", "element": "Physical", "maxHP": 10, "attack": 2, "attackRange": 1, "skillIds": [7]},
     {"id": 2, "championName": "Gepard", "path": "Preservation", "element": "Ice", "maxHP": 10, "attack": 1, "attackRange": 1, "skillIds": []},
     {"id": 3, "championName": "Himeko", "path": "Erudition", "element": "Fire", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": []},

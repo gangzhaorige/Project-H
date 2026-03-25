@@ -2904,6 +2904,7 @@ MonoBehaviour:
   endTurnButton: {fileID: 726064243}
   passButton: {fileID: 673065791}
   confirmPlayButton: {fileID: 324174808}
+  skillButton: {fileID: 1910410910}
   turnStatusText: {fileID: 921625577}
   instructionText: {fileID: 1945358122}
   stateText: {fileID: 425234273}
@@ -5392,6 +5393,7 @@ GameObject:
   - component: {fileID: 2088677927}
   - component: {fileID: 2088677926}
   - component: {fileID: 2088677929}
+  - component: {fileID: 2088677930}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5459,6 +5461,19 @@ MonoBehaviour:
   cardPrefab: {fileID: 2924899494192507594, guid: 4d7bf012162374465a8e3dbb1a27f923, type: 3}
   confirmButton: {fileID: 235759813}
   messageText: {fileID: 0}
+--- !u!114 &2088677930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2088677925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edce43cfc0ddc44328806505326f3ea4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardAnimationManager
+  defaultDuration: 0.5
 --- !u!1 &2106427320
 GameObject:
   m_ObjectHideFlags: 0

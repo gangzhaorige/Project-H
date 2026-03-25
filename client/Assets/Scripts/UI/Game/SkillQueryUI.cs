@@ -73,7 +73,7 @@ public class SkillQueryUI : MonoBehaviour
     private void OnResponse(bool accepted)
     {
         RequestSkillResponse req = new RequestSkillResponse();
-        req.Send(accepted);
+        req.Send(currentSkillId, accepted);
         NetworkManager.Instance.SendRequest(req);
         
         GameSession.Instance.TriggerSkillQueryAnswered();

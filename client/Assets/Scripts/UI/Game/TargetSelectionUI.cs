@@ -16,6 +16,8 @@ public class TargetSelectionUI : MonoBehaviour
     public TextMeshProUGUI instructionText;
 
     private CardData currentCard;
+    private int currentSkillId = -1;
+    private int maxTargetsForSkill = 0;
     private List<int> selectedTargetIds = new List<int>();
     private List<TargetItemUI> activeItems = new List<TargetItemUI>();
 
@@ -30,11 +32,28 @@ public class TargetSelectionUI : MonoBehaviour
     public void Show(CardData card)
     {
         currentCard = card;
+        currentSkillId = -1;
         selectedTargetIds.Clear();
         
         if (instructionText != null)
         {
             instructionText.text = $"Select targets for {card.Type} (Max: {CardTargetSelector.Instance.GetMaxTargets(card.Type)})";
+        }
+
+        RefreshList();
+        UpdateConfirmButton();
+    }
+
+    public void ShowForSkill(int skillId, int maxTargets)
+    {
+        currentSkillId = skillId;
+        currentCard = null;
+        maxTargetsForSkill = maxTargets;
+        selectedTargetIds.Clear();
+
+        if (instructionText != null)
+        {
+            instructionText.text = $"Select targets for Skill {skillId} (Max: {maxTargets})";
         }
 
         RefreshList();
@@ -56,7 +75,7 @@ public class TargetSelectionUI : MonoBehaviour
             if (pData.PlayerId == Constants.USER_ID) continue;
 
             bool inRange = true;
-            if (currentCard.Type == "ATTACK")
+            if (currentCard != null && currentCard.Type == "ATTACK")
             {
                 inRange = CardTargetSelector.Instance.CanTarget(Constants.USER_ID, pData.PlayerId);
                 
@@ -78,11 +97,11 @@ public class TargetSelectionUI : MonoBehaviour
         {
             if (!selectedTargetIds.Contains(playerId))
             {
+                int max = (currentCard != null) ? CardTargetSelector.Instance.GetMaxTargets(currentCard.Type) : maxTargetsForSkill;
                 // Enforce max targets
-                if (selectedTargetIds.Count >= CardTargetSelector.Instance.GetMaxTargets(currentCard.Type))
+                if (selectedTargetIds.Count >= max)
                 {
-                    // Deselect the oldest one or just prevent? Let's just prevent for now.
-                    // Or deselect the first one to allow "rotating" selection
+                    // Deselect the oldest one
                     int first = selectedTargetIds[0];
                     selectedTargetIds.RemoveAt(0);
                     foreach(var item in activeItems) if(item.PlayerId == first) item.SetSelected(false);
@@ -102,8 +121,15 @@ public class TargetSelectionUI : MonoBehaviour
     {
         if (confirmButton != null)
         {
-            // Allow confirm if at least one target is selected (or 0 if card allows it, but usually 1+)
-            confirmButton.interactable = selectedTargetIds.Count > 0 || (currentCard.Type == "HEAL" && selectedTargetIds.Count == 0);
+            if (currentCard != null)
+            {
+                // Allow confirm if at least one target is selected (or 0 if card allows it, but usually 1+)
+                confirmButton.interactable = selectedTargetIds.Count > 0 || (currentCard.Type == "HEAL" && selectedTargetIds.Count == 0);
+            }
+            else if (currentSkillId != -1)
+            {
+                confirmButton.interactable = selectedTargetIds.Count > 0;
+            }
         }
     }
 

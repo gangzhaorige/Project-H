@@ -19,7 +19,6 @@ public class PlayFieldManager : MonoBehaviour
     public float cardSpacing = 250f;
 
     private List<GameObject> cardsOnField = new List<GameObject>();
-    private Dictionary<GameObject, Coroutine> activeCoroutines = new Dictionary<GameObject, Coroutine>();
 
     private void Awake()
     {
@@ -32,12 +31,13 @@ public class PlayFieldManager : MonoBehaviour
     /// </summary>
     public void ClearField()
     {
-        foreach (var co in activeCoroutines.Values) StopCoroutine(co);
-        activeCoroutines.Clear();
-
         foreach (GameObject card in cardsOnField)
         {
-            if (card != null) Destroy(card);
+            if (card != null)
+            {
+                if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(card);
+                Destroy(card);
+            }
         }
         cardsOnField.Clear();
     }
@@ -57,14 +57,11 @@ public class PlayFieldManager : MonoBehaviour
             if (go == null) continue;
 
             Vector3 targetLocalPos = new Vector3(startX + (i * cardSpacing), 0, 0);
-            
-            // Stop existing move if any
-            if (activeCoroutines.TryGetValue(go, out Coroutine co))
-            {
-                StopCoroutine(co);
-            }
 
-            activeCoroutines[go] = StartCoroutine(SmoothMove(go.transform, targetLocalPos, Quaternion.identity, playAnimDuration, go));
+            if (CardAnimationManager.Instance != null)
+            {
+                StartCoroutine(CardAnimationManager.Instance.SmoothMoveLocal(go.transform, targetLocalPos, Quaternion.identity, playAnimDuration));
+            }
         }
     }
 
@@ -153,9 +150,17 @@ public class PlayFieldManager : MonoBehaviour
             }
 
             // 4. Animate towards champion
-            yield return SmoothMove(cardGO.transform, targetLocalPos, Quaternion.identity, playAnimDuration);
+            if (CardAnimationManager.Instance != null)
+            {
+                yield return CardAnimationManager.Instance.SmoothMoveLocal(cardGO.transform, targetLocalPos, Quaternion.identity, playAnimDuration);
+            }
+            else
+            {
+                yield return new WaitForSeconds(playAnimDuration);
+            }
 
             // 5. Cleanup
+            if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(cardGO);
             Destroy(cardGO);
             if (GameSession.Instance.Players.TryGetValue(res.CasterId, out pData))
             {
@@ -295,16 +300,15 @@ public class PlayFieldManager : MonoBehaviour
         // 3. Animate the swap
         // Card A: Field -> Hand (or destroy)
         Vector3 handPos = Vector3.down * 500; // General direction of hand
-        if (isLocal && handManager != null)
-        {
-            // For local, we could use handManager to get a real position, but simplified for now
-        }
 
         if (AudioManager.Instance != null) AudioManager.Instance.PlayCardMoveSFX();
 
         if (fieldCardGO != null)
         {
-            StartCoroutine(SmoothMove(fieldCardGO.transform, handPos, Quaternion.identity, playAnimDuration));
+            if (CardAnimationManager.Instance != null)
+            {
+                StartCoroutine(CardAnimationManager.Instance.SmoothMoveLocal(fieldCardGO.transform, handPos, Quaternion.identity, playAnimDuration));
+            }
         }
 
         // Card B: Hand -> Field
@@ -329,6 +333,7 @@ public class PlayFieldManager : MonoBehaviour
             }
             else
             {
+                if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(fieldCardGO);
                 Destroy(fieldCardGO);
             }
         }
@@ -342,10 +347,6 @@ public class PlayFieldManager : MonoBehaviour
             {
                 pData.RemoveCardById(res.PlayedCardId);
                 // SwappedCardId was added via handManager.AddCard above
-            }
-            else
-            {
-                // Non-local counts: card played from hand, card received to hand. Net change 0.
             }
         }
     }
@@ -479,32 +480,5 @@ public class PlayFieldManager : MonoBehaviour
 
         // Wait for the duration of the play animation
         yield return new WaitForSeconds(playAnimDuration);
-    }
-
-    private IEnumerator SmoothMove(Transform tr, Vector3 targetLocalPos, Quaternion targetLocalRot, float duration, GameObject owner = null)
-    {
-        Vector3 startPos = tr.localPosition;
-        Quaternion startRot = tr.localRotation;
-        float elapsed = 0;
-
-        while (elapsed < duration)
-        {
-            if (tr == null) yield break;
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            t = t * t * (3f - 2f * t); // Smooth step
-
-            tr.localPosition = Vector3.Lerp(startPos, targetLocalPos, t);
-            tr.localRotation = Quaternion.Slerp(startRot, targetLocalRot, t);
-            yield return null;
-        }
-
-        if (tr != null)
-        {
-            tr.localPosition = targetLocalPos;
-            tr.localRotation = targetLocalRot;
-        }
-
-        if (owner != null) activeCoroutines.Remove(owner);
     }
 }

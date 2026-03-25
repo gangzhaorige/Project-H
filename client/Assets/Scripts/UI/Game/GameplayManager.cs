@@ -30,6 +30,7 @@ public class GameplayManager : MonoBehaviour
         NetworkManager.Instance.AddCallback(Constants.SMSG_SELECT_CARDS_FROM_OPPONENT, OnSelectCardsFromOpponent);
         NetworkManager.Instance.AddCallback(Constants.SMSG_SELECT_CARDS, OnSelectCardsResponse);
         NetworkManager.Instance.AddCallback(Constants.SMSG_MOVE_CARD, OnMoveCardResponse);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_UPDATE_PLAYER_ORDER, OnUpdatePlayerOrder);
 
         // UI events are decoupled - UIController will listen to GameSession events
 
@@ -58,6 +59,7 @@ public class GameplayManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_SELECT_CARDS_FROM_OPPONENT);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_SELECT_CARDS);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_MOVE_CARD);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_UPDATE_PLAYER_ORDER);
             }    }
 
     private void OnTimerStart(ExtendedEventArgs args)
@@ -197,6 +199,20 @@ public class GameplayManager : MonoBehaviour
 
         Debug.Log($"[GameplayManager] Move Card event: {res.Cards.Count} cards from {res.TargetId} to {res.CasterId}. Details Visible: {res.ShowDetails}");
         CardManager.Instance.HandleMoveCard(res);
+    }
+
+    private void OnUpdatePlayerOrder(ExtendedEventArgs args)
+    {
+        ResponseUpdatePlayerOrderEventArgs res = args as ResponseUpdatePlayerOrderEventArgs;
+        if (res == null) return;
+
+        Debug.Log($"[GameplayManager] Updating Player Order: {string.Join(", ", res.PlayerOrder)}");
+        GameSession.Instance.PlayerOrder = res.PlayerOrder;
+        
+        if (championSetup != null)
+        {
+            championSetup.UpdateChampionPositions(res.PlayerOrder);
+        }
     }
 
     private void OnSkillActivated(ExtendedEventArgs args)

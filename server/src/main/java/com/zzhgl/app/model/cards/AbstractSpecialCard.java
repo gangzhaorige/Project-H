@@ -5,7 +5,7 @@ package com.zzhgl.app.model.cards;
  */
 public abstract class AbstractSpecialCard extends AbstractCard {
     public enum SpecialType {
-        ARROW, DUEL, DRAW, STEAL, DISMANTLE, HEAL_ALL, FIRE, NEGATE, PRISON
+        ARROW, DUEL, DRAW, STEAL, DISMANTLE, HEAL_ALL, FIRE, NEGATE, PRISON, DRAW_SKIP
     }
 
     protected SpecialType type;

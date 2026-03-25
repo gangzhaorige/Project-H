@@ -1,5 +1,5 @@
 [
-    {"id": 0, "championName": "Bronya", "path": "Harmony", "element": "Wind", "skillAudio": [["b8a7ac37313ccab9"]]},
+    {"id": 0, "championName": "Bronya", "path": "Harmony", "element": "Wind", "skillAudio": [["b8a7ac37313ccab9"],["48637e2e64f08556"]]},
     {"id": 1, "championName": "Clara", "path": "Destruction", "element": "Physical", "skillAudio": [["3b3b6cfe083edb86", "bcf8cef5c4df076f"]]},
     {"id": 2, "championName": "Gepard", "path": "Preservation", "element": "Ice", "skillAudio": [[]]},
     {"id": 3, "championName": "Himeko", "path": "Erudition", "element": "Fire", "skillAudio": [[]]},
@@ -10,5 +10,5 @@
     {"id": 8, "championName": "Trailblazer (Physical)", "path": "Destruction", "element": "Physical", "skillAudio": [[]]},
     {"id": 9, "championName": "JingYuan", "path": "Erudition", "element": "Lightning", "skillAudio": [["00a57cf84f154724", "f19f9d36104dfdd8"]]},
     {"id": 10, "championName": "Jade", "path": "Erudition", "element": "Quantum", "skillAudio": [["1a12cf40baf767a4"], ["1a12cf40baf767a4"]]},
-    {"id": 11, "championName": "Black Swan", "path": "Nihility", "element": "Wind", "skillAudio": ["b0d67c37db7800a9", "36c36958bdc655a9"]}
+    {"id": 11, "championName": "Black Swan", "path": "Nihility", "element": "Wind", "skillAudio": [["b0d67c37db7800a9", "36c36958bdc655a9"]]}
 ]

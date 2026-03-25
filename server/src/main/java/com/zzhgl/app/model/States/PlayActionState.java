@@ -1,5 +1,6 @@
 package com.zzhgl.app.model.States;
 
+import com.zzhgl.app.model.Command.ActivateSkillCommand;
 import com.zzhgl.app.model.Command.Command;
 import com.zzhgl.app.model.Command.EndTurnCommand;
 import com.zzhgl.app.model.Command.PlayCardCommand;
@@ -9,19 +10,20 @@ import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.model.interactions.AbstractInteraction;
+import com.zzhgl.app.model.skills.AbstractSkill;
+import com.zzhgl.app.model.skills.CombatRedeploymentSkill;
 import com.zzhgl.app.networking.response.GameResponse;
-import com.zzhgl.app.networking.response.game.ResponseGameState;
-import com.zzhgl.app.networking.response.game.ResponsePlayCard;
-import com.zzhgl.app.networking.response.game.ResponseTimerCancel;
-import com.zzhgl.app.networking.response.game.ResponseTimerStart;
+import com.zzhgl.app.networking.response.game.*;
 import com.zzhgl.app.utility.Log;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * PlayActionState is where the active player can play cards.
@@ -80,6 +82,40 @@ public class PlayActionState implements GameState {
             if (playCmd.getPlayerId() == activePlayer.getID()) {
                 handlePlayCard(game, activePlayer, playCmd);
             }
+        }
+        else if (command instanceof ActivateSkillCommand skillCmd) {
+            if (skillCmd.getPlayerId() == activePlayer.getID()) {
+                handleActivateSkill(game, activePlayer, skillCmd);
+            }
+        }
+    }
+
+    private void handleActivateSkill(GameManager game, Player player, ActivateSkillCommand cmd) {
+        if (player.getSelectedChampion() == null) return;
+
+        Optional<AbstractSkill> skillOpt = player.getSelectedChampion().getSkills().stream()
+                .filter(s -> s.getId() == cmd.getSkillId())
+                .findFirst();
+
+        if (skillOpt.isEmpty()) {
+            Log.printf_e("Player %d tried to activate skill ID %d, but they don't have it.", player.getID(), cmd.getSkillId());
+            return;
+        }
+
+        AbstractSkill skill = skillOpt.get();
+
+        // Validate the skill activation
+        if (!skill.validateActivation(game, player, cmd.getDiscardCardIds(), cmd.getTargetIds())) {
+            Log.printf_e("Player %d failed to validate skill %s.", player.getID(), skill.getName());
+            return;
+        }
+
+        // Dynamically activate the skill by pushing its interaction to the stack
+        skill.activate(game, player, cmd.getDiscardCardIds(), cmd.getTargetIds());
+        
+        // Evaluate the stack
+        if (!game.getInteractionStack().isEmpty()) {
+            game.resolveStack();
         }
     }
 
