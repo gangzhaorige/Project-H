@@ -24,6 +24,7 @@ public class UIController : MonoBehaviour
     [Header("Panels")]
     public GameObject targetSelectionPanel;
     public GameObject loadingPanel;
+    public GameObject selectPanel;
 
     private float currentTimer = 0f;
     private float maxTimer = 0f;
@@ -233,6 +234,11 @@ public class UIController : MonoBehaviour
         if (targetSelectionPanel != null) targetSelectionPanel.SetActive(show);
     }
 
+    public void ShowSelectPanel(bool show)
+    {
+        if (selectPanel != null) selectPanel.SetActive(show);
+    }
+
     public void HideAll()
     {
         ShowEndTurnButton(false);
@@ -240,6 +246,7 @@ public class UIController : MonoBehaviour
         ShowConfirmPlayButton(false);
         ShowTimerUI(false);
         ShowTargetSelectionPanel(false);
+        ShowSelectPanel(false);
         SetInstruction("");
     }
 

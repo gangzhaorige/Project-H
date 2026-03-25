@@ -20,7 +20,7 @@ public class SkillFactory {
 
     public AbstractSkill createSkill(int skillId) {
         switch (skillId) {
-            case 1: return new DrawTwoOnTurnBeginSkill();
+            case 1: return new DrawOneOnTurnBeginSkill();
             case 2: return new DrawOnDamageSkill();
             case 3: return new DrawOnLastCardSkill();
             case 4: return new JudgementOverrideSkill();
@@ -28,6 +28,7 @@ public class SkillFactory {
             case 6: return new MyTurnSkill();
             case 7: return new SvarogsRevengeSkill();
             case 8: return new OneWithTheSwordSkill();
+            case 9: return new VisionaryPredationSkill();
             default: return null;
         }
     }

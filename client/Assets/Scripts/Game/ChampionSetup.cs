@@ -80,6 +80,7 @@ public class ChampionSetup : MonoBehaviour
                     Element = info.Champion.Element,
                     Attack = info.Champion.Attack,
                     AttackRange = info.Champion.AttackRange,
+                    SpecialRange = info.Champion.SpecialRange,
                     SpecialDefense = info.Champion.SpecialDefense,
                     AdditionalTargetForAttack = info.Champion.AdditionalTargetForAttack,
                     MaxNumOfAttack = info.Champion.MaxNumOfAttack,

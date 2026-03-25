@@ -47,12 +47,16 @@ public class TurnBeginState implements GameState {
         
         // Draw cards only if not skipped by a skill
         if (!game.isSkipDrawPhase()) {
-            Log.printf("Player %d is drawing 2 cards.", activePlayer.getID());
-            game.drawCards(activePlayer, 2);
+            int count = 2 + game.getExtraDrawCount();
+            Log.printf("Player %d is drawing %d cards (2 + %d bonus).", activePlayer.getID(), count, game.getExtraDrawCount());
+            game.drawCards(activePlayer, count);
         } else {
             Log.printf("Player %d skipped draw phase via skill.", activePlayer.getID());
             game.setSkipDrawPhase(false); // Reset flag
         }
+
+        // Reset extra draw count after drawing
+        game.setExtraDrawCount(0);
 
         // Check if a Judgement (like Prison) requested to skip the action phase
         if (game.isSkipActionPhase()) {

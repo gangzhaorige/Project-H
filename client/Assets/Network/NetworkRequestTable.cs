@@ -14,8 +14,15 @@ public class NetworkRequestTable {
 		Add(Constants.CMSG_HEARTBEAT, "RequestHeartBeat");
 		Add(Constants.CMSG_LOGOUT, "RequestLogout");
 		Add(Constants.CMSG_PICK_CHAMPION, "RequestPickChampion");
+		Add(Constants.CMSG_SELECT_CHAMPION, "RequestSelectChampion");
+		Add(Constants.CMSG_READY_FOR_CHAMPION_SELECT, "RequestReadyForChampionSelect");
+		Add(Constants.CMSG_READY_FOR_GAME_SETUP, "RequestReadyForGameSetup");
+		Add(Constants.CMSG_READY_TO_PLAY, "RequestReadyToPlay");
 		Add(Constants.CMSG_PLAY_CARD, "RequestPlayCard");
 		Add(Constants.CMSG_END_TURN, "RequestEndTurn");
+		Add(Constants.CMSG_PASS_PRIORITY, "RequestPassPriority");
+		Add(Constants.CMSG_SKILL_RESPONSE, "RequestSkillResponse");
+		Add(Constants.CMSG_SELECT_CARDS, "RequestSelectCards");
 		Add(Constants.CMSG_CONFIRMATION, "RequestConfirmation");
 
         // Room System

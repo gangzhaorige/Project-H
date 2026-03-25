@@ -43,7 +43,103 @@ public class CardManager : MonoBehaviour
         }
     }
 
+    public void HandleMoveCard(ResponseMoveCardEventArgs res)
+    {
+        AnimationController.Instance.AddAnimation(AnimateMoveCard(res));
+    }
+
     // --- Private Animation Logic ---
+
+    private IEnumerator AnimateMoveCard(ResponseMoveCardEventArgs res)
+    {
+        int localId = Constants.USER_ID;
+        PlayerData sourcePlayer = GameSession.Instance.Players.ContainsKey(res.TargetId) ? GameSession.Instance.Players[res.TargetId] : null;
+        PlayerData receiverPlayer = GameSession.Instance.Players.ContainsKey(res.CasterId) ? GameSession.Instance.Players[res.CasterId] : null;
+
+        List<Coroutine> anims = new List<Coroutine>();
+
+        for (int i = 0; i < res.Cards.Count; i++)
+        {
+            CardData cardData = res.Cards[i];
+            GameObject cardGO = null;
+            Vector3 startPos;
+            Vector3 endPos;
+
+            // --- 1. Identify/Create Card Object and Start Position ---
+            if (localId == res.TargetId)
+            {
+                // Target: find card in hand
+                cardGO = handManager.GetCardObject(cardData.Id);
+                if (cardGO != null)
+                {
+                    handManager.UnregisterCard(cardData.Id);
+                    sourcePlayer.RemoveCardById(cardData.Id);
+                    startPos = cardGO.transform.position;
+                }
+                else
+                {
+                    // Fallback if not found
+                    startPos = (sourcePlayer?.ChampionObject != null) ? sourcePlayer.ChampionObject.transform.position : Vector3.zero;
+                }
+            }
+            else
+            {
+                // Caster or Observer: create placeholder at source player champion
+                startPos = (sourcePlayer?.ChampionObject != null) ? sourcePlayer.ChampionObject.transform.position : Vector3.zero;
+                cardGO = Instantiate(cardPrefab, playFieldPanel); // Use playfield as temp parent
+                cardGO.transform.position = startPos;
+                
+                CardSetup setup = cardGO.GetComponent<CardSetup>();
+                if (setup != null)
+                {
+                    if (res.ShowDetails) setup.Init(cardData.Type, cardData.Suit, cardData.Value);
+                    else setup.Init("Standard", 0, 0); // Hidden
+                }
+            }
+
+            // Disable interactions during flight
+            var ui = cardGO.GetComponent<CardUIController>();
+            if (ui != null) ui.enabled = false;
+
+            // --- 2. Determine End Position ---
+            if (localId == res.CasterId)
+            {
+                // Caster: animate to hand
+                int futureCount = receiverPlayer.Hand.Count + res.Cards.Count;
+                int finalIdx = receiverPlayer.Hand.Count + i;
+                endPos = handManager.GetPredictiveWorldPosition(finalIdx, futureCount);
+            }
+            else
+            {
+                // Target or Observer: animate to receiver champion
+                endPos = (receiverPlayer?.ChampionObject != null) ? receiverPlayer.ChampionObject.transform.position : Vector3.down * 1000;
+            }
+
+            // --- 3. Execute Animation ---
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayCardMoveSFX();
+            anims.Add(StartCoroutine(MoveAndFinalize(cardGO, cardData, endPos, localId == res.CasterId, receiverPlayer)));
+        }
+
+        foreach (var a in anims) yield return a;
+    }
+
+    private IEnumerator MoveAndFinalize(GameObject cardGO, CardData data, Vector3 targetPos, bool isReceiver, PlayerData receiver)
+    {
+        yield return MoveCard(cardGO.transform, targetPos, drawAnimDuration);
+
+        if (isReceiver)
+        {
+            // Receiver: register to hand
+            handManager.RegisterAnimatedCard(data, cardGO);
+            receiver.AddCard(data);
+        }
+        else
+        {
+            // Target/Observer: destroy
+            Destroy(cardGO);
+            if (receiver != null) receiver.AddCard(new CardData { Id = -1 });
+        }
+    }
 
     private IEnumerator AnimateLocalDrawBatch(List<CardData> newCards)
     {

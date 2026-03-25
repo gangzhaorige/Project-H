@@ -40,6 +40,7 @@ public class GameManager {
     private InteractionStack interactionStack;
     private boolean skipActionPhase = false;
     private boolean skipDrawPhase = false;
+    private int extraDrawCount = 0;
 
     // Subscription-based skill registry
     private final Map<GameEvent.EventType, List<SkillSubscription>> skillRegistry = new EnumMap<>(GameEvent.EventType.class);
@@ -97,6 +98,9 @@ public class GameManager {
 
     public boolean isSkipDrawPhase() { return skipDrawPhase; }
     public void setSkipDrawPhase(boolean skip) { this.skipDrawPhase = skip; }
+
+    public int getExtraDrawCount() { return extraDrawCount; }
+    public void setExtraDrawCount(int count) { this.extraDrawCount = count; }
 
     public Pile getDrawPile() {
         return drawPile;

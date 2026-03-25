@@ -14,11 +14,13 @@ namespace ProjectH.Models
         public int Element;
         public int Attack;
         public int AttackRange;
+        public int SpecialRange;
         public int CurNumOfAttack;
         public int MaxNumOfAttack;
         public int AdditionalTargetForAttack;
         public int SpecialDefense;
         public List<int> SkillIds = new List<int>();
+        public List<List<AudioClip>> SkillClips = new List<List<AudioClip>>();
         // Other stats can be added here
     }
 
@@ -130,6 +132,15 @@ namespace ProjectH.Models
         public delegate void SkillQueryAnswered();
         public event SkillQueryAnswered OnSkillQueryAnswered;
 
+        public delegate void SkillActivated(int playerId, int skillIndex);
+        public event SkillActivated OnSkillActivated;
+
+        public delegate void SelectCardsFromOpponent(int targetPlayerId, int amount, int duration, string message, int targetHandSize);
+        public event SelectCardsFromOpponent OnSelectCardsFromOpponent;
+
+        public delegate void SelectCardsCompleted();
+        public event SelectCardsCompleted OnSelectCardsCompleted;
+
         public void TriggerTimerStarted(int seconds, string message, int playerId) => OnTimerStarted?.Invoke(seconds, message, playerId);
         public void TriggerTimerCancelled() => OnTimerCancelled?.Invoke();
         public void TriggerTurnStarted(int activePlayerId) => OnTurnStarted?.Invoke(activePlayerId);
@@ -137,6 +148,9 @@ namespace ProjectH.Models
         public void TriggerChampionStatsUpdated(int championId, int statId, int value) => OnChampionStatsUpdated?.Invoke(championId, statId, value);
         public void TriggerSkillQuery(int skillId) => OnSkillQuery?.Invoke(skillId);
         public void TriggerSkillQueryAnswered() => OnSkillQueryAnswered?.Invoke();
+        public void TriggerSkillActivated(int playerId, int skillIndex) => OnSkillActivated?.Invoke(playerId, skillIndex);
+        public void TriggerSelectCardsFromOpponent(int targetId, int amount, int duration, string msg, int handSize) => OnSelectCardsFromOpponent?.Invoke(targetId, amount, duration, msg, handSize);
+        public void TriggerSelectCardsCompleted() => OnSelectCardsCompleted?.Invoke();
 
         // Stat IDs (Matching Server)
         public const int STAT_CUR_HP = 1;

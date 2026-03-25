@@ -112,4 +112,20 @@ public class AudioManager : MonoBehaviour
             sfxSource.PlayOneShot(cardDrawClip);
         }
     }
+
+    public void PlayCardMoveSFX()
+    {
+        if (sfxSource != null && cardDrawClip != null)
+        {
+            sfxSource.PlayOneShot(cardDrawClip);
+        }
+    }
+
+    public void PlaySkillAudio(AudioClip clip)
+    {
+        if (sfxSource != null && clip != null)
+        {
+            sfxSource.PlayOneShot(clip);
+        }
+    }
 }

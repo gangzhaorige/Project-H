@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectH.Models.SkillSO
   skillId: 1
   skillName: MilitaryMight
-  skillDescription: Draw 2 extra cards during your draw phase.
+  skillDescription: Draw 1 extra cards during your draw phase.
   isPassive: 1
   skillIcon: {fileID: 21300000, guid: 0efeb1811c5184881a13e89b5f63fb22, type: 3}
   playConditions: 

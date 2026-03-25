@@ -45,6 +45,9 @@ public class NetworkResponseTable {
 		Add(Constants.SMSG_SWAP_JUDGEMENT, "ResponseSwapJudgement");
 		Add(Constants.SMSG_SWAP_FIELD_HAND, "ResponseSwapFieldHand");
 		Add(Constants.SMSG_FIELD_TO_HAND, "ResponseFieldToHand");
+		Add(Constants.SMSG_SELECT_CARDS_FROM_OPPONENT, "ResponseSelectCardsFromOpponent");
+		Add(Constants.SMSG_SELECT_CARDS, "ResponseSelectCards");
+		Add(Constants.SMSG_MOVE_CARD, "ResponseMoveCard");
 
         // Room System
         Add(Constants.SMSG_CREATE_ROOM, "ResponseCreateRoom");

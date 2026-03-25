@@ -26,6 +26,10 @@ public class GameplayManager : MonoBehaviour
         NetworkManager.Instance.AddCallback(Constants.SMSG_PASS_PRIORITY, OnPassPriorityResponse);
         NetworkManager.Instance.AddCallback(Constants.SMSG_STATE_CHANGE, OnGameStateResponse);
         NetworkManager.Instance.AddCallback(Constants.SMSG_CHAMPION_STATS_UPDATE_INTEGER, OnChampionStatsUpdate);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_SKILL_ACTIVATION, OnSkillActivated);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_SELECT_CARDS_FROM_OPPONENT, OnSelectCardsFromOpponent);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_SELECT_CARDS, OnSelectCardsResponse);
+        NetworkManager.Instance.AddCallback(Constants.SMSG_MOVE_CARD, OnMoveCardResponse);
 
         // UI events are decoupled - UIController will listen to GameSession events
 
@@ -50,8 +54,11 @@ public class GameplayManager : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_PASS_PRIORITY);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_STATE_CHANGE);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_CHAMPION_STATS_UPDATE_INTEGER);
-        }
-    }
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_SKILL_ACTIVATION);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_SELECT_CARDS_FROM_OPPONENT);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_SELECT_CARDS);
+            NetworkManager.Instance.RemoveCallback(Constants.SMSG_MOVE_CARD);
+            }    }
 
     private void OnTimerStart(ExtendedEventArgs args)
     {
@@ -157,12 +164,113 @@ public class GameplayManager : MonoBehaviour
 
         championSetup.InitializeChampions(res.Players);
         
+        // --- NEW: Load Skill Audio ---
+        LoadAllSkillAudios();
+
         GameSession.Instance.TriggerGameSetupCompleted();
 
         // Handshake Step 2
         RequestReadyToPlay readyReq = new RequestReadyToPlay();
         readyReq.Send();
         NetworkManager.Instance.SendRequest(readyReq);
+    }
+
+    private void OnSelectCardsFromOpponent(ExtendedEventArgs args)
+    {
+        ResponseSelectCardsFromOpponentEventArgs res = args as ResponseSelectCardsFromOpponentEventArgs;
+        if (res == null) return;
+
+        Debug.Log($"[GameplayManager] Opponent selection requested: {res.Amount} card(s) from {res.TargetPlayerId}");
+        GameSession.Instance.TriggerSelectCardsFromOpponent(res.TargetPlayerId, res.Amount, res.Duration, res.Message, res.TargetHandSize);
+    }
+
+    private void OnSelectCardsResponse(ExtendedEventArgs args)
+    {
+        Debug.Log("[GameplayManager] Card selection completed/confirmed by server.");
+        GameSession.Instance.TriggerSelectCardsCompleted();
+    }
+
+    private void OnMoveCardResponse(ExtendedEventArgs args)
+    {
+        ResponseMoveCardEventArgs res = args as ResponseMoveCardEventArgs;
+        if (res == null) return;
+
+        Debug.Log($"[GameplayManager] Move Card event: {res.Cards.Count} cards from {res.TargetId} to {res.CasterId}. Details Visible: {res.ShowDetails}");
+        CardManager.Instance.HandleMoveCard(res);
+    }
+
+    private void OnSkillActivated(ExtendedEventArgs args)
+    {
+        ResponseSkillActivatedEventArgs res = args as ResponseSkillActivatedEventArgs;
+        if (res == null) return;
+
+        Debug.Log($"[GameplayManager] Skill {res.SkillIndex} activated for Player {res.PlayerId}");
+
+        // Trigger observer pattern event
+        GameSession.Instance.TriggerSkillActivated(res.PlayerId, res.SkillIndex);
+
+        if (GameSession.Instance.Players.TryGetValue(res.PlayerId, out PlayerData player))
+        {
+            if (player.Champion != null && player.Champion.SkillClips != null && res.SkillIndex < player.Champion.SkillClips.Count)
+            {
+                List<AudioClip> clips = player.Champion.SkillClips[res.SkillIndex];
+                if (clips != null && clips.Count > 0)
+                {
+                    // Randomly pick one from the variants
+                    AudioClip clip = clips[Random.Range(0, clips.Count)];
+                    if (clip != null && AudioManager.Instance != null)
+                    {
+                        AudioManager.Instance.PlaySkillAudio(clip);
+                    }
+                }
+            }
+        }
+    }
+
+    private void LoadAllSkillAudios()
+    {
+        TextAsset jsonText = Resources.Load<TextAsset>("Data/champions");
+        if (jsonText == null) return;
+
+        string rawJson = jsonText.text;
+
+        foreach (var player in GameSession.Instance.Players.Values)
+        {
+            if (player.Champion == null) continue;
+            
+            player.Champion.SkillClips = new List<List<AudioClip>>();
+            
+            // Regex to find skillAudio for the specific champion ID
+            string pattern = $"\"id\":\\s*{player.Champion.Id},.*?\"skillAudio\":\\s*\\[(.*?)\\]\\s*[\\}},]";
+            var match = System.Text.RegularExpressions.Regex.Match(rawJson, pattern, System.Text.RegularExpressions.RegexOptions.Singleline);
+            
+            if (match.Success)
+            {
+                string skillAudioSection = match.Groups[1].Value.Trim();
+                if (string.IsNullOrEmpty(skillAudioSection)) continue;
+
+                // Handle nested lists: [["a", "b"], ["c"]]
+                string[] groups = skillAudioSection.Split(new string[] { "]," }, System.StringSplitOptions.RemoveEmptyEntries);
+                
+                foreach (string group in groups)
+                {
+                    List<AudioClip> clipsInGroup = new List<AudioClip>();
+                    string cleaned = group.Replace("[", "").Replace("]", "");
+                    string[] files = cleaned.Split(new char[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
+                    
+                    foreach (string f in files)
+                    {
+                        string fileName = f.Trim().Trim('"');
+                        if (string.IsNullOrEmpty(fileName)) continue;
+
+                        AudioClip clip = Resources.Load<AudioClip>($"Audio/ChampionVoices/{fileName}");
+                        if (clip != null) clipsInGroup.Add(clip);
+                        else Debug.LogWarning($"[GameplayManager] Clip not found: Audio/ChampionVoices/{fileName}");
+                    }
+                    player.Champion.SkillClips.Add(clipsInGroup);
+                }
+            }
+        }
     }
 
     private void OnGameStateResponse(ExtendedEventArgs args) {

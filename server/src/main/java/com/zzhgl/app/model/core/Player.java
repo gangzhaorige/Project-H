@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import com.zzhgl.app.core.GameClient;
 import com.zzhgl.app.networking.response.GameResponse;
 import com.zzhgl.app.model.champions.Champion;
-import com.zzhgl.app.model.skills.DrawOnDamageSkill;
-import com.zzhgl.app.model.skills.DrawTwoOnTurnBeginSkill;
-import com.zzhgl.app.model.skills.DrawOnLastCardSkill;
 import com.zzhgl.app.model.effects.AbstractEffect;
 
 /**

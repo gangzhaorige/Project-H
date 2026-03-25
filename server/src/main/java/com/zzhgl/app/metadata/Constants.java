@@ -72,7 +72,9 @@ public class Constants {
     public final static short SMSG_DISCARD_CARDS = 413;
     public final static short SMSG_FIELD_TO_HAND = 414;
     public final static short SMSG_PASS_PRIORITY = 416;
+    public final static short SMSG_SELECT_CARDS = 417;
     public final static short CMSG_PASS_PRIORITY = 312;
+    public final static short CMSG_SELECT_CARDS = 313;
 
     // Turn System ---
     public final static short CMSG_END_TURN = 320;
@@ -98,6 +100,8 @@ public class Constants {
     public final static short SMSG_UPDATE_ATTACK = 445;
     public final static short SMSG_SKILL_QUERY = 446;
     public final static short SMSG_SWAP_FIELD_HAND = 447;
+    public final static short SMSG_SELECT_CARDS_FROM_OPPONENT = 448;
+    public final static short SMSG_MOVE_CARD = 449;
 
     public final static short CMSG_CONFIRMATION = 350;
     public final static short CMSG_READY_FOR_GAME_SETUP = 351;

@@ -13,6 +13,9 @@ public class TurnState implements GameState {
 
     @Override
     public void onEnter(GameManager game) {
+        // Reset extra draw count at start of turn switching
+        game.setExtraDrawCount(0);
+
         // 1. Increment the index first
         int nextIndex = (game.getActivePlayerIndex() + 1) % game.getPlayers().size();
         game.setActivePlayerIndex(nextIndex);

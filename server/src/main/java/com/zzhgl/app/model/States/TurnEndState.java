@@ -15,7 +15,19 @@ public class TurnEndState implements GameState {
         Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
         Log.printf("Player %d turn ended.", activePlayer.getID());
 
+        // Emit TURN_END event
+        game.emitEvent(new com.zzhgl.app.model.core.GameEvent(com.zzhgl.app.model.core.GameEvent.EventType.TURN_END));
+
+        // If a skill was triggered, it pushes SkillResolutionState.
+        // We wait until it's finished and we resume.
+        if (game.getCurrentState() == this) {
+            proceedToNextTurn(game);
+        }
+    }
+
+    private void proceedToNextTurn(GameManager game) {
         // Notify all players
+        Player activePlayer = game.getPlayers().get(game.getActivePlayerIndex());
         ResponseEndTurn response = new ResponseEndTurn(activePlayer.getID());
         for (Player p : game.getPlayers()) {
             p.addResponseForUpdate(response);
@@ -35,5 +47,7 @@ public class TurnEndState implements GameState {
     public void onPause(GameManager game) {}
 
     @Override
-    public void onResume(GameManager game) {}
+    public void onResume(GameManager game) {
+        proceedToNextTurn(game);
+    }
 }

@@ -128,6 +128,8 @@ public class PlayFieldManager : MonoBehaviour
             handManager.RegisterAnimatedCard(data, cardGO);
             GameSession.Instance.GetLocalPlayer().AddCard(data);
 
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayCardMoveSFX();
+
             // Wait for HandManager's standard layout animation duration (typically 0.3s)
             yield return new WaitForSeconds(0.3f);
         }
@@ -297,6 +299,8 @@ public class PlayFieldManager : MonoBehaviour
         {
             // For local, we could use handManager to get a real position, but simplified for now
         }
+
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardMoveSFX();
 
         if (fieldCardGO != null)
         {
@@ -469,6 +473,9 @@ public class PlayFieldManager : MonoBehaviour
 
         // 4. Reorganize everything on the field
         ReorganizeField();
+
+        if (isLocal && AudioManager.Instance != null)
+            AudioManager.Instance.PlayCardMoveSFX();
 
         // Wait for the duration of the play animation
         yield return new WaitForSeconds(playAnimDuration);
