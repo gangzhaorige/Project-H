@@ -4,9 +4,6 @@ using System.Collections.Generic;
 [ExecuteInEditMode]
 public class DynamicHandLayout : MonoBehaviour
 {
-    [Header("Components")]
-    public HandManager handManager;
-
     [Header("Layout Configuration")]
     public float cardWidth = 200f;
     [Tooltip("Default spacing. Set equal to cardWidth for no gaps.")]

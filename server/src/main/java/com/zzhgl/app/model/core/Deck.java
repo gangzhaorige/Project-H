@@ -25,20 +25,18 @@ public class Deck {
         CardFactory factory = CardFactory.getInstance();
         
         // Distribution for ~108 cards
-        // addNormalCards(factory, AbstractNormalCard.NormalType.ATTACK, 30);
-        // addNormalCards(factory, AbstractNormalCard.NormalType.DODGE, 20);
-        // addNormalCards(factory, AbstractNormalCard.NormalType.HEAL, 8);
-        
-        // addSpecialCards(factory, AbstractSpecialCard.SpecialType.NEGATE, 10);
-        // addSpecialCards(factory, AbstractSpecialCard.SpecialType.DRAW, 8);
-        // addSpecialCards(factory, AbstractSpecialCard.SpecialType.STEAL, 20);
-        addSpecialCards(factory, AbstractSpecialCard.SpecialType.DISMANTLE, 20);
-        // addSpecialCards(factory, AbstractSpecialCard.SpecialType.DUEL, 6);
-        // addSpecialCards(factory, AbstractSpecialCard.SpecialType.FIRE, 6);
-        
-        // addSpecialCards(factory, AbstractSpecialCard.SpecialType.PRISON, 4);
-        // addSpecialCards(factory, AbstractSpecialCard.SpecialType.ARROW, 2);
-        // addSpecialCards(factory, AbstractSpecialCard.SpecialType.HEAL_ALL, 2);
+        addNormalCards(factory, AbstractNormalCard.NormalType.ATTACK, 30);
+        addNormalCards(factory, AbstractNormalCard.NormalType.DODGE, 20);
+        addNormalCards(factory, AbstractNormalCard.NormalType.HEAL, 8);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.NEGATE, 10);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.DRAW, 8);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.STEAL, 8);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.DISMANTLE, 8);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.DUEL, 6);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.FIRE, 6);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.PRISON, 4);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.ARROW, 2);
+        addSpecialCards(factory, AbstractSpecialCard.SpecialType.HEAL_ALL, 2);
 
         Collections.shuffle(cards);
     }

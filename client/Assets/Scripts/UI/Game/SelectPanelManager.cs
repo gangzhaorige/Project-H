@@ -71,6 +71,7 @@ public class SelectPanelManager : MonoBehaviour
                 int cardId = (i < targetPlayer.Hand.Count) ? targetPlayer.Hand[i].Id : -1;
                 
                 GameObject go = Instantiate(cardPrefab, cardsContainer);
+                go.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 
                 // Disable the default CardUIController so it doesn't interfere with the selection panel logic
                 var uiController = go.GetComponent<CardUIController>();

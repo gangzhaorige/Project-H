@@ -37,7 +37,6 @@ public class JudgementOverrideAction implements GameAction {
         // Calculate result for UI
         boolean judgeResult = false;
         if (game.getCurrentState() instanceof com.zzhgl.app.model.States.JudgementState judgeState) {
-            System.out.println("NASDIANSID:ASDASK:DSAJD:ASJDA:SKDJA:SKDJA");
             judgeResult = judgeState.getEffect().evaluateJudgement(game, newCard);
         }
 
