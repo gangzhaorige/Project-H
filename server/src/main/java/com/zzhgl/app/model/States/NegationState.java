@@ -7,6 +7,7 @@ import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.cards.AbstractSpecialCard;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
+import com.zzhgl.app.model.interactions.AbstractInteraction;
 import com.zzhgl.app.networking.response.GameResponse;
 import com.zzhgl.app.networking.response.game.ResponsePassPriority;
 import com.zzhgl.app.networking.response.game.ResponsePlayCard;
@@ -28,10 +29,17 @@ public class NegationState implements GameState {
     private final Set<Integer> passedPlayers = new HashSet<>();
     private final Random random = new Random();
     private int lastNegatorId = -1;
+    private final AbstractInteraction targetInteraction;
+    private int negateCount = 0;
+
+    public NegationState(AbstractInteraction targetInteraction) {
+        this.targetInteraction = targetInteraction;
+    }
 
     @Override
     public void onEnter(GameManager game) {
-        Log.printf("Entering NegationState. Priority window opened.");
+        Log.printf("Entering NegationState for interaction from %s. Priority window opened.", 
+                   targetInteraction.getCaster().getUsername());
         passedPlayers.clear();
         lastNegatorId = -1;
         startTimer(game);
@@ -52,7 +60,7 @@ public class NegationState implements GameState {
             Log.printf("No one else has Negate. Using hidden random timer: %d seconds.", duration);
         }
 
-        broadcast(game, new ResponseTimerStart(-1, duration, "Any player can play NEGATE!", SpecialType.NEGATE));
+        broadcast(game, new ResponseTimerStart(-1, duration, targetInteraction.getMessage() + " Any player can play NEGATE Card!", SpecialType.NEGATE));
 
         timerFuture = scheduler.schedule(() -> {
             Log.printf("Negation window expired. Proceeding to resolution.");
@@ -72,8 +80,18 @@ public class NegationState implements GameState {
     }
 
     private void resolve(GameManager game) {
+        // If negateCount is odd, the interaction is canceled (negated).
+        // If it's even (0, 2, 4...), the interaction is NOT canceled (either never negated or counter-negated).
+        if (negateCount % 2 != 0) {
+            Log.printf("Interaction from %s was NEGATED (%d negates played).", 
+                       targetInteraction.getCaster().getUsername(), negateCount);
+            targetInteraction.cancel();
+        } else if (negateCount > 0) {
+            Log.printf("Interaction from %s was NOT negated (negate was negated, %d negates played).", 
+                       targetInteraction.getCaster().getUsername(), negateCount);
+        }
+
         game.popState();
-        game.resolveStack();
     }
 
     private synchronized void cancelTimer(GameManager game) {
@@ -113,7 +131,8 @@ public class NegationState implements GameState {
                 player.getHand().removeCard(card);
                 Log.printf("Player %d played NegateCard in NegationState.", player.getID());
                 
-                card.play(game, player, playCmd.getTargetIds());
+                // Increment negate count instead of pushing a new NegateInteraction to the stack
+                negateCount++;
                 
                 broadcast(game, new ResponsePlayCard(player.getID(), card, playCmd.getTargetIds()));
 

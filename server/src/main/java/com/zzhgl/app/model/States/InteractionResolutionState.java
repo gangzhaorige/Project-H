@@ -44,7 +44,7 @@ public class InteractionResolutionState implements GameState {
         if (next.isNegatable() && !next.isNegationEvaluated()) {
             Log.printf("Interaction from %s is negatable. Pushing NegationState.", next.getCaster().getUsername());
             next.setNegationEvaluated(true);
-            game.pushState(new NegationState());
+            game.pushState(new NegationState(next));
             return;
         }
         // ----------------------------------------
