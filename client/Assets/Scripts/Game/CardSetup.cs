@@ -42,8 +42,8 @@ public class CardSetup : MonoBehaviour
         }
 
         // 5. Load Main Card Illustration based on type
-        // Normalizing type name to match file (e.g. "Attack" -> "attack")
-        string resourcePath = $"Images/cards/images/{typeName.ToLower()}";
+        // Use cardType (ID) instead of typeName to match resources
+        string resourcePath = $"Images/cards/images/{cardType}";
         Sprite mainSprite = Resources.Load<Sprite>(resourcePath);
         if (cardMainImage != null && mainSprite != null)
         {

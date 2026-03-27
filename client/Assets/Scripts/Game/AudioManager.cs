@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class AudioManager : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class AudioManager : MonoBehaviour
     [Header("SFX Clips")]
     public AudioClip cardHoverClip;
     public AudioClip cardDrawClip;
+
+    private Dictionary<int, AudioClip> cardAudioMap = new Dictionary<int, AudioClip>();
 
     private void Awake()
     {
@@ -118,6 +121,35 @@ public class AudioManager : MonoBehaviour
         if (sfxSource != null && cardDrawClip != null)
         {
             sfxSource.PlayOneShot(cardDrawClip);
+        }
+    }
+
+    public void PlayCardAudio(int cardType)
+    {
+        if (cardAudioMap.TryGetValue(cardType, out AudioClip clip))
+        {
+            if (sfxSource != null && clip != null)
+            {
+                sfxSource.PlayOneShot(clip);
+            }
+            return;
+        }
+
+        // Try to load from the paths mentioned in prompt or found in project
+        clip = Resources.Load<AudioClip>($"Audio/SFX/BasicCharacterAudio/{cardType}");
+        if (clip == null) clip = Resources.Load<AudioClip>($"Audios/CardAudio/{cardType}");
+
+        if (clip != null)
+        {
+            cardAudioMap[cardType] = clip;
+            if (sfxSource != null)
+            {
+                sfxSource.PlayOneShot(clip);
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[AudioManager] No audio clip found for cardType: {cardType}");
         }
     }
 

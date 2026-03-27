@@ -13,6 +13,7 @@ public class PlayFieldManager : MonoBehaviour
 
     [Header("Prefabs")]
     public GameObject cardPrefab;
+    public GameObject targetingEffectPrefab;
 
     [Header("Settings")]
     public float playAnimDuration = 0.5f;
@@ -397,8 +398,70 @@ public class PlayFieldManager : MonoBehaviour
         ResponsePlayCardEventArgs res = args as ResponsePlayCardEventArgs;
         if (res == null) return;
 
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayCardAudio(res.CardType);
+
+        // --- NEW: Trigger targeting visual effects from UI to UI ---
+        if (res.TargetIds != null && res.TargetIds.Count > 0)
+        {
+            TriggerTargetingEffects(res.PlayerId, res.TargetIds);
+        }
+
         // Add to animation queue to ensure sequence
         AnimationController.Instance.AddAnimation(AnimateCardPlay(res));
+    }
+
+    private void TriggerTargetingEffects(int sourceId, List<int> targetIds)
+    {
+        if (targetingEffectPrefab == null) return;
+
+        // Find source position (Player who played the card)
+        Vector3 sourcePos = Vector3.zero;
+        if (GameSession.Instance.Players.TryGetValue(sourceId, out PlayerData sourceData) && sourceData.ChampionObject != null)
+        {
+            sourcePos = sourceData.ChampionObject.transform.position;
+        }
+
+        foreach (int targetId in targetIds)
+        {
+            if (GameSession.Instance.Players.TryGetValue(targetId, out PlayerData targetData) && targetData.ChampionObject != null)
+            {
+                Vector3 targetPos = targetData.ChampionObject.transform.position;
+                StartCoroutine(FireProjectile(sourcePos, targetPos));
+            }
+        }
+    }
+
+    private IEnumerator FireProjectile(Vector3 start, Vector3 end)
+    {
+        GameObject effect = Instantiate(targetingEffectPrefab, playFieldPanel);
+        
+        // Ensure effect stays in World Space if the Canvas is World Space
+        effect.transform.position = start;
+
+        float elapsed = 0;
+        float projectileDuration = 0.5f;
+
+        while (elapsed < projectileDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / projectileDuration;
+            
+            // Linear lerp for the projectile
+            effect.transform.position = Vector3.Lerp(start, end, t);
+            yield return null;
+        }
+
+        // Particle systems often have trails or sub-emitters, 
+        // give it a moment to die naturally before destroying the object
+        var ps = effect.GetComponentInChildren<ParticleSystem>();
+        if (ps != null)
+        {
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            yield return new WaitForSeconds(1.0f);
+        }
+
+        Destroy(effect);
     }
 
     private IEnumerator AnimateCardPlay(ResponsePlayCardEventArgs res)
