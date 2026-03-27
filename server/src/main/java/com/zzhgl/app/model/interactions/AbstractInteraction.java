@@ -33,6 +33,21 @@ public abstract class AbstractInteraction {
     public boolean isNegationEvaluated() { return negationEvaluated; }
     public void setNegationEvaluated(boolean evaluated) { this.negationEvaluated = evaluated; }
 
+    public String getMessage() {
+        String message = "";
+        if(caster != null) {
+            message += caster.getSelectedChampion().getChampionName() + " used ";
+        }
+        if(card != null) {
+            message += card.getClass().getSimpleName() + " on ";
+        }
+        if(target != null) {
+            message += target.getSelectedChampion().getChampionName();
+        }
+        return message;
+
+    }
+
     /**
      * Executes the actual logic of the interaction (e.g., subtracting HP, pushing prompt states).
      */

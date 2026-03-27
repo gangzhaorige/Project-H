@@ -20,7 +20,9 @@ public class FireCard extends AbstractSpecialCard {
     public void play(GameManager game, Player caster, List<Integer> targetIds) {
         List<Player> targets = game.getAlivePlayersClockwise(caster);
         targets.remove(caster);
-        
+        for(Player p : targets) {
+            targetIds.add(p.getID());
+        }
         // Push in reverse order so they resolve from the stack in clockwise order
         for (int i = targets.size() - 1; i >= 0; i--) {
             Player target = targets.get(i);
