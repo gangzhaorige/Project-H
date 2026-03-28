@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 using ProjectH.Models;
 
 namespace ProjectH.Rules
@@ -10,14 +11,20 @@ namespace ProjectH.Rules
             return 1;
         }
 
+        public override bool CanPlay(CardData card, PlayerData caster)
+        {
+            if (!base.CanPlay(card, caster)) return false;
+
+            // Must have at least one valid target
+            return GameSession.Instance.Players.Values.Any(p => CanTarget(card, caster, p));
+        }
+
         public override bool CanTarget(CardData card, PlayerData caster, PlayerData target)
         {
             if (caster.PlayerId == target.PlayerId) return false;
 
-            // Target must have cards in hand
-            // Wait, we don't always know target hand size precisely in PlayerData unless we track it
-            // Assuming target.Hand.Count or another metric is updated, or we just rely on range check
-            // and let server reject if hand is empty.
+            // Target must be alive and have at least one card in hand
+            if (!target.IsAlive || target.Hand.Count == 0) return false;
 
             int distance = GetDistance(caster.PlayerId, target.PlayerId);
             int effectiveDistance = distance + target.Champion.SpecialDefense;

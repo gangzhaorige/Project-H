@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 using ProjectH.Models;
 
 namespace ProjectH.Rules
@@ -10,7 +11,10 @@ namespace ProjectH.Rules
             if (!base.CanPlay(card, caster)) return false;
 
             // Follow server-side logic: check if attack limit has been reached
-            return caster.Champion.CurNumOfAttack < caster.Champion.MaxNumOfAttack;
+            if (caster.Champion.CurNumOfAttack >= caster.Champion.MaxNumOfAttack) return false;
+
+            // Check if there is at least one valid target in range
+            return GameSession.Instance.Players.Values.Any(p => p.IsAlive && CanTarget(card, caster, p));
         }
 
         public override int GetMaxTargets(CardData card)

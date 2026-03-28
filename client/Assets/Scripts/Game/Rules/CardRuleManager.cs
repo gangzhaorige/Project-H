@@ -11,10 +11,16 @@ namespace ProjectH.Rules
         static CardRuleManager()
         {
             Rules.Add((int)CardData.NormalType.ATTACK, new AttackCardRule());
+            Rules.Add((int)CardData.NormalType.HEAL, new HealCardRule());
             Rules.Add((int)CardData.NormalType.DODGE, new DodgeCardRule());
+            Rules.Add((int)CardData.SpecialType.HEAL_ALL, new HealAllCardRule());
             Rules.Add((int)CardData.SpecialType.PRISON, new PrisonCardRule());
+            // Add other rules as needed
             Rules.Add((int)CardData.SpecialType.STEAL, new StealCardRule());
             Rules.Add((int)CardData.SpecialType.DISMANTLE, new DismantleCardRule());
+            Rules.Add((int)CardData.SpecialType.FIRE, new FireCardRule());
+            Rules.Add((int)CardData.SpecialType.ARROW, new ArrowCardRule());
+            Rules.Add((int)CardData.SpecialType.DUEL, new DuelCardRule());
             // Add other rules as needed
         }
 

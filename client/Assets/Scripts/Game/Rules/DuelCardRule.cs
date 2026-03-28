@@ -1,10 +1,9 @@
-using UnityEngine;
 using System.Linq;
 using ProjectH.Models;
 
 namespace ProjectH.Rules
 {
-    public class DismantleCardRule : BaseCardRule
+    public class DuelCardRule : BaseCardRule
     {
         public override int GetMaxTargets(CardData card)
         {
@@ -21,11 +20,11 @@ namespace ProjectH.Rules
 
         public override bool CanTarget(CardData card, PlayerData caster, PlayerData target)
         {
-            // Dismantle can target anyone except self
+            // Cannot duel self
             if (caster.PlayerId == target.PlayerId) return false;
 
-            // Target must be alive and have at least one card in hand
-            return target.IsAlive && target.Hand.Count > 0;
+            // Target must be alive
+            return target.IsAlive;
         }
     }
 }

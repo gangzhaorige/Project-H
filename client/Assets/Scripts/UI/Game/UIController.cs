@@ -265,21 +265,58 @@ public class UIController : MonoBehaviour
         ShowPassButton(canPass);
 
         // 3. Confirm Play Button: Visible when at least one card is selected
-        bool hasSelection = (_handManager != null && _handManager.GetSelectedCardIds().Count > 0);
-        ShowConfirmPlayButton(hasSelection);
+        var selectedIds = _handManager != null ? _handManager.GetSelectedCardIds() : new System.Collections.Generic.List<int>();
+        bool hasSelection = selectedIds.Count > 0;
 
         if (confirmPlayButton != null)
         {
-            bool multipleCards = _handManager != null && _handManager.GetSelectedCardIds().Count > 1;
-            if (currentState == "PlayActionState" && !isForcedResponse && multipleCards)
+            if (!hasSelection)
             {
                 confirmPlayButton.interactable = false;
             }
             else
             {
-                confirmPlayButton.interactable = true;
+                bool multipleCards = selectedIds.Count > 1;
+                if (currentState == "PlayActionState" && !isForcedResponse && multipleCards)
+                {
+                    confirmPlayButton.interactable = false;
+                }
+                else if (selectedIds.Count == 1)
+                {
+                    // Check if the first selected card can actually be played (ruling check)
+                    int cardId = selectedIds[0];
+                    PlayerData localPlayer = GameSession.Instance.GetLocalPlayer();
+                    CardData card = localPlayer?.Hand.Find(c => c.Id == cardId);
+                    if (card != null)
+                    {
+                        if (currentState == "PlayActionState" && !isForcedResponse)
+                        {
+                            confirmPlayButton.interactable = ProjectH.Rules.CardRuleManager.CanPlay(card, localPlayer);
+                        }
+                        else if (isForcedResponse)
+                        {
+                            int required = GameSession.Instance.RequiredCardType;
+                            // If a specific type is required, card must match. 
+                            // If required is 0 or -1, it's usually ANY or handled by state, default to true.
+                            confirmPlayButton.interactable = (required <= 0 || card.Type == required);
+                        }
+                        else
+                        {
+                            confirmPlayButton.interactable = true;
+                        }
+                    }
+                    else
+                    {
+                        confirmPlayButton.interactable = true;
+                    }
+                }
+                else
+                {
+                    confirmPlayButton.interactable = true; // For forced responses with multiple cards, etc.
+                }
             }
         }
+        ShowConfirmPlayButton(hasSelection);
     }
 
     private void OnConfirmPlayClick()
@@ -320,6 +357,19 @@ public class UIController : MonoBehaviour
 
         if (GameSession.Instance.IsResponseRequired)
         {
+            // If it's a non-forced response window (RequiredCardType == -1), it behaves like PlayActionState (can play anything).
+            // We should check if the card requires targets.
+            if (GameSession.Instance.RequiredCardType == -1)
+            {
+                int maxTargets = ProjectH.Rules.CardRuleManager.GetMaxTargets(cardData);
+                if (maxTargets > 0)
+                {
+                    Debug.Log($"[UIController] Response card {cardData.Type} requires {maxTargets} targets. Showing UI.");
+                    if (_cardTargetSelector != null) _cardTargetSelector.BeginTargeting(cardData);
+                    return;
+                }
+            }
+
             // Just send all selected cards for now. Usually, it's 1 card to defend/duel.
             Debug.Log($"[UIController] Playing response cards automatically.");
             SendPlayRequest(selectedIds, new System.Collections.Generic.List<int>());

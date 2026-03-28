@@ -101,7 +101,7 @@ public class TargetSelectionManager : MonoBehaviour
             if (pData.PlayerId == Constants.USER_ID) continue;
 
             bool inRange = true;
-            if (currentCard != null && currentCard.Type == (int)CardData.NormalType.ATTACK)
+            if (currentCard != null)
             {
                 inRange = _cardTargetSelector != null && _cardTargetSelector.CanTarget(Constants.USER_ID, pData.PlayerId);
                 

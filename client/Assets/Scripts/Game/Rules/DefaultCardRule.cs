@@ -6,7 +6,6 @@ namespace ProjectH.Rules
     {
         public override int GetMaxTargets(CardData card)
         {
-            if (card.Type == (int)CardData.SpecialType.DUEL) return 1;
             return 0;
         }
     }

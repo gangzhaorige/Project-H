@@ -34,6 +34,8 @@ namespace ProjectH.Models
         public GameObject ChampionObject; // Reference to the spawned prefab
         public List<CardData> Hand = new List<CardData>();
 
+        public bool IsAlive => Champion != null && Champion.CurHP > 0;
+
         public delegate void HandChanged();
         public event HandChanged OnHandChanged;
 
