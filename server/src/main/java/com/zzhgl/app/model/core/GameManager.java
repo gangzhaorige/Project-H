@@ -290,6 +290,19 @@ public class GameManager {
         return stateStack.peek();
     }
 
+    /**
+     * Finds the first state of a specific type in the stack, starting from the top.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends GameState> T findState(Class<T> stateClass) {
+        for (GameState state : stateStack) {
+            if (stateClass.isInstance(state)) {
+                return (T) state;
+            }
+        }
+        return null;
+    }
+
     public List<Player> getPlayers() {
         return players;
     }

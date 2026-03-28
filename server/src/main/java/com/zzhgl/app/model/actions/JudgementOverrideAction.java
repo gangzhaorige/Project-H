@@ -1,5 +1,6 @@
 package com.zzhgl.app.model.actions;
 
+import com.zzhgl.app.model.States.JudgementState;
 import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
@@ -36,7 +37,8 @@ public class JudgementOverrideAction implements GameAction {
 
         // Calculate result for UI
         boolean judgeResult = false;
-        if (game.getCurrentState() instanceof com.zzhgl.app.model.States.JudgementState judgeState) {
+        JudgementState judgeState = game.findState(JudgementState.class);
+        if (judgeState != null) {
             judgeResult = judgeState.getEffect().evaluateJudgement(game, newCard);
         }
 

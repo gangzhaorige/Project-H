@@ -1,5 +1,6 @@
 package com.zzhgl.app.model.actions;
 
+import com.zzhgl.app.model.States.JudgementState;
 import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
@@ -33,7 +34,8 @@ public class JudgementSwapperAction implements GameAction {
             
             // Calculate current evaluation for the UI
             boolean judgeResult = false;
-            if (game.getCurrentState() instanceof com.zzhgl.app.model.States.JudgementState judgeState) {
+            JudgementState judgeState = game.findState(JudgementState.class);
+            if (judgeState != null) {
                 judgeResult = judgeState.getEffect().evaluateJudgement(game, handCard);
             }
 
