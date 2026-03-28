@@ -5,6 +5,7 @@ import com.zzhgl.app.model.Command.PassPriorityCommand;
 import com.zzhgl.app.model.Command.PlayCardCommand;
 import com.zzhgl.app.model.cards.AbstractCard;
 import com.zzhgl.app.model.cards.AbstractSpecialCard;
+import com.zzhgl.app.model.core.GameEvent;
 import com.zzhgl.app.model.core.GameManager;
 import com.zzhgl.app.model.core.Player;
 import com.zzhgl.app.model.interactions.AbstractInteraction;
@@ -131,6 +132,10 @@ public class NegationState implements GameState {
                 player.getHand().removeCard(card);
                 Log.printf("Player %d played NegateCard in NegationState.", player.getID());
                 
+                game.emitEvent(new GameEvent(GameEvent.EventType.CARD_PLAYED)
+                    .setParam("card", card)
+                    .setParam("player", player));
+
                 // Increment negate count instead of pushing a new NegateInteraction to the stack
                 negateCount++;
 

@@ -142,7 +142,9 @@ public class PlayActionState implements GameState {
 
             // 3. Play the card, pushing interactions to the stack
             card.play(game, player, cmd.getTargetIds());
-            game.emitEvent(new GameEvent(GameEvent.EventType.CARD_PLAYED).setParam("card", card));
+            game.emitEvent(new GameEvent(GameEvent.EventType.CARD_PLAYED)
+                .setParam("card", card)
+                .setParam("player", player));
             // 4. Notify everyone
             ResponsePlayCard response = new ResponsePlayCard(player.getID(), card, cmd.getTargetIds());
             for (Player p : game.getPlayers()) {
