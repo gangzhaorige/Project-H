@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4531017687157960328}
   - component: {fileID: 8233871551469877741}
+  - component: {fileID: 6585733466142392068}
   m_Layer: 0
   m_Name: SkillActivationManager
   m_TagString: Untagged
@@ -45,3 +46,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillActivationManager
   skillActivationPrefab: {fileID: 4171935375407198521, guid: 9cc673c34a9ab4130b1f0b6dddc06de3, type: 3}
+  _skillQueryUI: {fileID: 6585733466142392068}
+--- !u!114 &6585733466142392068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5469458571003199078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2164c2fb07d0545bb85b6a23c6e803a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkillQueryUI
+  _view: {fileID: 0}

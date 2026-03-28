@@ -10,6 +10,9 @@ public class SkillActivationManager : MonoBehaviour
     [Header("Prefabs")]
     public GameObject skillActivationPrefab;
     
+    [Header("UI")]
+    [SerializeField] private SkillQueryUI _skillQueryUI;
+    
     private Transform _uiContainer;
     private Dictionary<int, Sprite> championIcons = new Dictionary<int, Sprite>();
 
@@ -18,6 +21,10 @@ public class SkillActivationManager : MonoBehaviour
         if (canvasView != null)
         {
             _uiContainer = canvasView.skillActivationPanel;
+            if (_skillQueryUI != null)
+            {
+                _skillQueryUI.Init(canvasView.skillResponsePanelView);
+            }
         }
     }
 

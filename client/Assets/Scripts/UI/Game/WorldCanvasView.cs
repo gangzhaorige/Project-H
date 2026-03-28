@@ -21,9 +21,6 @@ namespace ProjectH.UI
         [Header("Player Hand")]
         [Tooltip("The container that holds the local player's current hand of cards.")]
         public RectTransform handPanel;
-        
-        [Tooltip("The position used to display a specific card prominently (e.g., during targeting or skill resolution).")]
-        public RectTransform displayCardPosition;
 
         [Header("Components")]
         [Tooltip("The layout handler for the player's hand.")]

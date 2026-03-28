@@ -146,7 +146,7 @@ public class GameInitiator : MonoBehaviour
             handManager.Init(cardAnimationManager, animationController, worldCanvasView);
 
         if (playFieldManager != null) 
-            playFieldManager.Init(cardAnimationManager, animationController, worldCanvasView);
+            playFieldManager.Init(cardAnimationManager, animationController, handManager, worldCanvasView);
 
         if (uiController != null) 
             uiController.Init(handManager, cardTargetSelector, canvasView);

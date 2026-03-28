@@ -1,20 +1,21 @@
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using ProjectH.Models;
+using ProjectH.UI;
 
 public class SkillQueryUI : MonoBehaviour
 {
     public static SkillQueryUI Instance { get; private set; }
 
     [Header("UI References")]
-    public GameObject panel;
-    public TextMeshProUGUI queryText;
-    public Button yesButton;
-    public Button noButton;
+    private SkillResponsePanelView _view;
 
     private int currentSkillId;
-    private int currentTargetId; // If needed, although not used for request anymore
+
+    public void Init(SkillResponsePanelView view)
+    {
+        _view = view;
+        Hide();
+    }
 
     private void Awake()
     {
@@ -23,9 +24,6 @@ public class SkillQueryUI : MonoBehaviour
             return;
         }
         Instance = this;
-
-        if (yesButton != null) yesButton.onClick.AddListener(() => OnResponse(true));
-        if (noButton != null) noButton.onClick.AddListener(() => OnResponse(false));
 
         Hide();
     }
@@ -61,13 +59,15 @@ public class SkillQueryUI : MonoBehaviour
 
     public void Show(string message)
     {
-        if (queryText != null) queryText.text = message;
-        if (panel != null) panel.SetActive(true);
+        if (_view != null)
+        {
+            _view.Show(message, () => OnResponse(true), () => OnResponse(false));
+        }
     }
 
     public void Hide()
     {
-        if (panel != null) panel.SetActive(false);
+        if (_view != null) _view.Hide();
     }
 
     private void OnResponse(bool accepted)

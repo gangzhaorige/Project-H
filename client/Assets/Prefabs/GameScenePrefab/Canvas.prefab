@@ -3063,6 +3063,7 @@ GameObject:
   - component: {fileID: 3306259226791151387}
   - component: {fileID: 2093516904694451307}
   - component: {fileID: 6323374863355441235}
+  - component: {fileID: 7931109897512834831}
   m_Layer: 5
   m_Name: SkillResponsePanel
   m_TagString: Untagged
@@ -3129,6 +3130,22 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7931109897512834831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7193450165937215626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7441a059e14bf44338c23fbd104f1b11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectH.UI.SkillResponsePanelView
+  _panel: {fileID: 7193450165937215626}
+  _messageText: {fileID: 7618761179625759689}
+  _yesButton: {fileID: 4417693710506040520}
+  _noButton: {fileID: 2639929239310124085}
 --- !u!1 &7580283017011765604
 GameObject:
   m_ObjectHideFlags: 0
@@ -4047,12 +4064,13 @@ MonoBehaviour:
   passButton: {fileID: 4471086671773512024}
   confirmPlayButton: {fileID: 7844467199784362600}
   turnStatusText: {fileID: 6109241205489249798}
-  instructionText: {fileID: 0}
+  instructionText: {fileID: 8572660086098912459}
   stateText: {fileID: 5457024334959724212}
   timerUI: {fileID: 2981695372575876435}
   timerSlider: {fileID: 8753253819201135286}
-  targetSelectionPanelView: {fileID: 0}
+  targetSelectionPanelView: {fileID: 2742154628996889580}
   selectPanelView: {fileID: 1033915643833672773}
+  skillResponsePanelView: {fileID: 7931109897512834831}
   skillPanel: {fileID: 1437111636061199303}
   skillActivationPanel: {fileID: 1540355384392364457}
   skillContainer: {fileID: 1437111636061199303}

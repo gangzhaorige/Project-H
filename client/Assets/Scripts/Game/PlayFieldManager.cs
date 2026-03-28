@@ -7,7 +7,7 @@ public class PlayFieldManager : MonoBehaviour
 {
     // --- UI Containers ---
     private RectTransform playFieldPanel; // Where the card will land
-    public HandManager handManager;
+    private HandManager _handManager;
 
     [Header("Prefabs")]
     public GameObject cardPrefab;
@@ -23,10 +23,11 @@ public class PlayFieldManager : MonoBehaviour
 
     private AnimationController _animationController;
 
-    public void Init(CardAnimationManager cardAnimationManager, AnimationController animationController, ProjectH.UI.WorldCanvasView canvasView)
+    public void Init(CardAnimationManager cardAnimationManager, AnimationController animationController, HandManager handManager, ProjectH.UI.WorldCanvasView canvasView)
     {
         _cardAnimationManager = cardAnimationManager;
         _animationController = animationController;
+        _handManager = handManager;
         if (canvasView != null) playFieldPanel = canvasView.playFieldPanel;
         Debug.Log("[PlayFieldManager] Initialized.");
     }
@@ -128,7 +129,7 @@ public class PlayFieldManager : MonoBehaviour
             
             // HandManager reparents the card, maintains its world position, and starts moving it to its final slot
             // while simultaneously adjusting all other cards.
-            handManager.RegisterAnimatedCard(data, cardGO);
+            _handManager.RegisterAnimatedCard(data, cardGO);
             GameSession.Instance.GetLocalPlayer().AddCard(data);
 
             if (AudioManager.Instance != null) AudioManager.Instance.PlayCardMoveSFX();
@@ -190,10 +191,10 @@ public class PlayFieldManager : MonoBehaviour
 
         if (isLocal)
         {
-            cardGO = handManager.GetCardObject(res.CardId);
+            cardGO = _handManager.GetCardObject(res.CardId);
             if (cardGO != null)
             {
-                handManager.UnregisterCard(res.CardId);
+                _handManager.UnregisterCard(res.CardId);
                 
                 // Disable interaction script when moving to field
                 var ui = cardGO.GetComponent<CardUIController>();
@@ -269,11 +270,11 @@ public class PlayFieldManager : MonoBehaviour
 
         if (isLocal)
         {
-            handCardGO = handManager.GetCardObject(res.PlayedCardId);
+            handCardGO = _handManager.GetCardObject(res.PlayedCardId);
             if (handCardGO != null)
             {
-                originalIndex = handManager.GetCardIndex(res.PlayedCardId); // --- NEW: Save index ---
-                handManager.UnregisterCard(res.PlayedCardId);
+                originalIndex = _handManager.GetCardIndex(res.PlayedCardId); // --- NEW: Save index ---
+                _handManager.UnregisterCard(res.PlayedCardId);
 
                 // Disable interaction script when moving to field
                 var ui = handCardGO.GetComponent<CardUIController>();
@@ -332,7 +333,7 @@ public class PlayFieldManager : MonoBehaviour
                 CardData newCard = new CardData { Id = res.SwappedCardId, Suit = res.SwappedSuit, Value = res.SwappedValue, Type = res.SwappedCardType };
                 
                 // Give the object to HandManager
-                handManager.RegisterAnimatedCardAtIndex(newCard, fieldCardGO, originalIndex);
+                _handManager.RegisterAnimatedCardAtIndex(newCard, fieldCardGO, originalIndex);
                 
                 // Update local data model
                 GameSession.Instance.GetLocalPlayer().AddCard(newCard);
@@ -477,11 +478,11 @@ public class PlayFieldManager : MonoBehaviour
         if (isLocal)
         {
             // 1. Local Player: Find the card in HandManager and "take" it
-            cardGO = handManager.GetCardObject(res.CardId);
+            cardGO = _handManager.GetCardObject(res.CardId);
             if (cardGO != null)
             {
                 // Unregister from hand so it doesn't get reorganized
-                handManager.UnregisterCard(res.CardId);
+                _handManager.UnregisterCard(res.CardId);
 
                 // Disable interaction script when moving to field
                 var ui = cardGO.GetComponent<CardUIController>();

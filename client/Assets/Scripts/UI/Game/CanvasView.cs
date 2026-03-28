@@ -27,7 +27,7 @@ namespace ProjectH.UI
         [Header("Major Panels")]
         public TargetSelectionPanelView targetSelectionPanelView;
         public SelectPanelView selectPanelView;
-        public RectTransform skillPanel;
+        public SkillResponsePanelView skillResponsePanelView;
         public RectTransform skillActivationPanel;
         public RectTransform skillContainer;
     }
