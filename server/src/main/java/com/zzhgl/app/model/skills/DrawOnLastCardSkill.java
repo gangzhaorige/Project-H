@@ -23,8 +23,11 @@ public class DrawOnLastCardSkill extends AbstractSkill {
 
     @Override
     public boolean canTrigger(GameManager game, GameEvent event, Player owner) {
-        // Triggered after a card is played if the hand is now empty
-        return event.getType() == GameEvent.EventType.CARD_PLAYED && owner.getHand().size() == 0;
+        // Triggered after a card is played by the owner if their hand is now empty
+        if (event.getType() != GameEvent.EventType.CARD_PLAYED) return false;
+        
+        Player cardPlayer = (Player) event.getParam("player");
+        return cardPlayer != null && cardPlayer.equals(owner) && owner.getHand().size() == 0;
     }
 
     @Override
