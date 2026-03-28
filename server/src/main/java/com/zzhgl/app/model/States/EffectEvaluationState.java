@@ -64,7 +64,12 @@ public class EffectEvaluationState implements GameState {
 
     @Override
     public void onResume(GameManager game) {
-        // A child state (like NegationState -> JudgementState) finished.
+        // A child state (like NegationState -> JudgementState -> ActionResolveState) finished.
+        
+        // --- NEW: Check if there are actions pending from that resolution ---
+        game.resolveActions();
+        if (game.getCurrentState() != this) return;
+
         // Evaluate the next effect in the queue.
         evaluateNext(game);
     }

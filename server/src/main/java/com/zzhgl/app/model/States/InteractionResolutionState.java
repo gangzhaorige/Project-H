@@ -22,7 +22,12 @@ public class InteractionResolutionState implements GameState {
 
     @Override
     public void onResume(GameManager game) {
-        // This is called after a skill pushed on top of this state is popped.
+        // This is called after a skill/judgement/resolve pushed on top of this state is popped.
+        
+        // --- NEW: Check if there are actions pending from that resolution ---
+        game.resolveActions();
+        if (game.getCurrentState() != this) return;
+
         processNext(game);
     }
 

@@ -98,9 +98,7 @@ public class JudgementState implements GameState {
         game.popState();
 
         // If actions were added (e.g. AddCardToHand), ensure they are processed with pacing
-        if (!game.getActionQueue().isEmpty()) {
-            game.pushState(new ActionResolveState());
-        }
+        game.resolveActions();
     }
 
 

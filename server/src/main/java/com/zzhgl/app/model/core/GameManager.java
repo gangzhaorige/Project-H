@@ -2,6 +2,7 @@ package com.zzhgl.app.model.core;
 
 import com.zzhgl.app.core.NetworkManager;
 import com.zzhgl.app.model.Command.Command;
+import com.zzhgl.app.model.States.ActionResolveState;
 import com.zzhgl.app.model.States.GameState;
 import com.zzhgl.app.model.States.InteractionResolutionState;
 import com.zzhgl.app.model.States.SkillResolutionState;
@@ -182,6 +183,15 @@ public class GameManager {
 
         // Instead of passing a list, the state now pulls from the GameManager's stack
         pushState(new InteractionResolutionState());
+    }
+
+    /**
+     * Pushes ActionResolveState to process pending actions if not already processing.
+     */
+    public void resolveActions() {
+        if (actionQueue.isEmpty()) return;
+        if (getCurrentState() instanceof ActionResolveState) return;
+        pushState(new ActionResolveState());
     }
 
     public int getDistance(int p1Id, int p2Id) {

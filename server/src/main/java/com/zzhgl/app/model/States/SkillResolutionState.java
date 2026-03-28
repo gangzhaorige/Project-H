@@ -63,10 +63,8 @@ public class SkillResolutionState implements GameState {
         cancelTimer(game);
 
         // 1. If there are existing actions to process, push ActionResolveState
-        if (!game.getActionQueue().isEmpty()) {
-            game.pushState(new ActionResolveState());
-            return;
-        }
+        game.resolveActions();
+        if (game.getCurrentState() != this) return;
 
         // 2. If no more skills to resolve, finish
         if (queue.isEmpty()) {
@@ -99,7 +97,7 @@ public class SkillResolutionState implements GameState {
             if (actions != null && !actions.isEmpty()) {
                 game.getActionQueue().addAll(actions);
                 notifySkillActivation(game, next.owner, next.skill);
-                game.pushState(new ActionResolveState());
+                game.resolveActions();
             } else {
                 resolveNext(game);
             }
@@ -158,7 +156,7 @@ public class SkillResolutionState implements GameState {
                     game.getActionQueue().addAll(actions);
                     notifySkillActivation(game, current.owner, current.skill);
                     queue.poll();
-                    game.pushState(new ActionResolveState());
+                    game.resolveActions();
                 } else {
                     // Skill returned null/empty but was accepted - likely needs more input (PlayCard)
                     current.isWaitingForInput = true;
@@ -177,7 +175,7 @@ public class SkillResolutionState implements GameState {
                 notifySkillActivation(game, current.owner, current.skill);
                 cancelTimer(game);
                 queue.poll();
-                game.pushState(new ActionResolveState());
+                game.resolveActions();
             } else {
                 current.isWaitingForInput = true;
                 Log.printf("Skill execution for %s returned null/empty. Invalid input? Timer continues.", current.skill.getName());
