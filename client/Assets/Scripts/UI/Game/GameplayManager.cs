@@ -2,11 +2,14 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using ProjectH.Models;
+using Cysharp.Threading.Tasks;
 
 public class GameplayManager : MonoBehaviour
 {
     private HandManager _handManager;
     private ChampionSetup _championSetup;
+
+    public UniTaskCompletionSource<ResponseGameSetupEventArgs> GameSetupDataReceived = new();
 
     public void Init(HandManager handManager, CardTargetSelector cardTargetSelector, ProjectH.UI.CanvasView canvasView, ChampionSetup championSetup)
     {
@@ -75,39 +78,35 @@ public class GameplayManager : MonoBehaviour
         ResponseGameSetupEventArgs res = args as ResponseGameSetupEventArgs;
         if (res == null) return;
 
-        StartCoroutine(EstablishSceneRoutine(res));
+        GameSetupDataReceived.TrySetResult(res);
     }
 
-    private IEnumerator EstablishSceneRoutine(ResponseGameSetupEventArgs res)
+    public async UniTask PreloadAssets(ResponseGameSetupEventArgs res)
     {
-        Debug.Log("[GameplayManager] Starting Scene Establishment...");
+        Debug.Log("[GameplayManager] Starting PreloadAssets...");
 
-        // 1. Initialize Champions (Prefab Spawning)
-        if (_championSetup != null) _championSetup.InitializeChampions(res.Players);
-        yield return null; // Wait a frame
-
-        // 2. Preload Addressables via ChampionAssetManager
+        // 1. Preload Addressables via ChampionAssetManager
         int totalChamps = res.Players.Count;
-        int loadedChamps = 0;
+        int loadedChampsCount = 0;
+
+        List<UniTask> preloadTasks = new List<UniTask>();
 
         foreach (var playerInfo in res.Players)
         {
-            if (playerInfo.Champion == null) { loadedChamps++; continue; }
+            if (playerInfo.Champion == null) { loadedChampsCount++; continue; }
 
-            bool soLoaded = false;
+            var tcs = new UniTaskCompletionSource();
+            preloadTasks.Add(tcs.Task);
+
             ChampionAssetManager.Instance.GetChampionSO(playerInfo.Champion.ChampionId, (so) =>
             {
-                // We don't necessarily need to wait for individual sprites here if the components 
-                // load them lazily, but preloading the SO is essential.
-                // To be thorough, let's preload the key images too.
                 int imagesToLoad = 3;
                 int imagesLoaded = 0;
 
                 System.Action checkImage = () => {
                     imagesLoaded++;
                     if (imagesLoaded >= imagesToLoad) {
-                        loadedChamps++;
-                        soLoaded = true;
+                        tcs.TrySetResult();
                     }
                 };
 
@@ -115,19 +114,18 @@ public class GameplayManager : MonoBehaviour
                 ChampionAssetManager.Instance.GetSprite(so.elementImage, (s) => checkImage());
                 ChampionAssetManager.Instance.GetSprite(so.pathImage, (s) => checkImage());
             });
-
-            // Wait for this champion's critical assets
-            while (!soLoaded) yield return null;
         }
 
-        // 3. Load Audio
+        await UniTask.WhenAll(preloadTasks);
+
+        // 2. Load Audio
         LoadAllSkillAudios();
-        yield return null;
+        await UniTask.Yield();
+    }
 
-        // 4. Finalize
-        GameSession.Instance.TriggerGameSetupCompleted();
-
-        Debug.Log("[GameplayManager] Scene Establishment Complete. Sending RequestReadyToPlay.");
+    public void SendReadyToPlayRequest()
+    {
+        Debug.Log("[GameplayManager] Setup Completed. Sending ReadyToPlay Request.");
         RequestReadyToPlay readyReq = new RequestReadyToPlay();
         readyReq.Send();
         NetworkManager.Instance.SendRequest(readyReq);
@@ -202,7 +200,7 @@ public class GameplayManager : MonoBehaviour
         ResponseTurnStartEventArgs res = args as ResponseTurnStartEventArgs;
         if (res == null) return;
 
-        Debug.Log($"[GameplayManager] Turn started for player {res.ActivePlayerId}.");
+        Debug.Log($"[GameplayManager] Turn Start for {res.ActivePlayerId}");
         GameSession.Instance.ActivePlayerId = res.ActivePlayerId;
         GameSession.Instance.TriggerTurnStarted(res.ActivePlayerId);
     }
@@ -210,57 +208,10 @@ public class GameplayManager : MonoBehaviour
     private void OnTurnEnd(ExtendedEventArgs args)
     {
         ResponseEndTurnEventArgs res = args as ResponseEndTurnEventArgs;
-        if (res != null) Debug.Log($"[GameplayManager] Turn ended for player {res.EndedPlayerId}");
-        
+        if (res == null) return;
+
+        Debug.Log("[GameplayManager] Turn End.");
         GameSession.Instance.ActivePlayerId = -1;
-        GameSession.Instance.TriggerTimerCancelled();
-
-        foreach (var player in GameSession.Instance.Players.Values)
-        {
-            if (player.ChampionObject != null)
-            {
-                var controller = player.ChampionObject.GetComponent<ChampionController>();
-                if (controller != null) controller.ToggleActive(false);
-            }
-        }
-    }
-
-    private void OnSelectCardsFromOpponent(ExtendedEventArgs args)
-    {
-        ResponseSelectCardsFromOpponentEventArgs res = args as ResponseSelectCardsFromOpponentEventArgs;
-        if (res == null) return;
-
-        Debug.Log($"[GameplayManager] Opponent selection requested: {res.Amount} card(s) from {res.TargetPlayerId}");
-        GameSession.Instance.TriggerSelectCardsFromOpponent(res.TargetPlayerId, res.Amount, res.Duration, res.Message, res.TargetHandSize);
-    }
-
-    private void OnSelectCardsResponse(ExtendedEventArgs args)
-    {
-        Debug.Log("[GameplayManager] Card selection completed/confirmed by server.");
-        GameSession.Instance.TriggerSelectCardsCompleted();
-    }
-
-    private void OnMoveCardResponse(ExtendedEventArgs args)
-    {
-        ResponseMoveCardEventArgs res = args as ResponseMoveCardEventArgs;
-        if (res == null) return;
-
-        Debug.Log($"[GameplayManager] Move Card event: {res.Cards.Count} cards from {res.TargetId} to {res.CasterId}. Details Visible: {res.ShowDetails}");
-        if (_handManager != null) _handManager.HandleMoveCard(res);
-    }
-
-    private void OnUpdatePlayerOrder(ExtendedEventArgs args)
-    {
-        ResponseUpdatePlayerOrderEventArgs res = args as ResponseUpdatePlayerOrderEventArgs;
-        if (res == null) return;
-
-        Debug.Log($"[GameplayManager] Updating Player Order: {string.Join(", ", res.PlayerOrder)}");
-        GameSession.Instance.PlayerOrder = res.PlayerOrder;
-        
-        if (_championSetup != null)
-        {
-            _championSetup.UpdateChampionPositions(res.PlayerOrder);
-        }
     }
 
     private void OnSkillActivated(ExtendedEventArgs args)
@@ -268,14 +219,14 @@ public class GameplayManager : MonoBehaviour
         ResponseSkillActivatedEventArgs res = args as ResponseSkillActivatedEventArgs;
         if (res == null) return;
 
-        Debug.Log($"[GameplayManager] Skill {res.SkillIndex} activated for Player {res.PlayerId}");
-        GameSession.Instance.TriggerSkillActivated(res.PlayerId, res.SkillIndex);
-
-        if (GameSession.Instance.Players.TryGetValue(res.PlayerId, out PlayerData player))
+        Debug.Log($"[GameplayManager] Skill activated by player {res.PlayerId}, skillIndex {res.SkillIndex}");
+        
+        // --- NEW: Play Champion Voice ---
+        if (GameSession.Instance.Players.TryGetValue(res.PlayerId, out PlayerData pData))
         {
-            if (player.Champion != null && player.Champion.SkillClips != null && res.SkillIndex < player.Champion.SkillClips.Count)
+            if (pData.Champion != null && pData.Champion.SkillClips != null && res.SkillIndex < pData.Champion.SkillClips.Count)
             {
-                List<AudioClip> clips = player.Champion.SkillClips[res.SkillIndex];
+                var clips = pData.Champion.SkillClips[res.SkillIndex];
                 if (clips != null && clips.Count > 0)
                 {
                     AudioClip clip = clips[Random.Range(0, clips.Count)];
@@ -286,16 +237,57 @@ public class GameplayManager : MonoBehaviour
                 }
             }
         }
+
+        GameSession.Instance.TriggerSkillActivated(res.PlayerId, res.SkillIndex);
+    }
+
+    private void OnSelectCardsFromOpponent(ExtendedEventArgs args)
+    {
+        ResponseSelectCardsFromOpponentEventArgs res = args as ResponseSelectCardsFromOpponentEventArgs;
+        if (res == null) return;
+
+        GameSession.Instance.TriggerSelectCardsFromOpponent(res.TargetPlayerId, res.Amount, res.Duration, res.Message, res.TargetHandSize);
+    }
+
+    private void OnSelectCardsResponse(ExtendedEventArgs args)
+    {
+        ResponseSelectCardsEventArgs res = args as ResponseSelectCardsEventArgs;
+        if (res == null) return;
+
+        GameSession.Instance.TriggerSelectCardsCompleted();
+    }
+
+    private void OnMoveCardResponse(ExtendedEventArgs args)
+    {
+        ResponseMoveCardEventArgs res = args as ResponseMoveCardEventArgs;
+        if (res == null) return;
+
+        if (_handManager != null)
+        {
+            _handManager.HandleMoveCard(res);
+        }
+    }
+
+    private void OnUpdatePlayerOrder(ExtendedEventArgs args)
+    {
+        ResponseUpdatePlayerOrderEventArgs res = args as ResponseUpdatePlayerOrderEventArgs;
+        if (res == null) return;
+
+        GameSession.Instance.PlayerOrder = res.PlayerOrder;
+        if (_championSetup != null)
+        {
+            _championSetup.UpdateChampionPositions(res.PlayerOrder);
+        }
     }
 
     private void LoadAllSkillAudios()
     {
-        TextAsset jsonText = Resources.Load<TextAsset>("Data/champions");
-        if (jsonText == null) return;
+        TextAsset skillData = Resources.Load<TextAsset>("Data/champions");
+        if (skillData == null) return;
 
-        string rawJson = jsonText.text;
+        string rawJson = skillData.text;
 
-        foreach (var player in GameSession.Instance.Players.Values)
+        foreach (PlayerData player in GameSession.Instance.Players.Values)
         {
             if (player.Champion == null) continue;
             player.Champion.SkillClips = new List<List<AudioClip>>();

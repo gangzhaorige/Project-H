@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using Cysharp.Threading.Tasks;
 using ProjectH.Core;
 using ProjectH.UI;
+using ProjectH.Models;
 
 public class GameInitiator : MonoBehaviour
 {
@@ -55,9 +56,9 @@ public class GameInitiator : MonoBehaviour
     private void BindObjects()
     {
         // 1. Infrastructure
-        Instantiate(_mainCamera);
-        Instantiate(_mainDirectionalLight);
-        Instantiate(_mainEventSystem);
+        _mainCamera = Instantiate(_mainCamera);
+        _mainDirectionalLight= Instantiate(_mainDirectionalLight);
+        _mainEventSystem = Instantiate(_mainEventSystem);
         if (_mainBoard != null) Instantiate(_mainBoard);
         _loadingScreen = Instantiate(_loadingScreen);
 
@@ -166,14 +167,37 @@ public class GameInitiator : MonoBehaviour
         if (gameplayManager != null) 
             gameplayManager.Init(handManager, cardTargetSelector, canvasView, championSetupInstance);
 
-        await UniTask.Delay(1000); 
+        await UniTask.Delay(100); 
         Debug.Log("Systems Ready.");
     }
 
     private async UniTask CreateObjects()
     {
         Debug.Log("Spawning objects...");
-        await UniTask.Delay(500); 
+        
+        _resolver.TryResolve<GameplayManager>(out var gameplayManager);
+        _resolver.TryResolve<ChampionSetup>(out var championSetup);
+
+        if (gameplayManager != null && championSetup != null)
+        {
+            Debug.Log("[GameInitiator] Waiting for Game Setup Data from server...");
+            var res = await gameplayManager.GameSetupDataReceived.Task;
+
+            Debug.Log("[GameInitiator] Spawning Champions and Skills...");
+            championSetup.InitializeChampions(res.Players);
+
+            Debug.Log("[GameInitiator] Preloading Assets...");
+            await gameplayManager.PreloadAssets(res);
+
+            GameSession.Instance.TriggerGameSetupCompleted();
+
+            gameplayManager.SendReadyToPlayRequest();
+        }
+        else
+        {
+            Debug.LogError("[GameInitiator] Critical Managers missing in CreateObjects!");
+        }
+
         Debug.Log("Objects Created.");
     }
 
