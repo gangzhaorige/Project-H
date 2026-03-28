@@ -8,9 +8,6 @@ public class ChampionSetup : MonoBehaviour
     public GameObject championPrefab; // Base champion prefab
     public GameObject skillPrefab;
 
-    [Header("UI Containers")]
-    public Transform skillContainer;
-
     private Vector3[] spawnPositions = new Vector3[]
     {
         new Vector3(-17.42f, 0.1f, -8.96f),
@@ -22,6 +19,17 @@ public class ChampionSetup : MonoBehaviour
     };
 
     private Dictionary<Transform, Coroutine> activeMoveCoroutines = new Dictionary<Transform, Coroutine>();
+
+    private HandManager _handManager;
+    private CardTargetSelector _cardTargetSelector;
+    private Transform _skillContainer;
+
+    public void Init(HandManager handManager, CardTargetSelector cardTargetSelector, ProjectH.UI.CanvasView canvasView)
+    {
+        _handManager = handManager;
+        _cardTargetSelector = cardTargetSelector;
+        if (canvasView != null) _skillContainer = canvasView.skillContainer;
+    }
 
     public void UpdateChampionPositions(List<int> newOrder)
     {
@@ -152,20 +160,20 @@ public class ChampionSetup : MonoBehaviour
                 controller.Init(data);
 
                 // Instantiate Skills ONLY for the local player
-                if (info.PlayerId == Constants.USER_ID && skillPrefab != null && skillContainer != null && data.Champion.SkillIds != null)
+                if (info.PlayerId == Constants.USER_ID && skillPrefab != null && _skillContainer != null && data.Champion.SkillIds != null)
                 {
                     foreach (int skillId in data.Champion.SkillIds)
                     {
                         SkillSO skillSO = Resources.Load<SkillSO>($"Data/Skills/{skillId}");
                         if (skillSO != null)
                         {
-                            GameObject skillGo = Instantiate(skillPrefab, skillContainer);
+                            GameObject skillGo = Instantiate(skillPrefab, _skillContainer);
                             skillGo.name = $"Skill_{skillSO.skillName}";
                             
                             SkillUIController skillUI = skillGo.GetComponent<SkillUIController>();
                             if (skillUI != null)
                             {
-                                skillUI.Init(skillSO);
+                                skillUI.Init(skillSO, _handManager, _cardTargetSelector);
                             }
                         }
                         else

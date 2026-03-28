@@ -9,15 +9,19 @@ using ProjectH.Rules;
  */
 public class CardTargetSelector : MonoBehaviour
 {
-    public static CardTargetSelector Instance { get; private set; }
+    private UIController _uiController;
+    private TargetSelectionManager _targetSelectionManager;
+    private HandManager _handManager;
 
     private CardData currentCard;
     private int currentSkillId = -1;
     private List<int> discardCardIds = new List<int>();
 
-    private void Awake()
+    public void Init(UIController uiController, TargetSelectionManager targetSelectionManager, HandManager handManager)
     {
-        Instance = this;
+        _uiController = uiController;
+        _targetSelectionManager = targetSelectionManager;
+        _handManager = handManager;
     }
 
     public void BeginTargeting(CardData card)
@@ -33,14 +37,14 @@ public class CardTargetSelector : MonoBehaviour
             return;
         }
         
-        if (UIController.Instance != null)
+        if (_uiController != null)
         {
-            UIController.Instance.ShowTargetSelectionPanel(true);
-            TargetSelectionUI.Instance.Show(card);
+            _uiController.ShowTargetSelectionPanel(true);
+            if (_targetSelectionManager != null) _targetSelectionManager.Show(card);
         }
         else
         {
-            Debug.LogError("[CardTargetSelector] UIController.Instance is missing!");
+            Debug.LogError("[CardTargetSelector] UIController is missing!");
         }
     }
 
@@ -53,10 +57,10 @@ public class CardTargetSelector : MonoBehaviour
         // Bronya's skill ID 10 targets 1 champion
         int maxTargets = (skillId == 10) ? 1 : 0;
 
-        if (UIController.Instance != null)
+        if (_uiController != null)
         {
-            UIController.Instance.ShowTargetSelectionPanel(true);
-            TargetSelectionUI.Instance.ShowForSkill(skillId, maxTargets);
+            _uiController.ShowTargetSelectionPanel(true);
+            if (_targetSelectionManager != null) _targetSelectionManager.ShowForSkill(skillId, maxTargets);
         }
     }
 
@@ -82,9 +86,9 @@ public class CardTargetSelector : MonoBehaviour
         currentCard = null;
 
         // Clear selection in HandManager after playing
-        if (HandManager.Instance != null)
+        if (_handManager != null)
         {
-            HandManager.Instance.ClearSelection();
+            _handManager.ClearSelection();
         }
     }
 
@@ -98,9 +102,9 @@ public class CardTargetSelector : MonoBehaviour
         currentSkillId = -1;
         discardCardIds.Clear();
 
-        if (HandManager.Instance != null)
+        if (_handManager != null)
         {
-            HandManager.Instance.ClearSelection();
+            _handManager.ClearSelection();
         }
     }
 

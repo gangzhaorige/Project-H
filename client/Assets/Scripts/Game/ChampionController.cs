@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using ProjectH.Models;
+using System.Collections.Generic;
 
 public class ChampionController : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class ChampionController : MonoBehaviour
     [SerializeField] private GameObject activeIndicator;
 
     private PlayerData player;
+    private ChampionSO cachedSO;
 
     public void Init(PlayerData pData)
     {
@@ -50,8 +52,17 @@ public class ChampionController : MonoBehaviour
         // Subscribe to stat updates (Observer Pattern)
         GameSession.Instance.OnChampionStatsUpdated += OnChampionStatsUpdated;
 
-        UpdateVisuals();
+        LoadChampionAssets();
         UpdateCardCount();
+    }
+
+    private void LoadChampionAssets()
+    {
+        ChampionAssetManager.Instance.GetChampionSO(id, (so) =>
+        {
+            cachedSO = so;
+            UpdateVisuals();
+        });
     }
 
     private void OnDestroy()
@@ -71,7 +82,6 @@ public class ChampionController : MonoBehaviour
     {
         if (this.id != championId) return;
 
-        // Sync local component fields with updated model
         switch (statId)
         {
             case GameSession.STAT_CUR_HP: this.curHP = value; break;
@@ -95,7 +105,6 @@ public class ChampionController : MonoBehaviour
     {
         if (activeIndicator != null)
         {
-            Debug.Log($"[ChampionController] {championName} active indicator -> {active}");
             activeIndicator.SetActive(active);
         }
     }
@@ -107,36 +116,11 @@ public class ChampionController : MonoBehaviour
         if (attackTextUI != null) attackTextUI.text = attack.ToString();
         if (rangeTextUI != null) rangeTextUI.text = attackRange.ToString();
 
-        if (championImageUI != null)
-        {
-            championImageUI.sprite = Resources.Load<Sprite>($"Images/Characters/Portraits/InGame/{id}");
-        }
+        if (cachedSO == null) return;
 
-        if (elementImageUI != null)
-        {
-            elementImageUI.sprite = Resources.Load<Sprite>($"Images/Elements/{GetElementName(element)}");
-        }
-
-        if (pathImageUI != null)
-        {
-            pathImageUI.sprite = Resources.Load<Sprite>($"Images/Paths/{pathId}");
-        }
-
-        Debug.Log($"Initialized {championName} UI with {curHP}/{maxHP} HP");
-    }
-
-    private string GetElementName(int elementId)
-    {
-        switch (elementId)
-        {
-            case 1: return "Physical";
-            case 2: return "Fire";
-            case 3: return "Ice";
-            case 4: return "Lightning";
-            case 5: return "Wind";
-            case 6: return "Quantum";
-            case 7: return "Imaginary";
-            default: return "Physical";
-        }
+        // Use ChampionAssetManager to share sprites across multiple components
+        ChampionAssetManager.Instance.GetSprite(cachedSO.champInGameImage, (s) => { if (championImageUI != null) championImageUI.sprite = s; });
+        ChampionAssetManager.Instance.GetSprite(cachedSO.elementImage, (s) => { if (elementImageUI != null) elementImageUI.sprite = s; });
+        ChampionAssetManager.Instance.GetSprite(cachedSO.pathImage, (s) => { if (pathImageUI != null) pathImageUI.sprite = s; });
     }
 }

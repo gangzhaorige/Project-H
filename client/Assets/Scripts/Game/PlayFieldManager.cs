@@ -5,10 +5,8 @@ using ProjectH.Models;
 
 public class PlayFieldManager : MonoBehaviour
 {
-    public static PlayFieldManager Instance { get; private set; }
-
-    [Header("UI Containers")]
-    public RectTransform playFieldPanel; // Where the card will land
+    // --- UI Containers ---
+    private RectTransform playFieldPanel; // Where the card will land
     public HandManager handManager;
 
     [Header("Prefabs")]
@@ -21,9 +19,16 @@ public class PlayFieldManager : MonoBehaviour
 
     private List<GameObject> cardsOnField = new List<GameObject>();
 
-    private void Awake()
+    private CardAnimationManager _cardAnimationManager;
+
+    private AnimationController _animationController;
+
+    public void Init(CardAnimationManager cardAnimationManager, AnimationController animationController, ProjectH.UI.WorldCanvasView canvasView)
     {
-        Instance = this;
+        _cardAnimationManager = cardAnimationManager;
+        _animationController = animationController;
+        if (canvasView != null) playFieldPanel = canvasView.playFieldPanel;
+        Debug.Log("[PlayFieldManager] Initialized.");
     }
 
     /// <summary>
@@ -36,7 +41,7 @@ public class PlayFieldManager : MonoBehaviour
         {
             if (card != null)
             {
-                if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(card);
+                if (_cardAnimationManager != null) _cardAnimationManager.StopAllAnimationsFor(card);
                 Destroy(card);
             }
         }
@@ -59,9 +64,9 @@ public class PlayFieldManager : MonoBehaviour
 
             Vector3 targetLocalPos = new Vector3(startX + (i * cardSpacing), 0, 0);
 
-            if (CardAnimationManager.Instance != null)
+            if (_cardAnimationManager != null)
             {
-                StartCoroutine(CardAnimationManager.Instance.SmoothMoveLocal(go.transform, targetLocalPos, Quaternion.identity, playAnimDuration));
+                StartCoroutine(_cardAnimationManager.SmoothMoveLocal(go.transform, targetLocalPos, Quaternion.identity, playAnimDuration));
             }
         }
     }
@@ -95,7 +100,7 @@ public class PlayFieldManager : MonoBehaviour
         ResponseFieldToHandEventArgs res = args as ResponseFieldToHandEventArgs;
         if (res == null) return;
 
-        AnimationController.Instance.AddAnimation(AnimateFieldToHand(res));
+        if (_animationController != null) _animationController.AddAnimation(AnimateFieldToHand(res));
     }
 
     private IEnumerator AnimateFieldToHand(ResponseFieldToHandEventArgs res)
@@ -151,9 +156,9 @@ public class PlayFieldManager : MonoBehaviour
             }
 
             // 4. Animate towards champion
-            if (CardAnimationManager.Instance != null)
+            if (_cardAnimationManager != null)
             {
-                yield return CardAnimationManager.Instance.SmoothMoveLocal(cardGO.transform, targetLocalPos, Quaternion.identity, playAnimDuration);
+                yield return _cardAnimationManager.SmoothMoveLocal(cardGO.transform, targetLocalPos, Quaternion.identity, playAnimDuration);
             }
             else
             {
@@ -161,7 +166,7 @@ public class PlayFieldManager : MonoBehaviour
             }
 
             // 5. Cleanup
-            if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(cardGO);
+            if (_cardAnimationManager != null) _cardAnimationManager.StopAllAnimationsFor(cardGO);
             Destroy(cardGO);
             if (GameSession.Instance.Players.TryGetValue(res.CasterId, out pData))
             {
@@ -175,7 +180,7 @@ public class PlayFieldManager : MonoBehaviour
         ResponseDiscardCardEventArgs res = args as ResponseDiscardCardEventArgs;
         if (res == null) return;
 
-        AnimationController.Instance.AddAnimation(AnimateDiscardCard(res));
+        if (_animationController != null) _animationController.AddAnimation(AnimateDiscardCard(res));
     }
 
     private IEnumerator AnimateDiscardCard(ResponseDiscardCardEventArgs res)
@@ -235,7 +240,7 @@ public class PlayFieldManager : MonoBehaviour
         ResponseSwapFieldHandEventArgs res = args as ResponseSwapFieldHandEventArgs;
         if (res == null) return;
 
-        AnimationController.Instance.AddAnimation(AnimateSwapFieldHand(res));
+        if (_animationController != null) _animationController.AddAnimation(AnimateSwapFieldHand(res));
     }
 
     private IEnumerator AnimateSwapFieldHand(ResponseSwapFieldHandEventArgs res)
@@ -306,9 +311,9 @@ public class PlayFieldManager : MonoBehaviour
 
         if (fieldCardGO != null)
         {
-            if (CardAnimationManager.Instance != null)
+            if (_cardAnimationManager != null)
             {
-                StartCoroutine(CardAnimationManager.Instance.SmoothMoveLocal(fieldCardGO.transform, handPos, Quaternion.identity, playAnimDuration));
+                StartCoroutine(_cardAnimationManager.SmoothMoveLocal(fieldCardGO.transform, handPos, Quaternion.identity, playAnimDuration));
             }
         }
 
@@ -334,7 +339,7 @@ public class PlayFieldManager : MonoBehaviour
             }
             else
             {
-                if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(fieldCardGO);
+                if (_cardAnimationManager != null) _cardAnimationManager.StopAllAnimationsFor(fieldCardGO);
                 Destroy(fieldCardGO);
             }
         }
@@ -357,7 +362,7 @@ public class PlayFieldManager : MonoBehaviour
         ResponseJudgementEventArgs res = args as ResponseJudgementEventArgs;
         if (res == null) return;
 
-        AnimationController.Instance.AddAnimation(AnimateJudgement(res));
+        if (_animationController != null) _animationController.AddAnimation(AnimateJudgement(res));
     }
 
     private IEnumerator AnimateJudgement(ResponseJudgementEventArgs res)
@@ -408,7 +413,7 @@ public class PlayFieldManager : MonoBehaviour
         }
 
         // Add to animation queue to ensure sequence
-        AnimationController.Instance.AddAnimation(AnimateCardPlay(res));
+        if (_animationController != null) _animationController.AddAnimation(AnimateCardPlay(res));
     }
 
     private void TriggerTargetingEffects(int sourceId, List<int> targetIds)

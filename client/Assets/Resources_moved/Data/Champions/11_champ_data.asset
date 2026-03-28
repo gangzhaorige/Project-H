@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2901cac318e3f475b941a2bff4072124, type: 3}
+  m_Name: 11_champ_data
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectH.Models.ChampionSO
+  id: 11
+  championName: Black Swan
+  path: 4
+  element: 5
+  champIcon:
+    m_AssetGUID: 0c0354aa415dd48be9990ca983c7835e
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 1
+  champSelectImage:
+    m_AssetGUID: b12e888d146e6496493287e773ceff61
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 1
+  champInGameImage:
+    m_AssetGUID: 6b9b9b980ee8c46f3a17c1942139f6b3
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 1
+  pathImage:
+    m_AssetGUID: 74d0bb6c9f88a4d91960cf82251b5687
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  elementImage:
+    m_AssetGUID: 62264025edeb748eda7e6dddb11ebe59
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  skillAudio: []
+  damageTaken: {fileID: 0}

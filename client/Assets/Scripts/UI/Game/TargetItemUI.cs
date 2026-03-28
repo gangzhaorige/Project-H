@@ -22,7 +22,14 @@ public class TargetItemUI : MonoBehaviour
         if (nameText != null) nameText.text = data.Username;
         if (portraitImage != null && data.Champion != null)
         {
-            portraitImage.sprite = Resources.Load<Sprite>($"Images/Characters/Portraits/InGame/{data.Champion.Id}");
+            // Use ChampionAssetManager to share the same loaded portrait across different UI items
+            ChampionAssetManager.Instance.GetChampionSO(data.Champion.Id, (so) =>
+            {
+                ChampionAssetManager.Instance.GetSprite(so.champInGameImage, (s) =>
+                {
+                    if (portraitImage != null) portraitImage.sprite = s;
+                });
+            });
         }
 
         if (selectionToggle != null)

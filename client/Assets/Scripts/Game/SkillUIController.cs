@@ -15,9 +15,14 @@ public class SkillUIController : MonoBehaviour
     private bool isQueryActive = false;
     private bool isUsedThisTurn = false;
 
-    public void Init(SkillSO skillSO)
+    private HandManager _handManager;
+    private CardTargetSelector _cardTargetSelector;
+
+    public void Init(SkillSO skillSO, HandManager handManager, CardTargetSelector cardTargetSelector)
     {
         skillData = skillSO;
+        _handManager = handManager;
+        _cardTargetSelector = cardTargetSelector;
 
         if (nameText != null)
         {
@@ -42,9 +47,9 @@ public class SkillUIController : MonoBehaviour
         GameSession.Instance.OnStateChanged += (state) => UpdateInteractableState();
         GameSession.Instance.OnTurnStarted += (id) => { isUsedThisTurn = false; UpdateInteractableState(); };
         
-        if (HandManager.Instance != null)
+        if (_handManager != null)
         {
-            HandManager.Instance.OnSelectionChanged += UpdateInteractableState;
+            _handManager.OnSelectionChanged += UpdateInteractableState;
         }
         
         UpdateInteractableState();
@@ -59,9 +64,9 @@ public class SkillUIController : MonoBehaviour
             GameSession.Instance.OnSkillQueryAnswered -= OnSkillQueryAnswered;
             GameSession.Instance.OnTimerCancelled -= OnTimerCancelled;
         }
-        if (HandManager.Instance != null)
+        if (_handManager != null)
         {
-            HandManager.Instance.OnSelectionChanged -= UpdateInteractableState;
+            _handManager.OnSelectionChanged -= UpdateInteractableState;
         }
     }
 
@@ -104,7 +109,7 @@ public class SkillUIController : MonoBehaviour
                 case PlayCondition.HandAtleastTwoCards:
                     // This check is usually for total hand size, but based on requirement
                     // "discard two card", we check if exactly 2 are selected
-                    if (HandManager.Instance.GetSelectedCardIds().Count < 2) return false;
+                    if (_handManager != null && _handManager.GetSelectedCardIds().Count < 2) return false;
                     break;
             }
         }
@@ -112,7 +117,7 @@ public class SkillUIController : MonoBehaviour
         // Check Card Requirement specifically
         if (skillData.cardRequirement != null && skillData.cardRequirement.discardCount > 0)
         {
-            if (HandManager.Instance.GetSelectedCardIds().Count != skillData.cardRequirement.discardCount)
+            if (_handManager != null && _handManager.GetSelectedCardIds().Count != skillData.cardRequirement.discardCount)
                 return false;
         }
 
@@ -132,10 +137,13 @@ public class SkillUIController : MonoBehaviour
         else
         {
             // Manual Activation
-            List<int> selectedCards = HandManager.Instance.GetSelectedCardIds();
+            List<int> selectedCards = _handManager != null ? _handManager.GetSelectedCardIds() : new List<int>();
             if (skillData.numberOfTargetToSelect > 0)
             {
-                CardTargetSelector.Instance.BeginTargetingForSkill(skillData.skillId, selectedCards);
+                if (_cardTargetSelector != null)
+                {
+                    _cardTargetSelector.BeginTargetingForSkill(skillData.skillId, selectedCards);
+                }
             }
             else
             {

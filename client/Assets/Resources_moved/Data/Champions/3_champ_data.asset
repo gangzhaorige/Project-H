@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2901cac318e3f475b941a2bff4072124, type: 3}
+  m_Name: 3_champ_data
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectH.Models.ChampionSO
+  id: 3
+  championName: Himeko
+  path: 2
+  element: 2
+  champIcon:
+    m_AssetGUID: b7646c3840a9a48f8925a2222f93d53e
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  champSelectImage:
+    m_AssetGUID: 975efe168d1a046ee80d3f8ae7e26990
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  champInGameImage:
+    m_AssetGUID: 10637f589e5d542508fb876df69d2224
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  pathImage:
+    m_AssetGUID: ea5ed7c18899944eba146be02ced67d6
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  elementImage:
+    m_AssetGUID: a40f7f46ddc074ee68773c3504699871
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  skillAudio: []
+  damageTaken: {fileID: 0}

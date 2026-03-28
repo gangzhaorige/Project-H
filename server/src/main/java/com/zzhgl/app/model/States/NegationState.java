@@ -133,13 +133,12 @@ public class NegationState implements GameState {
                 
                 // Increment negate count instead of pushing a new NegateInteraction to the stack
                 negateCount++;
-                
-                broadcast(game, new ResponsePlayCard(player.getID(), card, playCmd.getTargetIds()));
 
                 // Reset: Everyone must be prompted again, except the one who just played it
                 passedPlayers.clear();
                 passedPlayers.add(player.getID()); 
                 lastNegatorId = player.getID();
+                broadcast(game, new ResponsePlayCard(player.getID(), card, new ArrayList<>(lastNegatorId)));
                 startTimer(game);
             } else {
                 Log.printf_e("Player %d tried to play non-Negate card in NegationState.", player.getID());

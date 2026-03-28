@@ -1,32 +1,58 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using ProjectH.Models;
 
 public class HandManager : MonoBehaviour
 {
-    public static HandManager Instance { get; private set; }
+    // --- Positions (WorldCanvas) ---
+    private RectTransform deckPosition;
+    private RectTransform discardPilePosition;
+    private RectTransform playFieldPanel;
+
+    // --- UI Containers ---
+    private RectTransform handPanel;
 
     [Header("Prefabs")]
     public GameObject cardPrefab;
 
-    [Header("UI Containers")]
-    public RectTransform handPanel;
+    // --- Components ---
+    private DynamicHandLayout _layoutHandler;
 
-    [Header("Components")]
-    public DynamicHandLayout layoutHandler;
+    [Header("Animation Settings")]
+    public float drawAnimDuration = 0.5f;
 
+    // --- Hand State ---
     private List<GameObject> orderedCards = new List<GameObject>();
     private List<int> orderedCardIds = new List<int>();
     private Dictionary<int, GameObject> cardMap = new Dictionary<int, GameObject>();
     private List<int> selectedCardIds = new List<int>();
 
+    // --- Dependencies ---
+    private CardAnimationManager _cardAnimationManager;
+    private AnimationController _animationController;
+
     public delegate void SelectionChanged();
     public event SelectionChanged OnSelectionChanged;
 
-    private void Awake()
+    public void Init(CardAnimationManager cardAnimationManager, AnimationController animationController, ProjectH.UI.WorldCanvasView canvasView)
     {
-        Instance = this;
+        _cardAnimationManager = cardAnimationManager;
+        _animationController = animationController;
+
+        if (canvasView != null)
+        {
+            deckPosition = canvasView.deckPosition;
+            discardPilePosition = canvasView.discardPilePosition;
+            playFieldPanel = canvasView.playFieldPanel;
+            handPanel = canvasView.handPanel;
+            _layoutHandler = canvasView.layoutHandHandler;
+        }
     }
+
+    // =========================================================================
+    //  SELECTION LOGIC
+    // =========================================================================
 
     public void ToggleCardSelection(int cardId)
     {
@@ -58,19 +84,17 @@ public class HandManager : MonoBehaviour
         OnSelectionChanged?.Invoke();
     }
 
-    /// <summary>
-    /// Predicts where a card will end up in world space given its index and future total count.
-    /// </summary>
+    // =========================================================================
+    //  HAND MANAGEMENT
+    // =========================================================================
+
     public Vector3 GetPredictiveWorldPosition(int index, int futureTotal)
     {
-        if (layoutHandler == null) return handPanel.position;
-        Vector3 local = layoutHandler.GetLocalPosition(index, futureTotal, handPanel.rect.width);
+        if (_layoutHandler == null) return handPanel.position;
+        Vector3 local = _layoutHandler.GetLocalPosition(index, futureTotal, handPanel.rect.width);
         return handPanel.TransformPoint(local);
     }
 
-    /// <summary>
-    /// Registers a card that has already been instantiated and animated.
-    /// </summary>
     public void RegisterAnimatedCard(CardData data, GameObject cardGO)
     {
         if (cardMap.ContainsKey(data.Id))
@@ -79,7 +103,6 @@ public class HandManager : MonoBehaviour
             return;
         }
 
-        // Set parent and restore world position manually to handle potential parent scale differences
         Vector3 worldPos = cardGO.transform.position;
         Quaternion worldRot = cardGO.transform.rotation;
         cardGO.transform.SetParent(handPanel, false);
@@ -94,19 +117,14 @@ public class HandManager : MonoBehaviour
         CardUIController ui = cardGO.GetComponent<CardUIController>();
         if (ui != null) 
         {
-            ui.enabled = true; // Enable interaction when in hand
+            ui.enabled = true; 
             ui.Bind(data, this);
-        }
-        else
-        {
-            Debug.LogWarning($"[HandManager] CardUIController component missing on prefab for card {data.Id}!");
         }
 
         cardMap.Add(data.Id, cardGO);
         orderedCards.Add(cardGO);
         orderedCardIds.Add(data.Id);
 
-        // Crucial: immediately update the layout once the card is officially in the hand
         ReorganizeHand();
     }
 
@@ -165,10 +183,6 @@ public class HandManager : MonoBehaviour
         ReorganizeHand();
     }
 
-    /// <summary>
-    /// Unregisters a card from the hand logic without destroying it.
-    /// Used when a card is played and moves to the play field.
-    /// </summary>
     public void UnregisterCard(int cardId)
     {
         if (cardMap.TryGetValue(cardId, out GameObject go))
@@ -182,12 +196,11 @@ public class HandManager : MonoBehaviour
 
             cardMap.Remove(cardId);
 
-            if (CardAnimationManager.Instance != null)
+            if (_cardAnimationManager != null)
             {
-                CardAnimationManager.Instance.StopAllAnimationsFor(go);
+                _cardAnimationManager.StopAllAnimationsFor(go);
             }
 
-            // Reorganize the remaining cards in the hand
             ReorganizeHand();
         }
     }
@@ -203,10 +216,10 @@ public class HandManager : MonoBehaviour
 
     public void ReorganizeHand(int futureCount = -1)
     {
-        if (layoutHandler == null) return;
+        if (_layoutHandler == null) return;
 
         int countToUse = (futureCount != -1) ? futureCount : orderedCards.Count;
-        var targets = layoutHandler.GetCardTransforms(countToUse, handPanel.rect.width);
+        var targets = _layoutHandler.GetCardTransforms(countToUse, handPanel.rect.width);
 
         for (int i = 0; i < orderedCards.Count; i++)
         {
@@ -215,9 +228,9 @@ public class HandManager : MonoBehaviour
             {
                 Vector3 targetPos = targets[i].pos;
                 
-                if (CardAnimationManager.Instance != null)
+                if (_cardAnimationManager != null)
                 {
-                    StartCoroutine(CardAnimationManager.Instance.SmoothMoveLocal(cardGO.transform, targetPos, targets[i].rot, 0.3f));
+                    StartCoroutine(_cardAnimationManager.SmoothMoveLocal(cardGO.transform, targetPos, targets[i].rot, 0.3f));
                 }
             }
         }
@@ -227,12 +240,219 @@ public class HandManager : MonoBehaviour
     {
         foreach (var card in cardMap.Values)
         {
-            if (CardAnimationManager.Instance != null) CardAnimationManager.Instance.StopAllAnimationsFor(card);
+            if (_cardAnimationManager != null) _cardAnimationManager.StopAllAnimationsFor(card);
             Destroy(card);
         }
         cardMap.Clear();
         orderedCards.Clear();
         orderedCardIds.Clear();
         selectedCardIds.Clear();
+    }
+
+    // =========================================================================
+    //  GLOBAL CARD ANIMATION LOGIC (Formerly CardManager)
+    // =========================================================================
+
+    public void HandleLocalDraw(List<CardData> newCards)
+    {
+        if (_animationController != null) _animationController.AddAnimation(AnimateLocalDrawBatch(newCards));
+    }
+
+    public void HandleOtherDraw(int playerId, int cardCount)
+    {
+        if (GameSession.Instance.Players.TryGetValue(playerId, out PlayerData pData))
+        {
+            if (_animationController != null) _animationController.AddAnimation(AnimateOtherDrawBatch(pData, cardCount));
+        }
+    }
+
+    public void HandleMoveCard(ResponseMoveCardEventArgs res)
+    {
+        if (_animationController != null) _animationController.AddAnimation(AnimateMoveCard(res));
+    }
+
+    private IEnumerator AnimateMoveCard(ResponseMoveCardEventArgs res)
+    {
+        int localId = Constants.USER_ID;
+        PlayerData sourcePlayer = GameSession.Instance.Players.ContainsKey(res.TargetId) ? GameSession.Instance.Players[res.TargetId] : null;
+        PlayerData receiverPlayer = GameSession.Instance.Players.ContainsKey(res.CasterId) ? GameSession.Instance.Players[res.CasterId] : null;
+
+        List<Coroutine> anims = new List<Coroutine>();
+
+        for (int i = 0; i < res.Cards.Count; i++)
+        {
+            CardData cardData = res.Cards[i];
+            GameObject cardGO = null;
+            Vector3 startPos;
+            Vector3 endPos;
+
+            // --- 1. Identify/Create Card Object and Start Position ---
+            if (localId == res.TargetId)
+            {
+                cardGO = GetCardObject(cardData.Id);
+                if (cardGO != null)
+                {
+                    UnregisterCard(cardData.Id);
+                    sourcePlayer?.RemoveCardById(cardData.Id);
+                    startPos = cardGO.transform.position;
+                }
+                else
+                {
+                    startPos = (sourcePlayer?.ChampionObject != null) ? sourcePlayer.ChampionObject.transform.position : Vector3.zero;
+                }
+            }
+            else
+            {
+                startPos = (sourcePlayer?.ChampionObject != null) ? sourcePlayer.ChampionObject.transform.position : Vector3.zero;
+                cardGO = Instantiate(cardPrefab, playFieldPanel); 
+                cardGO.transform.position = startPos;
+                
+                CardSetup setup = cardGO.GetComponent<CardSetup>();
+                if (setup != null)
+                {
+                    if (res.ShowDetails) setup.Init(cardData.Type, cardData.Suit, cardData.Value);
+                    else setup.Init(0, 0, 0); 
+                }
+            }
+
+            var ui = cardGO.GetComponent<CardUIController>();
+            if (ui != null) ui.enabled = false;
+
+            // --- 2. Determine End Position ---
+            if (localId == res.CasterId && receiverPlayer != null)
+            {
+                int futureCount = receiverPlayer.Hand.Count + res.Cards.Count;
+                int finalIdx = receiverPlayer.Hand.Count + i;
+                endPos = GetPredictiveWorldPosition(finalIdx, futureCount);
+            }
+            else
+            {
+                endPos = (receiverPlayer?.ChampionObject != null) ? receiverPlayer.ChampionObject.transform.position : Vector3.down * 1000;
+            }
+
+            // --- 3. Execute Animation ---
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayCardMoveSFX();
+            anims.Add(StartCoroutine(MoveAndFinalize(cardGO, cardData, endPos, localId == res.CasterId, receiverPlayer)));
+        }
+
+        foreach (var a in anims) yield return a;
+    }
+
+    private IEnumerator MoveAndFinalize(GameObject cardGO, CardData data, Vector3 targetPos, bool isReceiver, PlayerData receiver)
+    {
+        if (_cardAnimationManager != null)
+        {
+            yield return _cardAnimationManager.SmoothMoveWorld(cardGO.transform, targetPos, drawAnimDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(drawAnimDuration);
+        }
+
+        if (isReceiver)
+        {
+            RegisterAnimatedCard(data, cardGO);
+            receiver?.AddCard(data);
+        }
+        else
+        {
+            if (_cardAnimationManager != null) _cardAnimationManager.StopAllAnimationsFor(cardGO);
+            Destroy(cardGO);
+            receiver?.AddCard(new CardData { Id = -1 });
+        }
+    }
+
+    private IEnumerator AnimateLocalDrawBatch(List<CardData> newCards)
+    {
+        int batchSize = newCards.Count;
+        int currentHandCount = GameSession.Instance.GetLocalPlayer().Hand.Count;
+        int totalFutureCount = currentHandCount + batchSize;
+
+        ReorganizeHand(totalFutureCount);
+
+        List<Coroutine> batchRoutines = new List<Coroutine>();
+        for (int i = 0; i < batchSize; i++)
+        {
+            int finalIndex = currentHandCount + i;
+            batchRoutines.Add(StartCoroutine(AnimateSingleLocalDraw(newCards[i], finalIndex, totalFutureCount)));
+        }
+
+        foreach (var routine in batchRoutines)
+        {
+            yield return routine;
+        }
+        
+        Debug.Log($"[HandManager] Local Draw Batch of {batchSize} completed.");
+    }
+
+    private IEnumerator AnimateSingleLocalDraw(CardData card, int finalIndex, int totalFutureCount)
+    {
+        Debug.Log("------------------------------------");
+        Vector3 targetWorldPos = GetPredictiveWorldPosition(finalIndex, totalFutureCount);
+
+        GameObject animCard = Instantiate(cardPrefab, deckPosition != null ? deckPosition.parent : transform);
+        Debug.LogError(animCard == null);
+        if (deckPosition != null)
+        {
+            animCard.transform.position = deckPosition.position;
+            animCard.transform.rotation = deckPosition.rotation;
+        }
+        
+        CardSetup setup = animCard.GetComponent<CardSetup>();
+        if (setup != null) setup.Init(card.Type, card.Suit, card.Value);
+
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardDrawSFX();
+
+        if (_cardAnimationManager != null)
+        {
+            yield return _cardAnimationManager.SmoothMoveWorld(animCard.transform, targetWorldPos, drawAnimDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(drawAnimDuration);
+        }
+
+        RegisterAnimatedCard(card, animCard);
+        GameSession.Instance.GetLocalPlayer().AddCard(card);
+    }
+
+    private IEnumerator AnimateOtherDrawBatch(PlayerData pData, int count)
+    {
+        List<Coroutine> batchRoutines = new List<Coroutine>();
+        for (int i = 0; i < count; i++)
+        {
+            batchRoutines.Add(StartCoroutine(AnimateSingleOtherDraw(pData)));
+        }
+
+        foreach (var routine in batchRoutines)
+        {
+            yield return routine;
+        }
+        Debug.Log($"[HandManager] Other Draw Batch for {pData.Username} completed.");
+    }
+
+    private IEnumerator AnimateSingleOtherDraw(PlayerData pData)
+    {
+        GameObject animCard = Instantiate(cardPrefab, deckPosition != null ? deckPosition.parent : transform);
+        if (deckPosition != null) animCard.transform.position = deckPosition.position;
+
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCardDrawSFX();
+        
+        Vector3 targetPos = (pData.ChampionObject != null) 
+            ? pData.ChampionObject.transform.position 
+            : Vector3.zero;
+
+        if (_cardAnimationManager != null)
+        {
+            yield return _cardAnimationManager.SmoothMoveWorld(animCard.transform, targetPos, drawAnimDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(drawAnimDuration);
+        }
+        
+        if (_cardAnimationManager != null) _cardAnimationManager.StopAllAnimationsFor(animCard);
+        Destroy(animCard);
+        pData.AddCard(new CardData { Id = -1 }); 
     }
 }

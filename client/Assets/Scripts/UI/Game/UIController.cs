@@ -5,38 +5,57 @@ using ProjectH.Models;
 
 public class UIController : MonoBehaviour
 {
-    public static UIController Instance { get; private set; }
-
-    [Header("Turn UI")]
-    public Button endTurnButton;
-    public Button passButton;
-    public Button confirmPlayButton; // New button for playing selected cards
+    private Button endTurnButton;
+    private Button passButton;
+    private Button confirmPlayButton; // New button for playing selected cards
     
-    [Header("Status & Info")]
-    public TextMeshProUGUI turnStatusText;
-    public TextMeshProUGUI instructionText;
-    public TextMeshProUGUI stateText;
+    private TextMeshProUGUI turnStatusText;
+    private TextMeshProUGUI instructionText;
+    private TextMeshProUGUI stateText;
     
-    [Header("Timer")]
-    public GameObject timerUI;
-    public Slider timerSlider;
+    private GameObject timerUI;
+    private Slider timerSlider;
 
-    [Header("Panels")]
-    public GameObject targetSelectionPanel;
-    public GameObject loadingPanel;
-    public GameObject selectPanel;
+    private ProjectH.UI.TargetSelectionPanelView targetSelectionPanelView;
+    private GameObject selectPanel;
 
     private float currentTimer = 0f;
     private float maxTimer = 0f;
     private bool isTimerActive = false;
 
-    private void Awake()
+    private HandManager _handManager;
+    private CardTargetSelector _cardTargetSelector;
+
+    public void Init(HandManager handManager, CardTargetSelector cardTargetSelector, ProjectH.UI.CanvasView canvasView)
     {
-        if (Instance != null && Instance != this) {
-            Destroy(gameObject);
-            return;
+        _handManager = handManager;
+        _cardTargetSelector = cardTargetSelector;
+
+        if (canvasView != null)
+        {
+            endTurnButton = canvasView.endTurnButton;
+            passButton = canvasView.passButton;
+            confirmPlayButton = canvasView.confirmPlayButton;
+            turnStatusText = canvasView.turnStatusText;
+            instructionText = canvasView.instructionText;
+            stateText = canvasView.stateText;
+            timerUI = canvasView.timerUI;
+            timerSlider = canvasView.timerSlider;
+            targetSelectionPanelView = canvasView.targetSelectionPanelView;
+            selectPanel = canvasView.selectPanelView != null ? canvasView.selectPanelView.gameObject : null;
+
+            // Add button listeners here instead of OnEnable if we want strict DI control
+            if (endTurnButton != null) endTurnButton.onClick.AddListener(OnEndTurnClick);
+            if (passButton != null) passButton.onClick.AddListener(OnPassPriorityClick);
+            if (confirmPlayButton != null) confirmPlayButton.onClick.AddListener(OnConfirmPlayClick);
         }
-        Instance = this;
+        
+        if (_handManager != null)
+        {
+            _handManager.OnSelectionChanged += UpdateUIState;
+        }
+
+        HideAll();
     }
 
     private void OnEnable()
@@ -47,12 +66,6 @@ public class UIController : MonoBehaviour
         GameSession.Instance.OnTimerStarted += OnTimerStarted;
         GameSession.Instance.OnTimerCancelled += OnTimerCancelled;
         GameSession.Instance.OnTurnStarted += OnTurnStarted;
-        GameSession.Instance.OnGameSetupCompleted += OnGameSetupCompleted;
-
-        // Button Listeners
-        if (endTurnButton != null) endTurnButton.onClick.AddListener(OnEndTurnClick);
-        if (passButton != null) passButton.onClick.AddListener(OnPassPriorityClick);
-        if (confirmPlayButton != null) confirmPlayButton.onClick.AddListener(OnConfirmPlayClick);
     }
 
     private void OnDisable()
@@ -65,24 +78,17 @@ public class UIController : MonoBehaviour
             GameSession.Instance.OnTimerStarted -= OnTimerStarted;
             GameSession.Instance.OnTimerCancelled -= OnTimerCancelled;
             GameSession.Instance.OnTurnStarted -= OnTurnStarted;
-            GameSession.Instance.OnGameSetupCompleted -= OnGameSetupCompleted;
         }
 
-        if (HandManager.Instance != null)
+        if (_handManager != null)
         {
-            HandManager.Instance.OnSelectionChanged -= UpdateUIState;
-        }
-    }
-
-    private void Start()
-    {
-        if (HandManager.Instance != null)
-        {
-            HandManager.Instance.OnSelectionChanged += UpdateUIState;
+            _handManager.OnSelectionChanged -= UpdateUIState;
         }
 
-        HideAll();
-        ShowLoading(true);
+        // Clean up listeners
+        if (endTurnButton != null) endTurnButton.onClick.RemoveListener(OnEndTurnClick);
+        if (passButton != null) passButton.onClick.RemoveListener(OnPassPriorityClick);
+        if (confirmPlayButton != null) confirmPlayButton.onClick.RemoveListener(OnConfirmPlayClick);
     }
 
     private void Update()
@@ -143,11 +149,6 @@ public class UIController : MonoBehaviour
         UpdateUIState();
     }
 
-    private void OnGameSetupCompleted()
-    {
-        ShowLoading(false);
-    }
-
     // --- Action Handlers ---
 
     private void OnEndTurnClick()
@@ -169,11 +170,6 @@ public class UIController : MonoBehaviour
     }
 
     // --- UI Utility Methods ---
-
-    public void ShowLoading(bool show)
-    {
-        if (loadingPanel != null) loadingPanel.SetActive(show);
-    }
 
     public void SetTurnStatus(string status)
     {
@@ -231,7 +227,7 @@ public class UIController : MonoBehaviour
 
     public void ShowTargetSelectionPanel(bool show)
     {
-        if (targetSelectionPanel != null) targetSelectionPanel.SetActive(show);
+        if (targetSelectionPanelView != null) targetSelectionPanelView.gameObject.SetActive(show);
     }
 
     public void ShowSelectPanel(bool show)
@@ -269,12 +265,12 @@ public class UIController : MonoBehaviour
         ShowPassButton(canPass);
 
         // 3. Confirm Play Button: Visible when at least one card is selected
-        bool hasSelection = (HandManager.Instance != null && HandManager.Instance.GetSelectedCardIds().Count > 0);
+        bool hasSelection = (_handManager != null && _handManager.GetSelectedCardIds().Count > 0);
         ShowConfirmPlayButton(hasSelection);
 
         if (confirmPlayButton != null)
         {
-            bool multipleCards = HandManager.Instance != null && HandManager.Instance.GetSelectedCardIds().Count > 1;
+            bool multipleCards = _handManager != null && _handManager.GetSelectedCardIds().Count > 1;
             if (currentState == "PlayActionState" && !isForcedResponse && multipleCards)
             {
                 confirmPlayButton.interactable = false;
@@ -288,9 +284,9 @@ public class UIController : MonoBehaviour
 
     private void OnConfirmPlayClick()
     {
-        if (HandManager.Instance == null) return;
+        if (_handManager == null) return;
 
-        System.Collections.Generic.List<int> selectedIds = HandManager.Instance.GetSelectedCardIds();
+        System.Collections.Generic.List<int> selectedIds = _handManager.GetSelectedCardIds();
         if (selectedIds.Count == 0) return;
 
         // Currently, we only process the first selected card for playing/targeting.
@@ -312,7 +308,7 @@ public class UIController : MonoBehaviour
             if (maxTargets > 0)
             {
                 Debug.Log($"[UIController] Card {cardData.Type} requires {maxTargets} targets. Showing UI.");
-                CardTargetSelector.Instance.BeginTargeting(cardData); // Wait, we might need selectedIds? Currently CardTargetSelector only handles 1 card.
+                if (_cardTargetSelector != null) _cardTargetSelector.BeginTargeting(cardData); // Wait, we might need selectedIds? Currently CardTargetSelector only handles 1 card.
             }
             else
             {
@@ -344,8 +340,8 @@ public class UIController : MonoBehaviour
         NetworkManager.Instance.SendRequest(req);
 
         // Clear selection
-        if (HandManager.Instance != null) {
-            HandManager.Instance.ClearSelection();
+        if (_handManager != null) {
+            _handManager.ClearSelection();
         }
 
         UpdateUIState();

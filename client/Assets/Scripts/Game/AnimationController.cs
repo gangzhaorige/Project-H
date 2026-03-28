@@ -4,15 +4,12 @@ using System.Collections.Generic;
 
 public class AnimationController : MonoBehaviour
 {
-    public static AnimationController Instance { get; private set; }
-
     private Queue<IEnumerator> animationQueue = new Queue<IEnumerator>();
     private bool isProcessing = false;
 
-    private void Awake()
+    public void Init()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        // Initialization if needed
     }
 
     private void Update()

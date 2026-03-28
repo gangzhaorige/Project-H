@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2901cac318e3f475b941a2bff4072124, type: 3}
+  m_Name: 9_champ_data
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectH.Models.ChampionSO
+  id: 9
+  championName: Jingyuan
+  path: 2
+  element: 4
+  champIcon:
+    m_AssetGUID: a6c346bb933784008aac226b45dffde7
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  champSelectImage:
+    m_AssetGUID: a8dde50150b7c4b1aa60541e665e8a38
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  champInGameImage:
+    m_AssetGUID: d42bcabe7d68d4578bddf87a8335e4bd
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  pathImage:
+    m_AssetGUID: ea5ed7c18899944eba146be02ced67d6
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  elementImage:
+    m_AssetGUID: 1fc59547219304659849165d64295dee
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  skillAudio: []
+  damageTaken: {fileID: 0}

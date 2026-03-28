@@ -1,0 +1,143 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Default Local Group
+  m_GUID: 859166e75bfc34f38a2c4f6a60d382e7
+  m_SerializeEntries:
+  - m_GUID: 0162a537ae2774087b4170649dc368b6
+    m_Address: Assets/Resources_moved/Images/Paths/Preservation.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 09a7ed338d4ef4bf3a6968ef9d13bb52
+    m_Address: Data/Champions/10_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b41b78ae461f4533927960d9660bfed
+    m_Address: Data/Champions/4_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1d8677cf678d546208bdd7db5e08a8ae
+    m_Address: Data/Champions/9_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 248176e1998344e408457688896a081f
+    m_Address: Images/Elements
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33f0598db0307450fbfeb2ef0fb86921
+    m_Address: Images/Characters/Portraits/InGame
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e7a0d07ade3b4a48b81f87f2e81be23
+    m_Address: Data/Champions/6_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 460c72da5eb98480fa2493efcb41e0c0
+    m_Address: Images/Paths
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 48feda2c420cb4170bf25496f0bb7c77
+    m_Address: Assets/Resources_moved/Images/Paths/Destruction.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5898744e86e5e4b8cb665f2ff29e375b
+    m_Address: Data/Champions/0_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c8310d7996d84907a22732af6b8334c
+    m_Address: Data/Champions/11_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 74d0bb6c9f88a4d91960cf82251b5687
+    m_Address: Images/Paths/Nihility.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9c520271b6572427198154f1831fc3e5
+    m_Address: Data/Champions/2_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f24e605d80d64ccbadad333d1929b3c
+    m_Address: Images/Characters/Portraits/ChampSelect
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a94763d92b963433da6008ecc94e31af
+    m_Address: Assets/Resources_moved/Images/Paths/Abundance.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ae926f26b06bc46198bd0b0e0171ba1d
+    m_Address: Data/Champions/1_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b455a963ae154479692be830ae6c3d03
+    m_Address: Assets/Resources_moved/Images/Paths/Hunt.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca5fde045a13a4d8dab1378e081067bc
+    m_Address: Data/Champions/7_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d2271cc8bbd2447b3b1cb0ecd85bfed3
+    m_Address: Assets/Resources_moved/Images/Paths/Harmony.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e0dbc313315164054a8ddbf1dd48a020
+    m_Address: Data/Champions/3_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e2e14065292394722985c2a13f31a32b
+    m_Address: Images/Characters/Icons
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e2fc306e99d784418bfca21e6fa8f4d8
+    m_Address: Data/Champions/5_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e5a59f5ee3fd44fbdba75466330175d8
+    m_Address: Data/Champions/8_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea5ed7c18899944eba146be02ced67d6
+    m_Address: Assets/Resources_moved/Images/Paths/Erudition.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 8129070c5095e40bb9b6f0cc02c17c02, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 16702b4383a8040dd9741a93bb3880d3, type: 2}
+    - {fileID: 11400000, guid: fac3371406cf74f559fac0056b25e448, type: 2}

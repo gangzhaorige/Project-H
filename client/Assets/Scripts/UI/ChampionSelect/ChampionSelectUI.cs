@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using ProjectH.Models;
 
 public class ChampionSelectUI : MonoBehaviour
 {
@@ -31,6 +34,11 @@ public class ChampionSelectUI : MonoBehaviour
     private int activePlayerId = -1;
     private float turnTimer = 0f;
     private bool isTimerActive = false;
+
+    // Addressables Caching
+    private Dictionary<int, ChampionSO> championSOCache = new Dictionary<int, ChampionSO>();
+    private Dictionary<int, int> playerRequestedChampId = new Dictionary<int, int>();
+    private List<AsyncOperationHandle> loadingHandles = new List<AsyncOperationHandle>();
 
     [System.Serializable]
     public class ChampionData
@@ -106,34 +114,54 @@ public class ChampionSelectUI : MonoBehaviour
         }
     }
 
-    private Sprite GetChampionIcon(int championId)
+    private void PreloadChampion(int id)
     {
-        Sprite s = Resources.Load<Sprite>($"Images/Characters/Icons/{championId}");
-        if (s == null) s = Resources.Load<Sprite>("Images/Characters/Icons/default");
-        return s;
-    }
-
-    private Sprite GetChampionPortrait(int championId)
-    {
-        Sprite s = Resources.Load<Sprite>($"Images/Characters/Portraits/ChampSelect/{championId}");
-        if (s == null) s = Resources.Load<Sprite>("Images/Characters/Portraits/ChampSelect/default");
-        return s;
-    }
-
-    private Sprite GetPathIcon(string path)
-    {
-        int pathId = 0;
-        switch (path)
+        GetChampionSO(id, (so) =>
         {
-            case "Destruction": pathId = 0; break;
-            case "Hunt": pathId = 1; break;
-            case "Erudition": pathId = 2; break;
-            case "Harmony": pathId = 3; break;
-            case "Nihility": pathId = 4; break;
-            case "Preservation": pathId = 5; break;
-            case "Abundance": pathId = 6; break;
+            // Preload icon
+            if (so.champIcon != null && so.champIcon.RuntimeKeyIsValid())
+            {
+                var hIcon = Addressables.LoadAssetAsync<Sprite>(so.champIcon);
+                loadingHandles.Add(hIcon);
+            }
+            // Preload select portrait
+            if (so.champSelectImage != null && so.champSelectImage.RuntimeKeyIsValid())
+            {
+                var hSelect = Addressables.LoadAssetAsync<Sprite>(so.champSelectImage);
+                loadingHandles.Add(hSelect);
+            }
+            // Preload path image
+            if (so.pathImage != null && so.pathImage.RuntimeKeyIsValid())
+            {
+                var hPath = Addressables.LoadAssetAsync<Sprite>(so.pathImage);
+                loadingHandles.Add(hPath);
+            }
+        });
+    }
+
+    private void GetChampionSO(int id, System.Action<ChampionSO> callback)
+    {
+        if (championSOCache.TryGetValue(id, out ChampionSO so))
+        {
+            callback?.Invoke(so);
+            return;
         }
-        return Resources.Load<Sprite>($"Images/Paths/{pathId}");
+
+        string address = $"Data/Champions/{id}_champ_data";
+        var handle = Addressables.LoadAssetAsync<ChampionSO>(address);
+        loadingHandles.Add(handle);
+        handle.Completed += (op) =>
+        {
+            if (op.Status == AsyncOperationStatus.Succeeded)
+            {
+                championSOCache[id] = op.Result;
+                callback?.Invoke(op.Result);
+            }
+            else
+            {
+                Debug.LogError($"[ChampionSelectUI] Failed to load ChampionSO for id {id} at address {address}");
+            }
+        };
     }
 
     void OnDestroy()
@@ -146,6 +174,13 @@ public class ChampionSelectUI : MonoBehaviour
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_NOTIFY_PLAYER_PICK);
             NetworkManager.Instance.RemoveCallback(Constants.SMSG_CHAMPION_SELECT_COMPLETED);
         }
+
+        // Release Addressable handles
+        foreach (var handle in loadingHandles)
+        {
+            if (handle.IsValid()) Addressables.Release(handle);
+        }
+        loadingHandles.Clear();
     }
 
     private void OnChampionSelectReady(ExtendedEventArgs args)
@@ -160,6 +195,12 @@ public class ChampionSelectUI : MonoBehaviour
         championButtons.Clear();
         pickedChampionIds.Clear();
         playersWhoPicked.Clear();
+
+        // Selective Preloading: Only preload champions in the server's pool
+        foreach (int champId in res.ChampionPool)
+        {
+            PreloadChampion(champId);
+        }
 
         // Create player displays
         foreach (var player in res.Players)
@@ -181,27 +222,22 @@ public class ChampionSelectUI : MonoBehaviour
             string champName = championNames.ContainsKey(champId) ? championNames[champId] : "Unknown " + champId;
             if (txt != null) txt.text = champName;
 
-            // Try to find ChampionImage child
+            // Find image for icon
+            Image img = null;
             Transform imageTransform = go.transform.Find("ChampionImage");
-            Image img = (imageTransform != null) ? imageTransform.GetComponent<Image>() : null;
-            
-            // If not found by name, try to find the first image that is not the button background
+            if (imageTransform != null) img = imageTransform.GetComponent<Image>();
             if (img == null)
             {
                 Image[] images = go.GetComponentsInChildren<Image>();
                 foreach (var i in images)
                 {
-                    if (i.gameObject != go) // Avoid the button background itself if it's on the root
-                    {
-                        img = i;
-                        break;
-                    }
+                    if (i.gameObject != go) { img = i; break; }
                 }
             }
 
             if (img != null)
             {
-                img.sprite = GetChampionIcon(champId);
+                LoadPoolIcon(champId, img);
             }
             
             Button btn = go.GetComponent<Button>();
@@ -210,6 +246,74 @@ public class ChampionSelectUI : MonoBehaviour
         }
 
         UpdateInteractivity();
+    }
+
+    private void LoadPoolIcon(int champId, Image img)
+    {
+        GetChampionSO(champId, (so) =>
+        {
+            if (so.champIcon == null || !so.champIcon.RuntimeKeyIsValid()) return;
+            var handle = Addressables.LoadAssetAsync<Sprite>(so.champIcon);
+            loadingHandles.Add(handle);
+            handle.Completed += (op) =>
+            {
+                if (op.Status == AsyncOperationStatus.Succeeded && img != null)
+                {
+                    img.sprite = op.Result;
+                }
+            };
+        });
+    }
+
+    private void UpdatePlayerPanel(int playerId, int championId, bool lockedIn)
+    {
+        if (!playerPanels.ContainsKey(playerId)) return;
+        playerRequestedChampId[playerId] = championId;
+
+        GetChampionSO(championId, (so) =>
+        {
+            if (playerRequestedChampId[playerId] != championId) return;
+
+            string displayName = $"{so.championName} ({so.path}/{so.element})";
+            string elementStr = so.element.ToString();
+
+            // Load Select Image if valid
+            if (so.champSelectImage != null && so.champSelectImage.RuntimeKeyIsValid())
+            {
+                var portraitHandle = Addressables.LoadAssetAsync<Sprite>(so.champSelectImage);
+                loadingHandles.Add(portraitHandle);
+                portraitHandle.Completed += (pOp) =>
+                {
+                    if (pOp.Status != AsyncOperationStatus.Succeeded || playerRequestedChampId[playerId] != championId) return;
+
+                    Sprite portrait = pOp.Result;
+                    
+                    // Load Path Image if valid
+                    if (so.pathImage != null && so.pathImage.RuntimeKeyIsValid())
+                    {
+                        var pathHandle = Addressables.LoadAssetAsync<Sprite>(so.pathImage);
+                        loadingHandles.Add(pathHandle);
+                        pathHandle.Completed += (pathOp) =>
+                        {
+                            if (pathOp.Status != AsyncOperationStatus.Succeeded || playerRequestedChampId[playerId] != championId) return;
+
+                            playerPanels[playerId].UpdateChampion(displayName, portrait, pathOp.Result, elementStr);
+                            if (lockedIn) playerPanels[playerId].SetLockedIn(true);
+                        };
+                    }
+                    else
+                    {
+                        playerPanels[playerId].UpdateChampion(displayName, portrait, null, elementStr);
+                        if (lockedIn) playerPanels[playerId].SetLockedIn(true);
+                    }
+                };
+            }
+            else
+            {
+                playerPanels[playerId].UpdateChampion(displayName, null, null, elementStr);
+                if (lockedIn) playerPanels[playerId].SetLockedIn(true);
+            }
+        });
     }
 
     private void OnNotifyTurn(ExtendedEventArgs args)
@@ -235,18 +339,13 @@ public class ChampionSelectUI : MonoBehaviour
 
         UpdateInteractivity();
     }
+
     private void OnChampionClick(int champId)
     {
-        Debug.Log($"OnChampionClick: champId={champId}, isMyTurn={isMyTurn}");
-        
         selectedChampionId = champId;
         confirmButton.interactable = isMyTurn;
 
-        if (!isMyTurn)
-        {
-            Debug.Log("Not my turn, not sending hover request.");
-            return;
-        }
+        if (!isMyTurn) return;
 
         // Send hover request
         RequestSelectChampion hoverReq = new RequestSelectChampion();
@@ -256,7 +355,6 @@ public class ChampionSelectUI : MonoBehaviour
 
     private void OnConfirmClick()
     {
-        Debug.Log($"OnConfirmClick: selectedChampionId={selectedChampionId}, isMyTurn={isMyTurn}");
         if (selectedChampionId == -1 || !isMyTurn) return;
 
         RequestPickChampion pickReq = new RequestPickChampion();
@@ -271,50 +369,25 @@ public class ChampionSelectUI : MonoBehaviour
     private void OnPlayerHover(ExtendedEventArgs args)
     {
         ResponseNotifyPlayerSelectEventArgs res = args as ResponseNotifyPlayerSelectEventArgs;
-        if (playerPanels.ContainsKey(res.PlayerId))
-        {
-            // Update image/text
-            ChampionData info = championInfo.ContainsKey(res.ChampionId) ? championInfo[res.ChampionId] : null;
-            string displayName = info != null ? $"{info.championName} ({info.path}/{info.element})" : "Picking...";
-            Sprite sprite = GetChampionPortrait(res.ChampionId);
-            Sprite pathSprite = info != null ? GetPathIcon(info.path) : null;
-
-            playerPanels[res.PlayerId].UpdateChampion(displayName, sprite, pathSprite, info != null ? info.element : "");
-            Debug.Log($"Player {res.PlayerId} hovered champion {res.ChampionId}");
-        }
+        UpdatePlayerPanel(res.PlayerId, res.ChampionId, false);
     }
-private void OnPlayerPick(ExtendedEventArgs args)
-{
-    ResponseNotifyPlayerPickEventArgs res = args as ResponseNotifyPlayerPickEventArgs;
-    pickedChampionIds.Add(res.ChampionId);
-    playersWhoPicked.Add(res.PlayerId);
 
-    if (playerPanels.ContainsKey(res.PlayerId))
-        {
-            // Lock in image/text
-            ChampionData info = championInfo.ContainsKey(res.ChampionId) ? championInfo[res.ChampionId] : null;
-            string displayName = info != null ? $"{info.championName} ({info.path}/{info.element})" : "Picking...";
-            Sprite sprite = GetChampionPortrait(res.ChampionId);
-            Sprite pathSprite = info != null ? GetPathIcon(info.path) : null;
+    private void OnPlayerPick(ExtendedEventArgs args)
+    {
+        ResponseNotifyPlayerPickEventArgs res = args as ResponseNotifyPlayerPickEventArgs;
+        pickedChampionIds.Add(res.ChampionId);
+        playersWhoPicked.Add(res.PlayerId);
 
-            playerPanels[res.PlayerId].UpdateChampion(displayName, sprite, pathSprite, info != null ? info.element : "");
-            playerPanels[res.PlayerId].SetLockedIn(true);
-            Debug.Log($"Player {res.PlayerId} locked in champion {res.ChampionId}");
-        }
-
+        UpdatePlayerPanel(res.PlayerId, res.ChampionId, true);
         UpdateInteractivity();
     }
+
     private void OnSelectionCompleted(ExtendedEventArgs args)
     {
         isTimerActive = false;
-        if (timerText != null)
-        {
-            timerText.text = "0";
-        }
+        if (timerText != null) timerText.text = "0";
         statusText.text = "Champion Selection Completed! Loading game...";
         confirmButton.gameObject.SetActive(false);
-
-        // Load Game scene after a short delay
         Invoke("LoadGameScene", 2.0f);
     }
 
@@ -331,11 +404,7 @@ private void OnPlayerPick(ExtendedEventArgs args)
             {
                 bool isPicked = pickedChampionIds.Contains(pair.Key);
                 pair.Value.interactable = !isPicked;
-                
-                if (isPicked)
-                {
-                    pair.Value.GetComponent<Image>().color = Color.gray;
-                }
+                if (isPicked) pair.Value.GetComponent<Image>().color = Color.gray;
             }
         }
         

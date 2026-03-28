@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2901cac318e3f475b941a2bff4072124, type: 3}
+  m_Name: 8_champ_data
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectH.Models.ChampionSO
+  id: 8
+  championName: Trailblazer (Physical)
+  path: 0
+  element: 1
+  champIcon:
+    m_AssetGUID: cdd3aaa82b8aa40749bf3b8418a13bef
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  champSelectImage:
+    m_AssetGUID: 4bcddbfdc324f472a8906da60f0f67b4
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  champInGameImage:
+    m_AssetGUID: f681e4b0eeac246c884f03c2d5bf7ef1
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 1
+  pathImage:
+    m_AssetGUID: 48feda2c420cb4170bf25496f0bb7c77
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  elementImage:
+    m_AssetGUID: 306a639c15be74191ba0653078004410
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  skillAudio: []
+  damageTaken: {fileID: 0}

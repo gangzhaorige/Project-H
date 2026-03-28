@@ -10,10 +10,16 @@ public class SkillActivationManager : MonoBehaviour
     [Header("Prefabs")]
     public GameObject skillActivationPrefab;
     
-    [Header("UI Containers")]
-    public Transform uiContainer; // The canvas or parent where animation should live
-
+    private Transform _uiContainer;
     private Dictionary<int, Sprite> championIcons = new Dictionary<int, Sprite>();
+
+    public void Init(ProjectH.UI.CanvasView canvasView)
+    {
+        if (canvasView != null)
+        {
+            _uiContainer = canvasView.skillActivationPanel;
+        }
+    }
 
     private void OnEnable()
     {
@@ -32,33 +38,20 @@ public class SkillActivationManager : MonoBehaviour
 
     private void OnGameSetup()
     {
-        // Create championId -> Sprite mapper
+        // We will load sprites on demand now using ChampionAssetManager
         championIcons.Clear();
-        foreach (var player in GameSession.Instance.Players.Values)
-        {
-            if (player.Champion != null)
-            {
-                int champId = player.Champion.Id;
-                if (!championIcons.ContainsKey(champId))
-                {
-                    Sprite icon = Resources.Load<Sprite>($"Images/Characters/Icons/{champId}");
-                    if (icon == null) icon = Resources.Load<Sprite>("Images/Characters/Icons/default");
-                    championIcons[champId] = icon;
-                }
-            }
-        }
     }
 
     private void OnSkillActivated(int playerId, int skillIndex)
     {
-        if (skillActivationPrefab == null || uiContainer == null) return;
+        if (skillActivationPrefab == null || _uiContainer == null) return;
 
         if (GameSession.Instance.Players.TryGetValue(playerId, out PlayerData player))
         {
             if (player.Champion != null)
             {
                 // Instantiate the prefab
-                GameObject go = Instantiate(skillActivationPrefab, uiContainer);
+                GameObject go = Instantiate(skillActivationPrefab, _uiContainer);
                 
                 // Get components
                 ChampionSkillPanel skillPanel = go.GetComponent<ChampionSkillPanel>();
@@ -69,11 +62,14 @@ public class SkillActivationManager : MonoBehaviour
                     // 0. Set Theme based on element
                     skillPanel.SetElementTheme(player.Champion.Element);
 
-                    // 1. Get Sprite
-                    if (championIcons.TryGetValue(player.Champion.Id, out Sprite champIcon))
+                    // 1. Get Sprite asynchronously
+                    ChampionAssetManager.Instance.GetChampionSO(player.Champion.Id, (so) => 
                     {
-                        skillPanel.UpdatePanelInfo(champIcon);
-                    }
+                        ChampionAssetManager.Instance.GetSprite(so.champIcon, (s) => 
+                        {
+                            if (skillPanel != null && s != null) skillPanel.UpdatePanelInfo(s);
+                        });
+                    });
 
                     // 2. Get Skill Name
                     // We need to find the skill ID based on index

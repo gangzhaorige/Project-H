@@ -4,21 +4,14 @@ using System.Collections.Generic;
 
 public class CardAnimationManager : MonoBehaviour
 {
-    public static CardAnimationManager Instance { get; private set; }
-
     [Header("Animation Settings")]
     public float defaultDuration = 0.5f;
 
     private Dictionary<GameObject, Coroutine> activeCoroutines = new Dictionary<GameObject, Coroutine>();
 
-    private void Awake()
+    public void Init()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
+        // Initialization if needed
     }
 
     /// <summary>
