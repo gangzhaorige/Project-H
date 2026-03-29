@@ -30,6 +30,7 @@ public class SkillFactory {
             case 8: return new OneWithTheSwordSkill();
             case 9: return new VisionaryPredationSkill();
             case 10: return new CombatRedeploymentSkill();
+            case 11: return new SyntheticBlackHoleSkill();
             default: return null;
         }
     }
