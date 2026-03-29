@@ -5,10 +5,11 @@
     {"id": 3, "championName": "Himeko", "path": "Erudition", "element": "Fire", "skillAudio": [[]]},
     {"id": 4, "championName": "Welt", "path": "Nihility", "element": "Imaginary", "skillAudio": [[]]},
     {"id": 5, "championName": "BaiLu", "path": "Abundance", "element": "Lightning", "skillAudio": [[]]},
-    {"id": 6, "championName": "Yanqing", "path": "Hunt", "element": "Ice", "skillAudio": [["6d14dc7278907f02", "c65cce68fcd0abcb"],["c785fa7aa7516325"]]},
+    {"id": 6, "championName": "YanQing", "path": "Hunt", "element": "Ice", "skillAudio": [["6d14dc7278907f02", "c65cce68fcd0abcb"],["c785fa7aa7516325"]]},
     {"id": 7, "championName": "Seele", "path": "Hunt", "element": "Quantum", "skillAudio": [["9f01286afd648dac", "6c26b2037a114965"]]},
     {"id": 8, "championName": "Trailblazer (Physical)", "path": "Destruction", "element": "Physical", "skillAudio": [[]]},
     {"id": 9, "championName": "JingYuan", "path": "Erudition", "element": "Lightning", "skillAudio": [["00a57cf84f154724", "f19f9d36104dfdd8"]]},
     {"id": 10, "championName": "Jade", "path": "Erudition", "element": "Quantum", "skillAudio": [["1a12cf40baf767a4"], ["1a12cf40baf767a4"]]},
-    {"id": 11, "championName": "Black Swan", "path": "Nihility", "element": "Wind", "skillAudio": [["b0d67c37db7800a9", "36c36958bdc655a9"]]}
+    {"id": 11, "championName": "Black Swan", "path": "Nihility", "element": "Wind", "skillAudio": [["b0d67c37db7800a9", "36c36958bdc655a9"]]},
+    {"id": 12, "championName": "JingLiu", "path": "Destruction", "element": "Ice", "skillAudio": [["894166b77e8e678f"]]}
 ]

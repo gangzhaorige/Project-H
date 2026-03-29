@@ -4,6 +4,12 @@ using UnityEngine;
 namespace ProjectH.Models
 {
     [System.Serializable]
+    public class AudioClipList
+    {
+        public List<AudioClip> Clips = new List<AudioClip>();
+    }
+
+    [System.Serializable]
     public class ChampionData
     {
         public int Id;
@@ -20,7 +26,7 @@ namespace ProjectH.Models
         public int AdditionalTargetForAttack;
         public int SpecialDefense;
         public List<int> SkillIds = new List<int>();
-        public List<List<AudioClip>> SkillClips = new List<List<AudioClip>>();
+        public List<AudioClipList> SkillClips = new List<AudioClipList>();
         // Other stats can be added here
     }
 

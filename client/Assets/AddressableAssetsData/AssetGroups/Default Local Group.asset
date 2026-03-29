@@ -25,6 +25,36 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0c0354aa415dd48be9990ca983c7835e
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/black_swan_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0e58f5c8b58b1484299cb8ded6bef03f
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/bronya_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 10637f589e5d542508fb876df69d2224
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/himeko_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 127ff6382663b4d4681185cead31456b
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/jade_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 192790eb8154343258ed92d0125ffac8
+    m_Address: Images/Characters/Portraits/ChampSelect/default.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1946d36b52c4340488183a8a640a90ee
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/bailu_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1b41b78ae461f4533927960d9660bfed
     m_Address: Data/Champions/4_champ_data
     m_ReadOnly: 0
@@ -35,8 +65,38 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e80a766889224346a26629982da3ce8
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/jingliu_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 222fa1580ba084873a7488cb2b0fef0a
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/seele_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 248176e1998344e408457688896a081f
     m_Address: Images/Elements
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 255909ed53e1b4904954a2b2b78ff6db
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/jade_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2759cc2aef1914d5b97f2468f10f969e
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/gepard_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 27c1a6e50d5f9493cad6868bd0740393
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/welt_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 310849c2ea8e64a28900ea90c32ac7f8
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/clara_ingame.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -60,6 +120,21 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4bcddbfdc324f472a8906da60f0f67b4
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/trailblazer_physical_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4bfb6c9a22e764b4fb1c56786000b3be
+    m_Address: Images/Characters/Icons/clara_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 536a0263541ad49b2b1555c503209757
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/bailu_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5898744e86e5e4b8cb665f2ff29e375b
     m_Address: Data/Champions/0_champ_data
     m_ReadOnly: 0
@@ -70,8 +145,68 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 620abea82115f45bfac1a518855ac6b3
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/welt_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b9b9b980ee8c46f3a17c1942139f6b3
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/black_swan_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6d073d8d5038142f0ab9a52b03a52c37
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/yanqing_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e46999c348c94e5dbd731021fe6ea3b
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/yanqing_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 74d0bb6c9f88a4d91960cf82251b5687
     m_Address: Images/Paths/Nihility.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 756031bf798af485c97a60f78f3e5183
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/gepard_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7a6de3db77ce0487c97b2a49ee45bc76
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/welt_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7e685bc10d0da4fb28e6ec44ecbef50e
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/bronya_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80d0c285d7c4d4c8d930ff1a5020b443
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/yanqing_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80d465f08bf964d5daeabc13b2e31337
+    m_Address: Images/Characters/Portraits/InGame/bronya_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8503a22c5ca364455a6f64e1239be814
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/gepard_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 975efe168d1a046ee80d3f8ae7e26990
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/himeko_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9a94d50870db74a989a913e270760a6f
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/clara_champ_select.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -85,8 +220,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a6c346bb933784008aac226b45dffde7
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/jingyuan_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a8dde50150b7c4b1aa60541e665e8a38
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/jingyuan_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a94763d92b963433da6008ecc94e31af
-    m_Address: Assets/Resources_moved/Images/Paths/Abundance.png
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/seele_icon.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -95,8 +240,33 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b12e888d146e6496493287e773ceff61
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/black_swan_champ_select.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1a61e35b14da49c68b59ab5bda6ee37
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/jingliu_champ_sekect.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b455a963ae154479692be830ae6c3d03
     m_Address: Assets/Resources_moved/Images/Paths/Hunt.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b7646c3840a9a48f8925a2222f93d53e
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/himeko_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c7a9234111b0f4a128077e73953affd1
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/jade_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c8588cc8a59c14ed39544af9f74344b0
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/ChampSelect/bailu_champ_select.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -105,8 +275,28 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cdd3aaa82b8aa40749bf3b8418a13bef
+    m_Address: Assets/Resources_moved/Images/Characters/Icons/trailblazer_physical_icon.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cfcf1d7575a424cfaaf36a254803d96b
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/seele_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d2271cc8bbd2447b3b1cb0ecd85bfed3
     m_Address: Assets/Resources_moved/Images/Paths/Harmony.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d42bcabe7d68d4578bddf87a8335e4bd
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/jingyuan_ingame.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dcaf1bd0d61604e1f90446a0a3b2bc38
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/jingliu_ingame.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -132,6 +322,16 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ea5ed7c18899944eba146be02ced67d6
     m_Address: Assets/Resources_moved/Images/Paths/Erudition.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f034757eb06b74a9f9f1cedb6c69b29d
+    m_Address: Data/Champions/12_champ_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f681e4b0eeac246c884f03c2d5bf7ef1
+    m_Address: Assets/Resources_moved/Images/Characters/Portraits/InGame/trailblazer_physical_ingame.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

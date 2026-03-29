@@ -387,11 +387,9 @@ public class HandManager : MonoBehaviour
 
     private IEnumerator AnimateSingleLocalDraw(CardData card, int finalIndex, int totalFutureCount)
     {
-        Debug.Log("------------------------------------");
         Vector3 targetWorldPos = GetPredictiveWorldPosition(finalIndex, totalFutureCount);
 
         GameObject animCard = Instantiate(cardPrefab, deckPosition != null ? deckPosition.parent : transform);
-        Debug.LogError(animCard == null);
         if (deckPosition != null)
         {
             animCard.transform.position = deckPosition.position;

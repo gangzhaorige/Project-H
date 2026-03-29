@@ -155,6 +155,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySkillAudio(AudioClip clip)
     {
+        Debug.LogError("PLAYING SOUND");
         if (sfxSource != null && clip != null)
         {
             sfxSource.PlayOneShot(clip);

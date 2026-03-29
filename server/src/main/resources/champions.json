@@ -3,12 +3,13 @@
     {"id": 1, "championName": "Clara", "path": "Destruction", "element": "Physical", "maxHP": 10, "attack": 2, "attackRange": 1, "skillIds": [7]},
     {"id": 2, "championName": "Gepard", "path": "Preservation", "element": "Ice", "maxHP": 10, "attack": 1, "attackRange": 1, "skillIds": []},
     {"id": 3, "championName": "Himeko", "path": "Erudition", "element": "Fire", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": []},
-    {"id": 4, "championName": "Welt", "path": "Nihility", "element": "Imaginary", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": []},
+    {"id": 4, "championName": "Welt", "path": "Nihility", "element": "Imaginary", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": [11]},
     {"id": 5, "championName": "BaiLu", "path": "Abundance", "element": "Lightning", "maxHP": 8, "attack": 1, "attackRange": 1, "skillIds": []},
     {"id": 6, "championName": "Yanqing", "path": "Hunt", "element": "Ice", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": [8]},
     {"id": 7, "championName": "Seele", "path": "Hunt", "element": "Quantum", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": [6]},
     {"id": 8, "championName": "Trailblazer (Physical)", "path": "Destruction", "element": "Physical", "maxHP": 10, "attack": 2, "attackRange": 1, "skillIds": []},
     {"id": 9, "championName": "JingYuan", "path": "Erudition", "element": "Lightning", "maxHP": 10, "attack": 2, "attackRange": 1, "skillIds": [3]},
     {"id": 10, "championName": "Jade", "path": "Erudition", "element": "Quantum", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": [4, 9]},
-    {"id": 11, "championName": "Black Swan", "path": "Nihility", "element": "Wind", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": [5]}
+    {"id": 11, "championName": "Black Swan", "path": "Nihility", "element": "Wind", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": [5]},
+    {"id": 12, "championName": "JingLiu", "path": "Destruction", "element": "Ice", "maxHP": 8, "attack": 2, "attackRange": 1, "skillIds": [12]}
 ]

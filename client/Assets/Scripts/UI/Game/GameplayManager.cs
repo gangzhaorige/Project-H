@@ -226,10 +226,10 @@ public class GameplayManager : MonoBehaviour
         {
             if (pData.Champion != null && pData.Champion.SkillClips != null && res.SkillIndex < pData.Champion.SkillClips.Count)
             {
-                var clips = pData.Champion.SkillClips[res.SkillIndex];
-                if (clips != null && clips.Count > 0)
+                var clipList = pData.Champion.SkillClips[res.SkillIndex];
+                if (clipList != null && clipList.Clips.Count > 0)
                 {
-                    AudioClip clip = clips[Random.Range(0, clips.Count)];
+                    AudioClip clip = clipList.Clips[Random.Range(0, clipList.Clips.Count)];
                     if (clip != null && AudioManager.Instance != null)
                     {
                         AudioManager.Instance.PlaySkillAudio(clip);
@@ -290,7 +290,7 @@ public class GameplayManager : MonoBehaviour
         foreach (PlayerData player in GameSession.Instance.Players.Values)
         {
             if (player.Champion == null) continue;
-            player.Champion.SkillClips = new List<List<AudioClip>>();
+            player.Champion.SkillClips = new List<AudioClipList>();
             
             string pattern = $"\"id\":\\s*{player.Champion.Id},.*?\"skillAudio\":\\s*\\[(.*?)\\]\\s*[\\}},]";
             var match = System.Text.RegularExpressions.Regex.Match(rawJson, pattern, System.Text.RegularExpressions.RegexOptions.Singleline);
@@ -303,7 +303,7 @@ public class GameplayManager : MonoBehaviour
                 string[] groups = skillAudioSection.Split(new string[] { "]," }, System.StringSplitOptions.RemoveEmptyEntries);
                 foreach (string group in groups)
                 {
-                    List<AudioClip> clipsInGroup = new List<AudioClip>();
+                    AudioClipList clipList = new AudioClipList();
                     string cleaned = group.Replace("[", "").Replace("]", "");
                     string[] files = cleaned.Split(new char[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
                     foreach (string f in files)
@@ -311,9 +311,9 @@ public class GameplayManager : MonoBehaviour
                         string fileName = f.Trim().Trim('"');
                         if (string.IsNullOrEmpty(fileName)) continue;
                         AudioClip clip = Resources.Load<AudioClip>($"Audio/ChampionVoices/{fileName}");
-                        if (clip != null) clipsInGroup.Add(clip);
+                        if (clip != null) clipList.Clips.Add(clip);
                     }
-                    player.Champion.SkillClips.Add(clipsInGroup);
+                    player.Champion.SkillClips.Add(clipList);
                 }
             }
         }

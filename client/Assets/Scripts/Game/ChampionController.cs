@@ -28,12 +28,16 @@ public class ChampionController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI cardCountTextUI;
     [SerializeField] private GameObject activeIndicator;
 
+    [Header("Debug Data")]
+    public ChampionData championData;
+
     private PlayerData player;
     private ChampionSO cachedSO;
 
     public void Init(PlayerData pData)
     {
         this.player = pData;
+        this.championData = pData.Champion;
         ChampionData data = pData.Champion;
 
         this.id = data.Id;

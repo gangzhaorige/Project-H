@@ -51,6 +51,7 @@ public class SkillActivationManager : MonoBehaviour
 
     private void OnSkillActivated(int playerId, int skillIndex)
     {
+        Debug.Log("------------------------------------");
         if (skillActivationPrefab == null || _uiContainer == null) return;
 
         if (GameSession.Instance.Players.TryGetValue(playerId, out PlayerData player))
