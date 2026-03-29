@@ -19,6 +19,6 @@ public class FireInteraction extends AbstractInteraction {
         Log.printf("Evaluating FireInteraction from %s targeting %s.", caster.getUsername(), target.getUsername());
         
         // Push DefendPromptState asking for an Attack card. Default damage is 1.
-        game.pushState(new DefendPromptState(target, caster, this, 1, AbstractNormalCard.NormalType.ATTACK));
+        game.pushState(new DefendPromptState(target, caster, this, 1, AbstractNormalCard.NormalType.ATTACK, 1));
     }
 }

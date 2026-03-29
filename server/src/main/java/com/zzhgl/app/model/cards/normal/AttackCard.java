@@ -70,7 +70,8 @@ public class AttackCard extends AbstractNormalCard {
             Player target = game.getPlayerMap().get(targetId);
             if (target != null) {
                 int damage = casterChamp != null ? casterChamp.getAttack() : 1;
-                AttackInteraction interaction = new AttackInteraction(caster, target, this, damage);
+                int reqDef = casterChamp != null ? casterChamp.getRequiredDefenseAmount() : 1;
+                AttackInteraction interaction = new AttackInteraction(caster, target, this, damage, reqDef);
                 game.getInteractionStack().push(interaction);
             }
         }

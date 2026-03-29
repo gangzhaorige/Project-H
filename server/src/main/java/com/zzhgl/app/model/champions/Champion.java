@@ -21,6 +21,7 @@ public class Champion {
     public static final int STAT_ADDITIONAL_TARGET_FOR_ATTACK = 9;
     public static final int STAT_PATH_ID = 10;
     public static final int STAT_ELEMENT = 11;
+    public static final int STAT_REQUIRED_DEFENSE_AMOUNT = 12;
 
     public enum Element {
         @SerializedName("Physical") PHYSICAL(1),
@@ -89,6 +90,7 @@ public class Champion {
     private int maxNumOfAttack = 1;
     private int specialDefenseRange = 0;
     private int additionalTargetForAttack = 0;
+    private int requiredDefenseAmount = 1;
     private List<AbstractSkill> skills = new ArrayList<>();
     private List<Integer> skillIds = new ArrayList<>();
 
@@ -140,6 +142,9 @@ public class Champion {
 
     public int getAdditionalTargetForAttack() { return additionalTargetForAttack; }
     public void setAdditionalTargetForAttack(int additionalTargetForAttack) { this.additionalTargetForAttack = additionalTargetForAttack; }
+
+    public int getRequiredDefenseAmount() { return requiredDefenseAmount; }
+    public void setRequiredDefenseAmount(int requiredDefenseAmount) { this.requiredDefenseAmount = requiredDefenseAmount; }
 
     public List<AbstractSkill> getSkills() { return skills; }
     public void addSkill(AbstractSkill skill) { this.skills.add(skill); }

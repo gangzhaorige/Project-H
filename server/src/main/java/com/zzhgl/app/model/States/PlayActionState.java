@@ -140,6 +140,11 @@ public class PlayActionState implements GameState {
             Log.printf("Player %d played card: %s (ID: %d) against targets: %s", 
                        player.getID(), card, card.getId(), cmd.getTargetIds());
 
+            // --- NEW: Emit BEFORE_CARD_PLAYED event ---
+            game.emitEvent(new GameEvent(GameEvent.EventType.BEFORE_CARD_PLAYED)
+                .setParam("card", card)
+                .setParam("player", player));
+
             // 3. Play the card, pushing interactions to the stack
             card.play(game, player, cmd.getTargetIds());
             game.emitEvent(new GameEvent(GameEvent.EventType.CARD_PLAYED)

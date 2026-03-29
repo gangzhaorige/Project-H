@@ -31,34 +31,38 @@ public class DefendPromptState implements GameState {
     private AbstractInteraction sourceInteraction;
     private int damageAmount;
     private AbstractNormalCard.NormalType requiredType;
+    private int requiredDefenseAmount;
+    private int currentDefendCount = 0;
 
-    public DefendPromptState(Player defender, Player attacker, AbstractInteraction sourceInteraction, int damageAmount, AbstractNormalCard.NormalType requiredType) {
+    public DefendPromptState(Player defender, Player attacker, AbstractInteraction sourceInteraction, int damageAmount, AbstractNormalCard.NormalType requiredType, int requiredDefenseAmount) {
         this.defender = defender;
         this.attacker = attacker;
         this.sourceInteraction = sourceInteraction;
         this.damageAmount = damageAmount;
         this.requiredType = requiredType;
+        this.requiredDefenseAmount = requiredDefenseAmount;
     }
 
     @Override
     public void onEnter(GameManager game) {
-        Log.printf("Entering DefendPromptState. Player %d must play %s to avoid %d damage.", defender.getID(), requiredType, damageAmount);
+        Log.printf("Entering DefendPromptState. Player %d must play %d %s cards to avoid %d damage.", 
+                   defender.getID(), requiredDefenseAmount, requiredType, damageAmount);
         startTimer(game);
     }
 
     private synchronized void startTimer(GameManager game) {
         cancelTimer();
         
+        String instruction = String.format("Play %d %s card(s) to defend! (%d/%d)", 
+                                           requiredDefenseAmount, requiredType, currentDefendCount, requiredDefenseAmount);
         for (Player p : game.getPlayers()) {
-            p.addResponseForUpdate(new ResponseTimerStart(defender.getID(), WINDOW_SECONDS, "Play " + requiredType + " to defend!", requiredType));
+            p.addResponseForUpdate(new ResponseTimerStart(defender.getID(), WINDOW_SECONDS, instruction, requiredType));
         }
 
         timerFuture = scheduler.schedule(() -> {
             Log.printf("Defend window expired for player %d. Taking damage.", defender.getID());
             applyDamage(game);
             game.popState();
-            // Important: we don't resolveStack here, we just pop. 
-            // The InteractionResolutionState is below us and will resume and process next.
         }, WINDOW_SECONDS, TimeUnit.SECONDS);
     }
 
@@ -97,15 +101,21 @@ public class DefendPromptState implements GameState {
                 
                 if (card instanceof AbstractNormalCard normal && normal.getNormalType() == requiredType) {
                     player.getHand().removeCard(card);
-                    Log.printf("Player %d successfully defended with %s.", player.getID(), card);
+                    currentDefendCount++;
+                    Log.printf("Player %d played %s (%d/%d).", player.getID(), card, currentDefendCount, requiredDefenseAmount);
                     
                     // Notify clients
                     ResponsePlayCard response = new ResponsePlayCard(player.getID(), card, playCmd.getTargetIds());
                     for (Player p : game.getPlayers()) p.addResponseForUpdate(response);
 
-                    // They successfully defended, so we just pop state without applying damage
-                    cancelTimer();
-                    game.popState();
+                    if (currentDefendCount >= requiredDefenseAmount) {
+                        Log.printf("Player %d successfully defended all requirements.", player.getID());
+                        cancelTimer();
+                        game.popState();
+                    } else {
+                        // Still need more cards, restart timer for next card
+                        startTimer(game);
+                    }
                 } else {
                     Log.printf_e("Player %d tried to play the wrong card type to defend.", player.getID());
                 }

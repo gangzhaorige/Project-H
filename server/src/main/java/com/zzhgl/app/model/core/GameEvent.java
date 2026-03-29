@@ -12,6 +12,7 @@ public class GameEvent {
         TURN_END,
         DAMAGE_TAKEN,
         CARD_PLAYED,
+        BEFORE_CARD_PLAYED,
         CARD_DISCARDED,
         SKILL_ACTIVATED,
         BEFORE_JUDGEMENT_RESOLVE

@@ -11,21 +11,28 @@ import com.zzhgl.app.utility.Log;
 public class AttackInteraction extends AbstractInteraction {
 
     private int damage;
+    private int requiredDefenseAmount;
 
-    public AttackInteraction(Player caster, Player target, AbstractCard card, int damage) {
+    public AttackInteraction(Player caster, Player target, AbstractCard card, int damage, int requiredDefenseAmount) {
         super(caster, target, card, false); // Attack is not negatable
         this.damage = damage;
+        this.requiredDefenseAmount = requiredDefenseAmount;
     }
 
     public int getDamage() {
         return damage;
     }
 
+    public int getRequiredDefenseAmount() {
+        return requiredDefenseAmount;
+    }
+
     @Override
     public void evaluate(GameManager game) {
-        Log.printf("Evaluating AttackInteraction: %s attacks %s for %d damage.", caster.getUsername(), target.getUsername(), damage);
+        Log.printf("Evaluating AttackInteraction: %s attacks %s for %d damage. Required defense: %d", 
+                   caster.getUsername(), target.getUsername(), damage, requiredDefenseAmount);
         
-        // Push a DefendPromptState asking for a Dodge card.
-        game.pushState(new DefendPromptState(target, caster, this, damage, AbstractNormalCard.NormalType.DODGE));
+        // Push a DefendPromptState asking for Dodge cards.
+        game.pushState(new DefendPromptState(target, caster, this, damage, AbstractNormalCard.NormalType.DODGE, requiredDefenseAmount));
     }
 }

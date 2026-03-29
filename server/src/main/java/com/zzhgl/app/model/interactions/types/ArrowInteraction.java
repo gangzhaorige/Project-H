@@ -19,6 +19,6 @@ public class ArrowInteraction extends AbstractInteraction {
         Log.printf("Evaluating ArrowInteraction from %s targeting %s.", caster.getUsername(), target.getUsername());
         
         // Push DefendPromptState asking for a Dodge card. Default damage is 1.
-        game.pushState(new DefendPromptState(target, caster, this, 1, AbstractNormalCard.NormalType.DODGE));
+        game.pushState(new DefendPromptState(target, caster, this, 1, AbstractNormalCard.NormalType.DODGE, 1));
     }
 }

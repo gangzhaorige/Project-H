@@ -93,10 +93,9 @@ public class SkillResolutionState implements GameState {
             List<GameAction> actions = next.skill.execute(game, next.owner, next.event, null);
             
             queue.poll(); // Skill evaluated
-
+            notifySkillActivation(game, next.owner, next.skill);
             if (actions != null && !actions.isEmpty()) {
                 game.getActionQueue().addAll(actions);
-                notifySkillActivation(game, next.owner, next.skill);
                 game.resolveActions();
             } else {
                 resolveNext(game);
